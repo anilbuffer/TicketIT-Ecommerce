@@ -30,11 +30,19 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/auth';
 
-interface NavItem {
+interface SubNavItem {
   title: string;
   href: string;
+  icon?: LucideIcon | React.ComponentType<any>;
+  badge?: string;
+}
+
+interface NavItem {
+  title: string;
+  href?: string;
   icon: LucideIcon | React.ComponentType<any>;
   badge?: string;
+  children?: SubNavItem[];
 }
 
 interface NavSection {
@@ -52,6 +60,7 @@ export function AdminSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const { user, role, switchUserRole } = useAuth();
+  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({});
 
   const sections: NavSection[] = [
     {
@@ -91,16 +100,6 @@ export function AdminSidebar({
           title: 'Accounts',
           href: '/admin/customers/accounts',
           icon: Building2,
-        },
-        {
-          title: 'Site Branches',
-          href: '/admin/customers/sites',
-          icon: MapPin,
-        },
-        {
-          title: 'User Management',
-          href: '/admin/customers/users',
-          icon: Users,
         },
       ],
     },
@@ -155,24 +154,9 @@ export function AdminSidebar({
       title: 'SYSTEM SETTINGS',
       items: [
         {
-          title: 'Enterprise APIs',
-          href: '/admin/integrations',
-          icon: Sparkles,
-        },
-        {
-          title: 'General Config',
-          href: '/admin/settings/general',
+          title: 'Settings',
+          href: '/admin/settings',
           icon: Settings,
-        },
-        {
-          title: 'Roles & RBAC',
-          href: '/admin/settings/roles-permissions',
-          icon: Shield,
-        },
-        {
-          title: 'PO Validation Rules',
-          href: '/admin/settings/required-fields',
-          icon: CheckSquare,
         },
       ],
     },
@@ -306,13 +290,169 @@ export function AdminSidebar({
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
               {section.items.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                const hasChildren = item.children && item.children.length > 0;
+                const isChildActive = hasChildren
+                  ? item.children!.some(
+                      (child) => pathname === child.href || pathname.startsWith(child.href + '/')
+                    )
+                  : false;
+                const isDirectActive = item.href
+                  ? pathname === item.href ||
+                    pathname.startsWith(item.href + '/') ||
+                    (item.href === '/admin/customers/accounts' && pathname.startsWith('/admin/customers')) ||
+                    (item.href === '/admin/settings' && (pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/integrations')))
+                  : false;
+                const isItemActive = isDirectActive || isChildActive;
+                const isExpanded = openMenus[item.title] ?? isChildActive;
                 const IconComponent = item.icon;
+
+                const toggleMenu = (title: string) => {
+                  setOpenMenus((prev) => ({
+                    ...prev,
+                    [title]: !(prev[title] ?? isChildActive),
+                  }));
+                };
+
+                if (hasChildren && !isCollapsed) {
+                  return (
+                    <div key={item.title} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      {/* Parent Menu Header */}
+                      <button
+                        type="button"
+                        onClick={() => toggleMenu(item.title)}
+                        style={{
+                          position: 'relative',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '9px 12px',
+                          width: '100%',
+                          borderRadius: '10px',
+                          color: isItemActive ? '#FFFFFF' : '#CBD5E1',
+                          backgroundColor: isItemActive ? 'rgba(247, 53, 130, 0.15)' : 'transparent',
+                          border: isItemActive
+                            ? '1px solid rgba(247, 53, 130, 0.35)'
+                            : '1px solid transparent',
+                          fontSize: '0.88rem',
+                          fontWeight: isItemActive ? 700 : 500,
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 150ms ease',
+                        }}
+                      >
+                        <IconComponent
+                          size={18}
+                          color={isItemActive ? '#F73582' : '#94A3B8'}
+                          style={{ flexShrink: 0 }}
+                        />
+                        <span
+                          style={{
+                            flex: 1,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {item.title}
+                        </span>
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 90 : 0 }}
+                          transition={{ duration: 0.18 }}
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <ChevronRight size={15} color={isItemActive ? '#F73582' : '#94A3B8'} />
+                        </motion.div>
+                      </button>
+
+                      {/* Nested Sub-menu */}
+                      {isExpanded && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '2px',
+                            paddingLeft: '14px',
+                            marginLeft: '18px',
+                            borderLeft: '2px solid rgba(247, 53, 130, 0.25)',
+                            marginTop: '2px',
+                            marginBottom: '4px',
+                          }}
+                        >
+                          {item.children!.map((child) => {
+                            const isChildItemActive =
+                              pathname === child.href || pathname.startsWith(child.href + '/');
+                            const ChildIcon = child.icon;
+
+                            return (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                style={{
+                                  position: 'relative',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '10px',
+                                  padding: '7px 10px',
+                                  borderRadius: '8px',
+                                  color: isChildItemActive ? '#FFFFFF' : '#CBD5E1',
+                                  backgroundColor: isChildItemActive
+                                    ? 'rgba(247, 53, 130, 0.22)'
+                                    : 'transparent',
+                                  textDecoration: 'none',
+                                  fontSize: '0.82rem',
+                                  fontWeight: isChildItemActive ? 700 : 500,
+                                  transition: 'all 150ms ease',
+                                  border: isChildItemActive
+                                    ? '1px solid rgba(247, 53, 130, 0.4)'
+                                    : '1px solid transparent',
+                                }}
+                              >
+                                {ChildIcon && (
+                                  <ChildIcon
+                                    size={15}
+                                    color={isChildItemActive ? '#F73582' : '#94A3B8'}
+                                    style={{ flexShrink: 0 }}
+                                  />
+                                )}
+                                <span
+                                  style={{
+                                    flex: 1,
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                  }}
+                                >
+                                  {child.title}
+                                </span>
+                                {child.badge && (
+                                  <span
+                                    style={{
+                                      fontSize: '0.62rem',
+                                      padding: '1px 5px',
+                                      borderRadius: '9999px',
+                                      backgroundColor: '#58B97D',
+                                      color: '#FFFFFF',
+                                      fontWeight: 700,
+                                    }}
+                                  >
+                                    {child.badge}
+                                  </span>
+                                )}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                const targetHref = item.href || (item.children && item.children[0]?.href) || '#';
 
                 return (
                   <Link
-                    key={item.href}
-                    href={item.href}
+                    key={item.title}
+                    href={targetHref}
                     title={isCollapsed ? item.title : undefined}
                     style={{
                       position: 'relative',
@@ -322,22 +462,31 @@ export function AdminSidebar({
                       padding: isCollapsed ? '10px 0' : '9px 12px',
                       justifyContent: isCollapsed ? 'center' : 'flex-start',
                       borderRadius: '10px',
-                      color: isActive ? '#FFFFFF' : '#CBD5E1',
-                      backgroundColor: isActive ? 'rgba(247, 53, 130, 0.15)' : 'transparent',
+                      color: isItemActive ? '#FFFFFF' : '#CBD5E1',
+                      backgroundColor: isItemActive ? 'rgba(247, 53, 130, 0.15)' : 'transparent',
                       textDecoration: 'none',
                       fontSize: '0.88rem',
-                      fontWeight: isActive ? 700 : 500,
+                      fontWeight: isItemActive ? 700 : 500,
                       transition: 'all 150ms ease',
-                      border: isActive ? '1px solid rgba(247, 53, 130, 0.35)' : '1px solid transparent',
+                      border: isItemActive
+                        ? '1px solid rgba(247, 53, 130, 0.35)'
+                        : '1px solid transparent',
                     }}
                   >
                     <IconComponent
                       size={18}
-                      color={isActive ? '#F73582' : '#94A3B8'}
+                      color={isItemActive ? '#F73582' : '#94A3B8'}
                       style={{ flexShrink: 0 }}
                     />
                     {!isCollapsed && (
-                      <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <span
+                        style={{
+                          flex: 1,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
                         {item.title}
                       </span>
                     )}

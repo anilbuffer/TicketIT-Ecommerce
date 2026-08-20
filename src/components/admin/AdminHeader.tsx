@@ -206,7 +206,7 @@ export function AdminHeader({
                 </div>
               </div>
               <Link
-                href="/admin/settings/general"
+                href="/admin/settings"
                 style={{
                   padding: '8px 12px',
                   fontSize: '0.82rem',
