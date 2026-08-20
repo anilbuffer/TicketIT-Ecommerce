@@ -1,27 +1,38 @@
 // src/lib/db/prisma.ts
 // Prisma client singleton for production adapter cutover (Phase 2+)
 
-// Note: @prisma/client will be used once installed and generated for production
+declare const __non_webpack_require__: any;
+
+// Fallback proxy to allow compilation and running in mock data mode without @prisma/client installed
+function createPrismaFallback() {
+  return new Proxy({}, {
+    get(_, prop) {
+      return () => {
+        throw new Error(
+          `Prisma client is not available or generated. Set up DATABASE_URL and install @prisma/client to use production database mode. Attempted to call '${String(prop)}'`
+        );
+      };
+    }
+  });
+}
+
 let prismaInstance: any = null;
 
 export function getPrismaClient() {
   if (!prismaInstance) {
     try {
-      // Dynamic require so mock mode works seamlessly without generated Prisma client
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { PrismaClient } = require('@prisma/client');
-      prismaInstance = new PrismaClient();
+      // Dynamic require so webpack does not fail during compilation when @prisma/client is not present
+      const req = typeof __non_webpack_require__ !== 'undefined'
+        ? __non_webpack_require__
+        : (typeof require !== 'undefined' ? eval('require') : null);
+      if (req) {
+        const { PrismaClient } = req('@prisma/client');
+        prismaInstance = new PrismaClient();
+      } else {
+        prismaInstance = createPrismaFallback();
+      }
     } catch {
-      // Mock / fallback proxy if Prisma is not generated yet
-      prismaInstance = new Proxy({}, {
-        get(_, prop) {
-          return () => {
-            throw new Error(
-              `Prisma client has not been generated yet. Run 'npx prisma generate' and configure DATABASE_URL. Attempted to access '${String(prop)}'`
-            );
-          };
-        }
-      });
+      prismaInstance = createPrismaFallback();
     }
   }
   return prismaInstance;
@@ -29,3 +40,4 @@ export function getPrismaClient() {
 
 export const prisma = getPrismaClient();
 export default prisma;
+

@@ -115,8 +115,9 @@ export async function createUser(input: Omit<PortalUser, 'id' | 'createdAt'>): P
 
 export async function getAccountOrderRules(accountId: string) {
   const ds = getDataSource();
-  if ('getOrderRules' in ds.accounts) {
-    return (ds.accounts as any).getOrderRules(accountId);
+  const accountsAny = ds.accounts as any;
+  if (typeof accountsAny.getOrderRules === 'function') {
+    return accountsAny.getOrderRules(accountId);
   }
   return {
     accountId,
@@ -132,10 +133,11 @@ export async function getAccountOrderRules(accountId: string) {
 
 export async function getSiteAddresses(siteId: string) {
   const ds = getDataSource();
-  if ('getSiteAddresses' in ds.accounts) {
-    return (ds.accounts as any).getSiteAddresses(siteId);
+  const accountsAny = ds.accounts as any;
+  if (typeof accountsAny.getSiteAddresses === 'function') {
+    return accountsAny.getSiteAddresses(siteId);
   }
-  const site = await ds.accounts.getSiteById(siteId);
+  const site = await accountsAny.getSiteById(siteId);
   if (!site) return null;
   return {
     siteId: site.id,
