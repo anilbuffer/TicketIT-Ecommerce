@@ -12,21 +12,18 @@ import {
   Truck,
   Building2,
   MapPin,
-  Phone,
   User,
   FileEdit,
   ArrowRight,
   ArrowLeft,
-  CheckCircle2,
   ShieldCheck,
-  Plus,
   AlertCircle,
 } from 'lucide-react';
 
 export default function CheckoutDeliveryPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { checkoutState, updateCheckoutState, subtotal, totalCount } = useCart();
+  const { checkoutState, updateCheckoutState } = useCart();
 
   const [siteData, setSiteData] = useState<{
     siteId: string;
@@ -135,83 +132,143 @@ export default function CheckoutDeliveryPage() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Main Form (8 cols) */}
-      <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-6">
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) 340px',
+        gap: '24px',
+        alignItems: 'start',
+      }}
+    >
+      {/* Main Form (Left) */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '20px',
+          border: '1px solid #e2e8f0',
+          padding: '28px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px',
+        }}
+      >
         <div>
-          <span className="text-xs font-bold text-[#F73582] uppercase tracking-wider">Step 2 of 3</span>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+          <span style={{ fontSize: '11px', fontWeight: 800, color: '#f73582', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Step 2 of 3
+          </span>
+          <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', margin: '4px 0 6px 0' }}>
             Delivery & Address Configuration
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p style={{ fontSize: '13px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
             Specify separate billing and physical delivery addresses, site contact, and freight instructions.
           </p>
         </div>
 
-        <form onSubmit={handleNext} className="space-y-6">
-          {/* 1. SEPARATE BILL-TO & SHIP-TO DISPLAY */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Bill-To Card (Read-Only / Head Office Account) */}
-            <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200/70">
-                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Building2 size={14} className="text-[#2B253E]" />
+        <form onSubmit={handleNext} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* 1. Separate Bill-To & Ship-To Displays */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            {/* Bill-To Card */}
+            <div
+              style={{
+                padding: '16px',
+                borderRadius: '14px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#f8fafc',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingBottom: '8px',
+                  borderBottom: '1px solid #e2e8f0',
+                }}
+              >
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Building2 size={14} color="#2B253E" />
                   <span>Bill-To Address (Head Office)</span>
                 </span>
-                <span className="text-[10px] font-semibold text-slate-500 uppercase bg-slate-200 px-1.5 py-0.5 rounded">
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', backgroundColor: '#e2e8f0', padding: '1px 6px', borderRadius: '4px' }}>
                   Fixed
                 </span>
               </div>
-              <div className="text-xs text-slate-600 space-y-0.5 leading-relaxed">
-                <p className="font-bold text-slate-900">{user?.accountName || 'Apex Healthcare Group'}</p>
-                <p>{defaultBillTo.street} {defaultBillTo.suite ? `, ${defaultBillTo.suite}` : ''}</p>
-                <p>{defaultBillTo.city}, {defaultBillTo.state} {defaultBillTo.postalCode}</p>
-                <p className="text-slate-400">{defaultBillTo.country}</p>
+
+              <div style={{ fontSize: '12px', color: '#475569', lineHeight: 1.5 }}>
+                <p style={{ fontWeight: 700, color: '#0f172a', margin: '0 0 2px 0' }}>
+                  {user?.accountName || 'Apex Healthcare Group'}
+                </p>
+                <p style={{ margin: 0 }}>{defaultBillTo.street} {defaultBillTo.suite ? `, ${defaultBillTo.suite}` : ''}</p>
+                <p style={{ margin: 0 }}>{defaultBillTo.city}, {defaultBillTo.state} {defaultBillTo.postalCode}</p>
+                <p style={{ margin: 0, color: '#94a3b8' }}>{defaultBillTo.country}</p>
               </div>
-              <span className="text-[10px] text-slate-400 block pt-1 italic">
+
+              <span style={{ fontSize: '11px', color: '#94a3b8', fontStyle: 'italic', paddingTop: '4px' }}>
                 Invoiced directly on monthly consolidated ledger
               </span>
             </div>
 
             {/* Ship-To Selection Card */}
-            <div className="p-4 rounded-2xl border border-pink-200 bg-pink-50/30 space-y-2">
-              <div className="flex items-center justify-between pb-2 border-b border-pink-200/60">
-                <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <Truck size={14} className="text-[#F73582]" />
-                  <span>Ship-To Delivery Destination</span>
+            <div
+              style={{
+                padding: '16px',
+                borderRadius: '14px',
+                border: '1.5px solid #fbcfe8',
+                backgroundColor: '#fdf2f8',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingBottom: '8px',
+                  borderBottom: '1px solid #fbcfe8',
+                }}
+              >
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Truck size={14} color="#f73582" />
+                  <span>Ship-To Destination</span>
                 </span>
-                <span className="text-[10px] font-semibold text-pink-700 bg-pink-100 px-1.5 py-0.5 rounded">
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#f73582', backgroundColor: '#ffffff', padding: '1px 6px', borderRadius: '4px', border: '1px solid #fbcfe8' }}>
                   Site Receiving
                 </span>
               </div>
 
-              {/* Toggle: Saved vs Custom (if permitted) */}
-              <div className="space-y-2 pt-1">
-                <label className="flex items-start gap-2.5 cursor-pointer">
+              {/* Toggle Saved vs Custom */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '4px' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
                   <input
                     type="radio"
                     name="addressChoice"
                     checked={useSavedAddress}
                     onChange={() => setUseSavedAddress(true)}
-                    className="mt-0.5 text-[#F73582] focus:ring-[#F73582]"
+                    style={{ marginTop: '2px', accentColor: '#f73582' }}
                   />
-                  <div className="text-xs text-slate-700">
-                    <span className="font-bold text-slate-900 block">Default Site Receiving Dock:</span>
-                    <p className="text-slate-600 mt-0.5">{defaultShipTo.street}, {defaultShipTo.suite}</p>
-                    <p className="text-slate-600">{defaultShipTo.city}, {defaultShipTo.state} {defaultShipTo.postalCode}</p>
+                  <div style={{ fontSize: '12px', color: '#475569' }}>
+                    <strong style={{ color: '#0f172a', display: 'block' }}>Default Site Receiving Dock:</strong>
+                    <p style={{ margin: '2px 0 0 0' }}>{defaultShipTo.street}, {defaultShipTo.suite}</p>
+                    <p style={{ margin: 0 }}>{defaultShipTo.city}, {defaultShipTo.state} {defaultShipTo.postalCode}</p>
                   </div>
                 </label>
 
                 {accountRules?.allowCustomDeliveryAddress && (
-                  <label className="flex items-center gap-2.5 cursor-pointer pt-2 border-t border-pink-200/40">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', paddingTop: '6px', borderTop: '1px solid #fbcfe8' }}>
                     <input
                       type="radio"
                       name="addressChoice"
                       checked={!useSavedAddress}
                       onChange={() => setUseSavedAddress(false)}
-                      className="text-[#F73582] focus:ring-[#F73582]"
+                      style={{ accentColor: '#f73582' }}
                     />
-                    <span className="text-xs font-bold text-slate-800">
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
                       Enter alternate one-off delivery address
                     </span>
                   </label>
@@ -220,117 +277,137 @@ export default function CheckoutDeliveryPage() {
             </div>
           </div>
 
-          {/* Alternate Custom Address Form (Expandable) */}
+          {/* Alternate Custom Address Form */}
           {!useSavedAddress && (
-            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4 animate-fadeIn">
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin size={14} className="text-[#F73582]" />
+            <div
+              style={{
+                padding: '20px',
+                borderRadius: '14px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+              }}
+            >
+              <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                <MapPin size={14} color="#f73582" />
                 <span>Alternate Delivery Location</span>
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="sm:col-span-2">
-                  <label className="block text-slate-700 font-bold mb-1">Street Address *</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '12px' }}>
+                <div style={{ gridColumn: 'span 2' }}>
+                  <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Street Address *</label>
                   <input
                     type="text"
                     required
                     value={customStreet}
                     onChange={(e) => setCustomStreet(e.target.value)}
                     placeholder="e.g. 780 Third Avenue"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582]"
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Suite / Floor / Dock</label>
+                  <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Suite / Dock</label>
                   <input
                     type="text"
                     value={customSuite}
                     onChange={(e) => setCustomSuite(e.target.value)}
                     placeholder="e.g. Bay #4"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582]"
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">City *</label>
+                  <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>City *</label>
                   <input
                     type="text"
                     required
                     value={customCity}
                     onChange={(e) => setCustomCity(e.target.value)}
                     placeholder="New York"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582]"
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">State / Region *</label>
+                  <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>State *</label>
                   <input
                     type="text"
                     required
                     value={customState}
                     onChange={(e) => setCustomState(e.target.value)}
                     placeholder="NY"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582]"
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Postal Code *</label>
+                  <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Postal Code *</label>
                   <input
                     type="text"
                     required
                     value={customPostal}
                     onChange={(e) => setCustomPostal(e.target.value)}
                     placeholder="10017"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582]"
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* 2. DELIVERY CONTACT DETAILS */}
-          <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-4">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <User size={14} className="text-[#F73582]" />
+          {/* 2. Delivery Contact Details */}
+          <div
+            style={{
+              padding: '20px',
+              borderRadius: '16px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#f8fafc',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+              <User size={14} color="#f73582" />
               <span>Receiving Contact Person</span>
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', fontSize: '12px' }}>
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Contact Name *</label>
+                <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Contact Name *</label>
                 <input
                   type="text"
                   required
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                   placeholder="Marcus Vance"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582] bg-white font-medium"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', fontSize: '13px', fontWeight: 600, outline: 'none' }}
                 />
               </div>
 
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Contact Phone Number</label>
+                <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Contact Phone</label>
                 <input
                   type="tel"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   placeholder="+1 (212) 555-0190"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582] bg-white font-medium"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', backgroundColor: '#ffffff', fontSize: '13px', fontWeight: 600, outline: 'none' }}
                 />
               </div>
             </div>
           </div>
 
-          {/* 3. DELIVERY INSTRUCTIONS & DOCK NOTES */}
-          <div className="space-y-2">
-            <label className="block text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
-              <FileEdit size={15} className="text-[#F73582]" />
+          {/* 3. Delivery Instructions */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <FileEdit size={15} color="#f73582" />
               <span>Special Delivery & Dispatch Instructions</span>
             </label>
-            <p className="text-xs text-slate-500">
+            <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>
               Provide instructions for logistics couriers (e.g. security gate code, loading bay receiving hours, cold storage handover).
             </p>
             <textarea
@@ -338,29 +415,84 @@ export default function CheckoutDeliveryPage() {
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               placeholder="e.g. Loading dock open 8am - 4pm. Ring buzzer B for dispensary access."
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-[#F73582] focus:ring-2 focus:ring-pink-100 text-xs sm:text-sm font-medium"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                border: '1px solid #cbd5e1',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: 'inherit',
+              }}
             />
           </div>
 
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2">
-              <AlertCircle size={15} className="shrink-0 text-red-500" />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                color: '#dc2626',
+                fontSize: '12px',
+                fontWeight: 600,
+              }}
+            >
+              <AlertCircle size={15} color="#dc2626" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingTop: '16px',
+              borderTop: '1px solid #f1f5f9',
+            }}
+          >
             <Link
               href="/shop/checkout/details"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '10px 18px',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                color: '#475569',
+                fontSize: '13px',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
             >
               <ArrowLeft size={14} /> Back to Details
             </Link>
 
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#F73582] hover:bg-[#de206d] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                borderRadius: '12px',
+                backgroundColor: '#f73582',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
+                transition: 'all 0.15s ease',
+              }}
             >
               <span>Continue to Final Review</span>
               <ArrowRight size={15} />
@@ -369,35 +501,59 @@ export default function CheckoutDeliveryPage() {
         </form>
       </div>
 
-      {/* Side Summary (4 cols) */}
-      <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200/90 p-6 shadow-sm space-y-4">
-        <h3 className="font-bold text-slate-900 text-sm pb-3 border-b border-slate-100">
+      {/* Side Summary (Right) */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '20px',
+          border: '1px solid #e2e8f0',
+          padding: '24px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: 0, paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
           Delivery Routing Summary
         </h3>
 
-        <div className="space-y-3 text-xs">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
           <div>
-            <span className="text-slate-400 font-medium block">Assigned Carrier:</span>
-            <span className="font-bold text-slate-800">
+            <span style={{ color: '#64748b', display: 'block' }}>Assigned Carrier:</span>
+            <strong style={{ color: '#0f172a' }}>
               {accountRules?.defaultCarrier || 'Rahhawan Direct Logistics Fleet'}
-            </span>
+            </strong>
           </div>
 
           <div>
-            <span className="text-slate-400 font-medium block">PO Reference:</span>
-            <span className="font-bold text-slate-900 font-mono">
+            <span style={{ color: '#64748b', display: 'block' }}>PO Reference:</span>
+            <strong style={{ color: '#0f172a', fontFamily: 'monospace' }}>
               {checkoutState.poReference || 'Pending Entry'}
-            </span>
+            </strong>
           </div>
 
-          <div className="pt-2 border-t border-slate-100">
-            <span className="text-slate-400 font-medium block">Estimated Fulfilment:</span>
-            <span className="font-bold text-emerald-700">Same-Day / Next-Day Dispatch</span>
+          <div style={{ paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
+            <span style={{ color: '#64748b', display: 'block' }}>Estimated Fulfilment:</span>
+            <strong style={{ color: '#059669' }}>Same-Day / Next-Day Dispatch</strong>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-900 text-xs flex items-start gap-2">
-          <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+        <div
+          style={{
+            padding: '12px',
+            borderRadius: '12px',
+            backgroundColor: '#ecfdf5',
+            border: '1px solid #a7f3d0',
+            color: '#065f46',
+            fontSize: '11px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '8px',
+            lineHeight: 1.4,
+          }}
+        >
+          <ShieldCheck size={16} color="#059669" style={{ flexShrink: 0, marginTop: '1px' }} />
           <span>Physical packing slip and barcode manifest will be attached to cartons.</span>
         </div>
       </div>

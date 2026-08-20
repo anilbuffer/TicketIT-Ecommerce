@@ -12,17 +12,12 @@ import type { EffectiveProduct, ProductCategory } from '@/lib/services/types';
 import { ProductCard } from '@/components/shop/ProductCard';
 import {
   Search,
-  Filter,
   Package,
-  Layers,
   ShoppingCart,
   Building2,
-  Sparkles,
-  RefreshCw,
   Tag,
-  AlertCircle,
+  Sparkles,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function ShopCataloguePage() {
   const { user } = useAuth();
@@ -74,49 +69,136 @@ export default function ShopCataloguePage() {
   const activeRateCardName = products.find((p) => p.rateCardName)?.rateCardName;
 
   return (
-    <div className="space-y-6 pb-12">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '48px' }}>
       {/* 1. Header Banner & Scope Info */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B253E] via-[#1e1b38] to-[#16122a] text-white p-6 sm:p-8 shadow-md border border-slate-800">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-pink-300 border border-white/10">
-              <Building2 size={13} />
+      <div
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: '24px',
+          background: 'linear-gradient(135deg, #2B253E 0%, #1e1b38 50%, #16122a 100%)',
+          color: '#ffffff',
+          padding: '32px',
+          boxShadow: '0 10px 30px rgba(43, 37, 62, 0.15)',
+          border: '1px solid #332d4a',
+        }}
+      >
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '24px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '650px' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(8px)',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#f472b6',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                width: 'fit-content',
+              }}
+            >
+              <Building2 size={14} />
               <span>{user?.siteName || 'Apex Midtown Central Pharmacy'} ({user?.siteCode || 'APX-MID-101'})</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            <h1
+              style={{
+                fontSize: '26px',
+                fontWeight: 800,
+                color: '#ffffff',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.25,
+              }}
+            >
               Approved Marketing & Collateral Catalogue
             </h1>
 
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <p style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>
               Order pre-approved print, point-of-sale displays, and packaging. Billed on-account directly to your Head Office monthly statement with zero online payment required.
             </p>
 
             {activeRateCardName && (
-              <div className="inline-flex items-center gap-1.5 pt-1 text-xs text-pink-200">
-                <Tag size={13} className="text-[#F73582]" />
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', paddingTop: '4px', fontSize: '12px', color: '#fbcfe8' }}>
+                <Tag size={13} color="#f73582" />
                 <span>Active Rate Card: <strong>{activeRateCardName}</strong></span>
               </div>
             )}
           </div>
 
           {/* Quick Cart Summary Pill */}
-          <div className="flex items-center md:flex-col items-end gap-3 shrink-0">
+          <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <button
               onClick={() => setIsCartDrawerOpen(true)}
-              className="group flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white backdrop-blur-md border border-white/15 transition-all shadow-sm hover:scale-[1.02]"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 20px',
+                borderRadius: '16px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: '#ffffff',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
             >
-              <div className="w-10 h-10 rounded-xl bg-[#F73582] text-white flex items-center justify-center shadow-md relative">
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  backgroundColor: '#f73582',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  boxShadow: '0 4px 10px rgba(247, 53, 130, 0.4)',
+                }}
+              >
                 <ShoppingCart size={18} />
                 {totalCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-emerald-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-[#1e1b38] animate-bounce">
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '-6px',
+                      right: '-6px',
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: '#10b981',
+                      color: '#ffffff',
+                      borderRadius: '50%',
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px solid #1e1b38',
+                    }}
+                  >
                     {totalCount}
                   </span>
                 )}
               </div>
-              <div className="text-left">
-                <span className="text-xs text-slate-300 block font-medium">Session Cart</span>
-                <span className="text-sm font-bold text-white">
+              <div style={{ textAlign: 'left' }}>
+                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block', fontWeight: 600 }}>Session Cart</span>
+                <span style={{ fontSize: '14px', fontWeight: 800, color: '#ffffff' }}>
                   ${subtotal.toFixed(2)} ({totalCount} items)
                 </span>
               </div>
@@ -125,49 +207,130 @@ export default function ShopCataloguePage() {
         </div>
 
         {/* Decorative background glow */}
-        <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-[#F73582]/20 blur-3xl pointer-events-none" />
+        <div
+          style={{
+            position: 'absolute',
+            right: '-60px',
+            bottom: '-60px',
+            width: '280px',
+            height: '280px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(247, 53, 130, 0.18)',
+            filter: 'blur(60px)',
+            pointerEvents: 'none',
+          }}
+        />
       </div>
 
       {/* 2. Filter & Search Controls */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '16px 20px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            flexWrap: 'wrap',
+          }}
+        >
           {/* Search Input */}
-          <div className="relative flex-1 max-w-md">
+          <div style={{ position: 'relative', flex: 1, minWidth: '260px', maxWidth: '460px' }}>
             <Search
-              size={17}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              size={16}
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#94a3b8',
+                pointerEvents: 'none',
+              }}
             />
             <input
               type="text"
               placeholder="Search by product name, SKU, or keyword..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#F73582] focus:ring-2 focus:ring-pink-100 transition-all bg-slate-50/50 hover:bg-white focus:bg-white"
+              style={{
+                width: '100%',
+                paddingLeft: '38px',
+                paddingRight: searchQuery ? '60px' : '14px',
+                paddingTop: '10px',
+                paddingBottom: '10px',
+                borderRadius: '12px',
+                border: '1.5px solid #e2e8f0',
+                fontSize: '13px',
+                fontWeight: 500,
+                color: '#0f172a',
+                backgroundColor: '#f8fafc',
+                outline: 'none',
+                transition: 'all 0.15s ease',
+              }}
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: 'none',
+                }}
               >
                 Clear
               </button>
             )}
           </div>
 
-          <div className="text-xs text-slate-500 font-medium self-center sm:self-auto">
-            Showing <strong className="text-slate-800">{filteredProducts.length}</strong> approved assets
+          <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+            Showing <strong style={{ color: '#0f172a' }}>{filteredProducts.length}</strong> approved assets
           </div>
         </div>
 
         {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            overflowX: 'auto',
+            paddingBottom: '4px',
+            paddingTop: '2px',
+          }}
+        >
           <button
             onClick={() => setSelectedCategory('All')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-              selectedCategory === 'All'
-                ? 'bg-[#2B253E] text-white shadow-sm'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
+            style={{
+              padding: '7px 14px',
+              borderRadius: '9999px',
+              fontSize: '12px',
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+              border: 'none',
+              transition: 'all 0.15s ease',
+              backgroundColor: selectedCategory === 'All' ? '#2B253E' : '#f1f5f9',
+              color: selectedCategory === 'All' ? '#ffffff' : '#475569',
+              boxShadow: selectedCategory === 'All' ? '0 2px 6px rgba(43, 37, 62, 0.2)' : 'none',
+            }}
           >
             All Categories ({products.length})
           </button>
@@ -179,11 +342,19 @@ export default function ShopCataloguePage() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                  isSelected
-                    ? 'bg-[#F73582] text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  border: 'none',
+                  transition: 'all 0.15s ease',
+                  backgroundColor: isSelected ? '#f73582' : '#f1f5f9',
+                  color: isSelected ? '#ffffff' : '#475569',
+                  boxShadow: isSelected ? '0 2px 6px rgba(247, 53, 130, 0.3)' : 'none',
+                }}
               >
                 {cat.name} ({count})
               </button>
@@ -194,21 +365,56 @@ export default function ShopCataloguePage() {
 
       {/* 3. Products Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+            gap: '20px',
+          }}
+        >
           {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
             <div
               key={n}
-              className="h-80 rounded-2xl bg-slate-100 animate-pulse border border-slate-200/60"
+              style={{
+                height: '340px',
+                borderRadius: '16px',
+                backgroundColor: '#f1f5f9',
+                border: '1px solid #e2e8f0',
+                animation: 'pulse 1.5s infinite ease-in-out',
+              }}
             />
           ))}
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-md mx-auto my-8 shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-pink-50 text-[#F73582] flex items-center justify-center mx-auto mb-4">
+        <div
+          style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            border: '1px solid #e2e8f0',
+            padding: '48px 24px',
+            textAlign: 'center',
+            maxWidth: '440px',
+            margin: '32px auto',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+          }}
+        >
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '16px',
+              backgroundColor: '#fdf2f8',
+              color: '#f73582',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto',
+            }}
+          >
             <Package size={30} />
           </div>
-          <h3 className="text-base font-bold text-slate-900">No Products Found</h3>
-          <p className="text-xs text-slate-500 mt-1 mb-6 leading-relaxed">
+          <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>No Products Found</h3>
+          <p style={{ fontSize: '13px', color: '#64748b', marginTop: '6px', marginBottom: '24px', lineHeight: 1.5 }}>
             {searchQuery || selectedCategory !== 'All'
               ? 'No products match your current search and filter criteria. Try clearing filters to see all available items.'
               : 'There are currently no products configured for your account catalogue visibility. Please contact your Platform Administrator.'}
@@ -218,13 +424,29 @@ export default function ShopCataloguePage() {
               setSearchQuery('');
               setSelectedCategory('All');
             }}
-            className="px-5 py-2.5 rounded-xl bg-[#F73582] hover:bg-[#de206d] text-white text-xs font-bold transition-all shadow-sm"
+            style={{
+              padding: '10px 20px',
+              borderRadius: '12px',
+              backgroundColor: '#f73582',
+              color: '#ffffff',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              boxShadow: '0 3px 8px rgba(247, 53, 130, 0.3)',
+            }}
           >
             Reset Filters
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+            gap: '20px',
+          }}
+        >
           {filteredProducts.map((product, index) => (
             <ProductCard key={product.id} product={product} index={index} />
           ))}

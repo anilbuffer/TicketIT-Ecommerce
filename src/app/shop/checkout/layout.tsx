@@ -19,7 +19,17 @@ export default function CheckoutLayout({ children }: { children: React.ReactNode
   }, [items.length, pathname, router]);
 
   return (
-    <div className="space-y-6 pb-16 max-w-5xl mx-auto">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px',
+        paddingBottom: '64px',
+        maxWidth: '1080px',
+        margin: '0 auto',
+        width: '100%',
+      }}
+    >
       <CheckoutStepper />
       {children}
     </div>

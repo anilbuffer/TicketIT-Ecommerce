@@ -27,46 +27,49 @@ export function OrderStatusBadge({ status, size = 'md', showIcon = true }: Order
       bg: 'rgba(59, 130, 246, 0.08)',
       text: '#2563eb',
       border: 'rgba(59, 130, 246, 0.25)',
-      icon: <Clock size={size === 'sm' ? 12 : 14} className="text-blue-600" />,
+      icon: <Clock size={size === 'sm' ? 12 : 14} color="#2563eb" />,
     },
     PROCESSING: {
       label: 'In Fulfilment',
       bg: 'rgba(245, 158, 11, 0.08)',
       text: '#d97706',
       border: 'rgba(245, 158, 11, 0.25)',
-      icon: <RefreshCw size={size === 'sm' ? 12 : 14} className="text-amber-600 animate-spin" style={{ animationDuration: '4s' }} />,
+      icon: <RefreshCw size={size === 'sm' ? 12 : 14} color="#d97706" style={{ animation: 'spin 4s linear infinite' }} />,
     },
     DISPATCHED: {
       label: 'Dispatched & In Transit',
       bg: 'rgba(168, 85, 247, 0.08)',
       text: '#7c3aed',
       border: 'rgba(168, 85, 247, 0.25)',
-      icon: <Truck size={size === 'sm' ? 12 : 14} className="text-purple-600" />,
+      icon: <Truck size={size === 'sm' ? 12 : 14} color="#7c3aed" />,
     },
     DELIVERED: {
       label: 'Delivered to Site',
       bg: 'rgba(88, 185, 125, 0.08)',
       text: '#16a34a',
       border: 'rgba(88, 185, 125, 0.25)',
-      icon: <CheckCircle2 size={size === 'sm' ? 12 : 14} className="text-emerald-600" />,
+      icon: <CheckCircle2 size={size === 'sm' ? 12 : 14} color="#16a34a" />,
     },
   };
 
   const current = configs[status] || configs.RECEIVED;
 
-  const sizeClasses = {
-    sm: 'text-xs px-2 py-0.5 gap-1 font-medium',
-    md: 'text-xs px-2.5 py-1 gap-1.5 font-semibold',
-    lg: 'text-sm px-3 py-1.5 gap-2 font-semibold',
-  };
+  const sizeStyles = {
+    sm: { fontSize: '11px', padding: '2px 8px', gap: '4px', fontWeight: 600 },
+    md: { fontSize: '12px', padding: '4px 10px', gap: '6px', fontWeight: 700 },
+    lg: { fontSize: '13px', padding: '6px 14px', gap: '8px', fontWeight: 700 },
+  }[size];
 
   return (
     <span
-      className={`inline-flex items-center rounded-full tracking-wide transition-all ${sizeClasses[size]}`}
       style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        borderRadius: '9999px',
         backgroundColor: current.bg,
         color: current.text,
         border: `1px solid ${current.border}`,
+        ...sizeStyles,
       }}
     >
       {showIcon && current.icon}

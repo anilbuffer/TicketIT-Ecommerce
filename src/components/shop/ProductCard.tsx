@@ -4,8 +4,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Check, Eye, AlertCircle, Sparkles, Tag, ShieldAlert } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ShoppingCart, Check, Eye, Tag, ShieldAlert } from 'lucide-react';
 import type { EffectiveProduct } from '@/lib/services/types';
 import { useCart } from '@/context/CartContext';
 import { QuantitySelector } from './QuantitySelector';
@@ -15,12 +15,15 @@ interface ProductCardProps {
   index?: number;
 }
 
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80';
+
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
-  const { addItem, setIsCartDrawerOpen } = useCart();
+  const { addItem } = useCart();
   const [qty, setQty] = useState<number>(product.moq || 1);
   const [isValidQty, setIsValidQty] = useState<boolean>(true);
   const [isAdded, setIsAdded] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [imgSrc, setImgSrc] = useState<string>(product.thumbnailUrl || FALLBACK_IMAGE);
 
   const isAvailable = product.status === 'ACTIVE';
   const unitPrice = product.effectivePrice ?? product.basePrice;
@@ -29,62 +32,124 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isAvailable) return;
+    if (!isAvailable || !isValidQty) return;
 
     const res = addItem(product, qty, unitPrice);
-    if (!res.success) {
-      setErrorMsg(res.error || 'Cannot add item');
-      return;
-    }
+    if (!res.success) return;
 
-    setErrorMsg(null);
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
-    }, 1800);
+    }, 2500);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, delay: Math.min(index * 0.04, 0.4), ease: 'easeOut' }}
-      className={`group relative flex flex-col bg-white rounded-2xl border transition-all duration-200 shadow-sm hover:shadow-md ${
-        isAvailable
-          ? 'border-slate-200/90 hover:border-pink-200'
-          : 'border-slate-200 bg-slate-50/70 opacity-80'
-      }`}
+      transition={{ duration: 0.25, delay: Math.min(index * 0.03, 0.3), ease: 'easeOut' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: isAvailable ? '#ffffff' : '#f8fafc',
+        borderRadius: '16px',
+        border: isHovered && isAvailable ? '1px solid #fbcfe8' : '1px solid #e2e8f0',
+        boxShadow: isHovered && isAvailable
+          ? '0 10px 25px -5px rgba(247, 53, 130, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04)'
+          : '0 1px 3px rgba(0,0,0,0.04)',
+        transition: 'all 0.2s ease',
+        overflow: 'hidden',
+        opacity: isAvailable ? 1 : 0.85,
+        height: '100%',
+      }}
     >
-      {/* 1. Thumbnail & Badges Container */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl bg-slate-100">
-        <Link href={`/shop/catalogue/${product.id}`} className="block w-full h-full">
-          <Image
-            src={product.thumbnailUrl || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={`object-cover transition-transform duration-300 ${
-              isAvailable ? 'group-hover:scale-105' : 'grayscale contrast-75'
-            }`}
-          />
+      {/* 1. Thumbnail Container */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '4 / 3',
+          backgroundColor: '#f1f5f9',
+          overflow: 'hidden',
+        }}
+      >
+        <Link
+          href={`/shop/catalogue/${product.id}`}
+          style={{
+            display: 'block',
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <Image
+              src={imgSrc}
+              alt={product.name}
+              fill
+              unoptimized
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              onError={() => setImgSrc(FALLBACK_IMAGE)}
+              style={{
+                objectFit: 'cover',
+                transition: 'transform 0.3s ease',
+                transform: isHovered && isAvailable ? 'scale(1.04)' : 'scale(1)',
+                filter: !isAvailable ? 'grayscale(80%) contrast(85%)' : 'none',
+              }}
+            />
+          </div>
         </Link>
 
         {/* Top Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-start justify-between pointer-events-none">
+        <div
+          style={{
+            position: 'absolute',
+            top: '10px',
+            left: '10px',
+            right: '10px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
           {/* Category Chip */}
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-white/95 text-slate-800 shadow-sm backdrop-blur-sm border border-slate-100">
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '3px 8px',
+              borderRadius: '9999px',
+              fontSize: '11px',
+              fontWeight: 700,
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              color: '#334155',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              border: '1px solid rgba(226, 232, 240, 0.8)',
+            }}
+          >
             {product.categoryName || 'Marketing Asset'}
           </span>
 
-          {/* Status Badge (if not active or discounted) */}
-          <div className="flex flex-col items-end gap-1">
+          {/* Status Badge */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
             {!isAvailable && (
               <span
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
-                  product.status === 'SUPERSEDED'
-                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                    : 'bg-red-100 text-red-900 border border-red-300'
-                }`}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '3px 8px',
+                  borderRadius: '9999px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  backgroundColor: product.status === 'SUPERSEDED' ? '#fef3c7' : '#fee2e2',
+                  color: product.status === 'SUPERSEDED' ? '#92400e' : '#991b1b',
+                  border: product.status === 'SUPERSEDED' ? '1px solid #fde68a' : '1px solid #fecaca',
+                }}
               >
                 <ShieldAlert size={12} />
                 {product.status === 'SUPERSEDED' ? 'Superseded' : 'Unavailable'}
@@ -92,7 +157,20 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             )}
 
             {isAvailable && product.isCustomPriced && product.discountPct > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#F73582] text-white shadow-sm">
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  padding: '2px 7px',
+                  borderRadius: '6px',
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  backgroundColor: '#f73582',
+                  color: '#ffffff',
+                  boxShadow: '0 2px 5px rgba(247, 53, 130, 0.3)',
+                }}
+              >
                 <Tag size={10} />
                 {product.discountPct}% OFF
               </span>
@@ -100,78 +178,154 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Hover Quick View overlay button */}
-        {isAvailable && (
+        {/* Hover Quick View Button */}
+        {isAvailable && isHovered && (
           <Link
             href={`/shop/catalogue/${product.id}`}
-            className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-auto"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 3,
+              textDecoration: 'none',
+            }}
           >
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-slate-900 shadow-lg hover:bg-slate-50 transition-all scale-95 group-hover:scale-100">
-              <Eye size={14} className="text-[#F73582]" />
-              View Specifications
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '7px 14px',
+                borderRadius: '10px',
+                fontSize: '12px',
+                fontWeight: 700,
+                backgroundColor: '#ffffff',
+                color: '#0f172a',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              }}
+            >
+              <Eye size={13} color="#f73582" />
+              View Specs
             </span>
           </Link>
         )}
       </div>
 
-      {/* 2. Product Details */}
-      <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+      {/* 2. Content Details */}
+      <div
+        style={{
+          padding: '14px',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          justifyContent: 'space-between',
+          gap: '12px',
+        }}
+      >
         <div>
-          {/* SKU and MOQ/Multiple Tags */}
-          <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono mb-1">
+          {/* SKU and Pack Size */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '11px',
+              fontFamily: 'monospace',
+              color: '#64748b',
+              marginBottom: '6px',
+            }}
+          >
             <span>SKU: {product.sku}</span>
-            <span className="font-sans font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
+            <span
+              style={{
+                fontFamily: 'inherit',
+                fontSize: '10px',
+                fontWeight: 600,
+                color: '#475569',
+                backgroundColor: '#f1f5f9',
+                padding: '2px 6px',
+                borderRadius: '4px',
+              }}
+            >
               {product.packSize || `1 ${product.uom}`}
             </span>
           </div>
 
-          {/* Product Name */}
+          {/* Product Title */}
           <Link
             href={`/shop/catalogue/${product.id}`}
-            className="font-bold text-slate-900 hover:text-[#F73582] transition-colors line-clamp-1 text-base leading-snug"
+            style={{
+              fontWeight: 700,
+              fontSize: '14px',
+              color: '#0f172a',
+              textDecoration: 'none',
+              display: '-webkit-box',
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              lineHeight: 1.3,
+            }}
           >
             {product.name}
           </Link>
 
-          {/* Description */}
-          <p className="text-xs text-slate-600 line-clamp-2 mt-1 min-h-[32px] leading-relaxed">
+          {/* Product Description */}
+          <p
+            style={{
+              fontSize: '12px',
+              color: '#64748b',
+              marginTop: '4px',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              lineHeight: 1.4,
+              minHeight: '34px',
+            }}
+          >
             {product.description}
           </p>
         </div>
 
-        {/* Pricing & Ordering Row */}
-        <div className="pt-3 border-t border-slate-100 flex flex-col gap-3">
-          {/* Price Block */}
-          <div className="flex items-baseline justify-between">
+        {/* Pricing & Actions */}
+        <div style={{ paddingTop: '10px', borderTop: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Price Row */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <div>
-              <span className="text-xs text-slate-400 font-medium block">Price per {product.uom || 'unit'}</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-lg font-extrabold text-slate-900">
+              <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>
+                Price / {product.uom || 'unit'}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                <span style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>
                   ${unitPrice.toFixed(2)}
                 </span>
                 {product.isCustomPriced && product.discountPct > 0 && (
-                  <span className="text-xs font-medium text-slate-400 line-through">
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', textDecoration: 'line-through' }}>
                     ${product.basePrice.toFixed(2)}
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Extended Line Preview if qty > 1 */}
             {isAvailable && qty > 1 && (
-              <div className="text-right">
-                <span className="text-[11px] text-slate-400 block">Extended ({qty} {product.uom})</span>
-                <span className="text-sm font-bold text-[#F73582]">
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block' }}>
+                  Total ({qty} {product.uom})
+                </span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#f73582' }}>
                   ${lineTotal.toFixed(2)}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Ordering Action or Disabled Notice */}
+          {/* Ordering controls */}
           {isAvailable ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <QuantitySelector
                   product={product}
                   value={qty}
@@ -183,55 +337,71 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                   showInlineHelp={false}
                 />
 
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
+                <button
+                  type="button"
                   onClick={handleAddToCart}
                   disabled={!isValidQty}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold shadow-sm transition-all ${
-                    isAdded
-                      ? 'bg-emerald-600 text-white'
-                      : isValidQty
-                      ? 'bg-[#F73582] hover:bg-[#de206d] text-white hover:shadow'
-                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  }`}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: isValidQty ? 'pointer' : 'not-allowed',
+                    backgroundColor: isAdded ? '#059669' : isValidQty ? '#f73582' : '#cbd5e1',
+                    color: '#ffffff',
+                    border: 'none',
+                    boxShadow: isValidQty && !isAdded ? '0 2px 6px rgba(247, 53, 130, 0.25)' : 'none',
+                    transition: 'all 0.15s ease',
+                  }}
                 >
-                  <AnimatePresence mode="wait">
-                    {isAdded ? (
-                      <motion.span
-                        key="added"
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.5, opacity: 0 }}
-                        className="flex items-center gap-1"
-                      >
-                        <Check size={14} /> Added!
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="add"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex items-center gap-1"
-                      >
-                        <ShoppingCart size={13} /> Add to Cart
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
+                  {isAdded ? (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Check size={14} /> Added!
+                    </span>
+                  ) : (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <ShoppingCart size={13} /> Add to Cart
+                    </span>
+                  )}
+                </button>
               </div>
 
               {/* Order rules mini pill */}
               {(product.moq > 1 || product.orderMultiple > 1) && (
-                <div className="text-[11px] text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-100 flex items-center justify-between">
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: '#64748b',
+                    backgroundColor: '#f8fafc',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <span>MOQ: {product.moq}</span>
                   {product.orderMultiple > 1 && <span>Multiple: {product.orderMultiple}</span>}
                 </div>
               )}
             </div>
           ) : (
-            <div className="py-2 px-3 bg-slate-100 rounded-lg text-center">
-              <span className="text-xs font-medium text-slate-500">
-                {product.status === 'SUPERSEDED' ? 'Item superseded by newer version' : 'Item currently unavailable'}
+            <div
+              style={{
+                padding: '8px',
+                backgroundColor: '#f1f5f9',
+                borderRadius: '8px',
+                textAlign: 'center',
+              }}
+            >
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>
+                {product.status === 'SUPERSEDED' ? 'Item superseded' : 'Unavailable for ordering'}
               </span>
             </div>
           )}

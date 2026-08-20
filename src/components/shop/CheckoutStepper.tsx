@@ -45,13 +45,46 @@ export function CheckoutStepper() {
   const currentIdx = getCurrentStepIndex();
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm mb-6">
-      <div className="relative flex items-center justify-between max-w-2xl mx-auto">
+    <div
+      style={{
+        width: '100%',
+        backgroundColor: '#ffffff',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+        padding: '16px 24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+        marginBottom: '24px',
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          maxWidth: '600px',
+          margin: '0 auto',
+        }}
+      >
         {/* Progress Line */}
-        <div className="absolute top-1/2 left-8 right-8 -translate-y-1/2 h-0.5 bg-slate-200 -z-0">
+        <div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            left: '30px',
+            right: '30px',
+            height: '2px',
+            backgroundColor: '#e2e8f0',
+            zIndex: 1,
+          }}
+        >
           <div
-            className="h-full bg-[#F73582] transition-all duration-300 ease-out"
-            style={{ width: `${(currentIdx / (steps.length - 1)) * 100}%` }}
+            style={{
+              height: '100%',
+              backgroundColor: '#f73582',
+              width: `${(currentIdx / (steps.length - 1)) * 100}%`,
+              transition: 'width 0.3s ease-out',
+            }}
           />
         </div>
 
@@ -61,32 +94,58 @@ export function CheckoutStepper() {
           const StepIcon = step.icon;
 
           return (
-            <div key={step.id} className="relative z-10 flex flex-col items-center">
+            <div
+              key={step.id}
+              style={{
+                position: 'relative',
+                zIndex: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-200 border-2 ${
-                  isCompleted
-                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  transition: 'all 0.2s ease',
+                  backgroundColor: isCompleted ? '#059669' : isCurrent ? '#f73582' : '#ffffff',
+                  color: isCompleted || isCurrent ? '#ffffff' : '#94a3b8',
+                  border: isCompleted
+                    ? '2px solid #059669'
                     : isCurrent
-                    ? 'bg-[#F73582] border-[#F73582] text-white shadow-md ring-4 ring-pink-100'
-                    : 'bg-white border-slate-300 text-slate-400'
-                }`}
+                    ? '2px solid #f73582'
+                    : '2px solid #cbd5e1',
+                  boxShadow: isCurrent ? '0 0 0 4px rgba(247, 53, 130, 0.15)' : 'none',
+                }}
               >
                 {isCompleted ? <Check size={16} /> : <StepIcon size={16} />}
               </div>
 
-              <div className="mt-2 text-center">
+              <div style={{ marginTop: '8px', textAlign: 'center' }}>
                 <span
-                  className={`text-xs block font-bold transition-colors ${
-                    isCurrent
-                      ? 'text-[#F73582]'
-                      : isCompleted
-                      ? 'text-slate-800'
-                      : 'text-slate-400'
-                  }`}
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    display: 'block',
+                    color: isCurrent ? '#f73582' : isCompleted ? '#0f172a' : '#94a3b8',
+                  }}
                 >
                   {step.label}
                 </span>
-                <span className="text-[10px] text-slate-400 font-medium hidden sm:block">
+                <span
+                  style={{
+                    fontSize: '11px',
+                    color: '#94a3b8',
+                    fontWeight: 500,
+                  }}
+                >
                   {step.sublabel}
                 </span>
               </div>

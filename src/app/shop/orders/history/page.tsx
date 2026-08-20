@@ -10,18 +10,13 @@ import { OrderStatusBadge } from '@/components/shop/OrderStatusBadge';
 import {
   ClipboardList,
   Search,
-  Filter,
   Eye,
   Building2,
   Calendar,
   Package,
-  TrendingUp,
   Clock,
   Truck,
-  CheckCircle2,
   Receipt,
-  ArrowRight,
-  ShieldCheck,
 } from 'lucide-react';
 
 export default function SiteOrderHistoryPage() {
@@ -39,7 +34,7 @@ export default function SiteOrderHistoryPage() {
       setIsLoading(true);
       try {
         const res = await getOrders({
-          siteId, // STRICT SERVER-SIDE SCOPING TO OWN SITE ONLY
+          siteId,
           pageSize: 100,
         });
         setOrders(res.items);
@@ -84,67 +79,79 @@ export default function SiteOrderHistoryPage() {
   const dispatchedCount = orders.filter((o) => o.status === 'DISPATCHED' || o.status === 'DELIVERED').length;
 
   return (
-    <div className="space-y-6 pb-16">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '64px' }}>
       {/* 1. Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-slate-500 font-semibold mb-1">
-            <Building2 size={13} className="text-[#F73582]" />
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#f73582' }}>
+            <Building2 size={14} />
             <span>{user?.siteName || 'Apex Midtown Central Pharmacy'} ({user?.siteCode || 'APX-MID-101'})</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', margin: '4px 0 2px 0' }}>
             Site Collateral Order History
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
             Read-only audit history of orders placed for this site branch.
           </p>
         </div>
 
         <Link
           href="/shop/catalogue"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F73582] hover:bg-[#de206d] text-white text-xs font-bold shadow-sm self-start sm:self-auto transition-all"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 20px',
+            borderRadius: '12px',
+            backgroundColor: '#f73582',
+            color: '#ffffff',
+            fontSize: '13px',
+            fontWeight: 700,
+            textDecoration: 'none',
+            boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
+          }}
         >
-          <Package size={14} /> New Collateral Order
+          <Package size={15} /> New Collateral Order
         </Link>
       </div>
 
       {/* 2. KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Total Site Orders</span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-slate-900">{orders.length}</span>
-            <span className="p-2 rounded-xl bg-slate-100 text-slate-700">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+        <div style={{ padding: '18px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Total Site Orders</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>{orders.length}</span>
+            <span style={{ padding: '8px', borderRadius: '10px', backgroundColor: '#f1f5f9', color: '#334155' }}>
               <ClipboardList size={16} />
             </span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Active In-Fulfilment</span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-amber-600">{activeOrdersCount}</span>
-            <span className="p-2 rounded-xl bg-amber-50 text-amber-600">
+        <div style={{ padding: '18px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Active In-Fulfilment</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '24px', fontWeight: 900, color: '#d97706' }}>{activeOrdersCount}</span>
+            <span style={{ padding: '8px', borderRadius: '10px', backgroundColor: '#fef3c7', color: '#d97706' }}>
               <Clock size={16} />
             </span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Dispatched & Delivered</span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-emerald-600">{dispatchedCount}</span>
-            <span className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+        <div style={{ padding: '18px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Dispatched & Delivered</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '24px', fontWeight: 900, color: '#059669' }}>{dispatchedCount}</span>
+            <span style={{ padding: '8px', borderRadius: '10px', backgroundColor: '#ecfdf5', color: '#059669' }}>
               <Truck size={16} />
             </span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Total Site Spend</span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-[#F73582]">${totalSiteSpend.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-            <span className="p-2 rounded-xl bg-pink-50 text-[#F73582]">
+        <div style={{ padding: '18px', borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Total Site Spend</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '24px', fontWeight: 900, color: '#f73582' }}>${totalSiteSpend.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            <span style={{ padding: '8px', borderRadius: '10px', backgroundColor: '#fdf2f8', color: '#f73582' }}>
               <Receipt size={16} />
             </span>
           </div>
@@ -152,27 +159,58 @@ export default function SiteOrderHistoryPage() {
       </div>
 
       {/* 3. Search & Filter Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '16px 20px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <div style={{ position: 'relative', flex: 1, minWidth: '260px', maxWidth: '420px' }}>
+            <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
             <input
               type="text"
               placeholder="Search by Order #, PO Reference, or Item..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#F73582] focus:ring-2 focus:ring-pink-100 bg-slate-50/50"
+              style={{
+                width: '100%',
+                paddingLeft: '36px',
+                paddingRight: '12px',
+                paddingTop: '9px',
+                paddingBottom: '9px',
+                borderRadius: '10px',
+                border: '1px solid #cbd5e1',
+                fontSize: '13px',
+                backgroundColor: '#f8fafc',
+                outline: 'none',
+              }}
             />
           </div>
 
-          {/* Date Filter Selector */}
-          <div className="flex items-center gap-2">
-            <Calendar size={15} className="text-slate-400 shrink-0" />
+          {/* Date Filter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Calendar size={15} color="#64748b" />
             <select
               value={dateFilter}
               onChange={(e: any) => setDateFilter(e.target.value)}
-              className="text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-[#F73582]"
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#334155',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: '10px',
+                padding: '8px 12px',
+                outline: 'none',
+              }}
             >
               <option value="all">All Dates</option>
               <option value="30d">Last 30 Days</option>
@@ -182,7 +220,7 @@ export default function SiteOrderHistoryPage() {
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar border-t border-slate-100">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflowX: 'auto', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
           {(['ALL', 'RECEIVED', 'PROCESSING', 'DISPATCHED', 'DELIVERED'] as const).map((status) => {
             const isSelected = statusFilter === status;
             const count =
@@ -194,11 +232,19 @@ export default function SiteOrderHistoryPage() {
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                  isSelected
-                    ? 'bg-[#2B253E] text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  border: 'none',
+                  backgroundColor: isSelected ? '#2B253E' : '#f1f5f9',
+                  color: isSelected ? '#ffffff' : '#475569',
+                  boxShadow: isSelected ? '0 2px 6px rgba(43, 37, 62, 0.2)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
               >
                 {status === 'ALL' ? 'All Statuses' : status.charAt(0) + status.slice(1).toLowerCase()} ({count})
               </button>
@@ -208,58 +254,99 @@ export default function SiteOrderHistoryPage() {
       </div>
 
       {/* 4. Orders Table */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '20px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+          overflow: 'hidden',
+        }}
+      >
         {isLoading ? (
-          <div className="p-12 text-center">
-            <div className="w-8 h-8 border-4 border-pink-200 border-t-[#F73582] rounded-full animate-spin mx-auto mb-3"></div>
-            <p className="text-xs text-slate-500">Loading site orders...</p>
+          <div style={{ padding: '48px', textAlign: 'center' }}>
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                border: '3px solid #fbcfe8',
+                borderTopColor: '#f73582',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 12px auto',
+              }}
+            />
+            <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>Loading site orders...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="p-12 text-center max-w-md mx-auto">
-            <div className="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
-              <ClipboardList size={28} />
+          <div style={{ padding: '48px 24px', textAlign: 'center', maxWidth: '420px', margin: '0 auto' }}>
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '16px',
+                backgroundColor: '#f1f5f9',
+                color: '#94a3b8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 12px auto',
+              }}
+            >
+              <ClipboardList size={26} />
             </div>
-            <h3 className="text-base font-bold text-slate-800">No Orders Found</h3>
-            <p className="text-xs text-slate-500 mt-1 mb-5 leading-relaxed">
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>No Orders Found</h3>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0', lineHeight: 1.5 }}>
               {searchQuery || statusFilter !== 'ALL' || dateFilter !== 'all'
                 ? 'No past orders matched your filters. Try resetting the search or status filter.'
                 : 'No collateral orders have been placed for this branch yet.'}
             </p>
             <Link
               href="/shop/catalogue"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F73582] text-white text-xs font-bold shadow-sm"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '10px 20px',
+                borderRadius: '12px',
+                backgroundColor: '#f73582',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
             >
               Order Marketing Assets
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12px' }}>
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="py-3.5 px-4 sm:px-6">Order Number</th>
-                  <th className="py-3.5 px-4">Date Placed</th>
-                  <th className="py-3.5 px-4">PO Reference</th>
-                  <th className="py-3.5 px-4">Items / Assets</th>
-                  <th className="py-3.5 px-4">Fulfilment Status</th>
-                  <th className="py-3.5 px-4 text-right">Order Total</th>
-                  <th className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
+                <tr style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', fontSize: '11px' }}>
+                  <th style={{ padding: '14px 20px' }}>Order Number</th>
+                  <th style={{ padding: '14px 16px' }}>Date Placed</th>
+                  <th style={{ padding: '14px 16px' }}>PO Reference</th>
+                  <th style={{ padding: '14px 16px' }}>Items / Assets</th>
+                  <th style={{ padding: '14px 16px' }}>Fulfilment Status</th>
+                  <th style={{ padding: '14px 16px', textAlign: 'right' }}>Order Total</th>
+                  <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody>
                 {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-4 px-4 sm:px-6">
+                  <tr key={order.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '16px 20px' }}>
                       <Link
                         href={`/shop/orders/${order.id}`}
-                        className="font-bold text-slate-900 hover:text-[#F73582] transition-colors block"
+                        style={{ fontWeight: 700, color: '#0f172a', textDecoration: 'none', display: 'block' }}
                       >
                         {order.orderNumber}
                       </Link>
-                      <span className="text-[11px] font-mono text-slate-400">ID: {order.id}</span>
+                      <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#94a3b8' }}>ID: {order.id}</span>
                     </td>
 
-                    <td className="py-4 px-4 text-slate-600">
+                    <td style={{ padding: '16px 16px', color: '#475569' }}>
                       {new Date(order.createdAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -267,43 +354,55 @@ export default function SiteOrderHistoryPage() {
                       })}
                     </td>
 
-                    <td className="py-4 px-4">
-                      <span className="font-mono font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded text-[11px]">
+                    <td style={{ padding: '16px 16px' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#334155', backgroundColor: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
                         {order.poReference || '—'}
                       </span>
                     </td>
 
-                    <td className="py-4 px-4">
-                      <div className="max-w-[220px]">
-                        <span className="font-semibold text-slate-800 block">
+                    <td style={{ padding: '16px 16px' }}>
+                      <div style={{ maxWidth: '240px' }}>
+                        <span style={{ fontWeight: 700, color: '#0f172a', display: 'block' }}>
                           {order.itemCount} items ({order.lineItems.length} lines)
                         </span>
-                        <span className="text-[11px] text-slate-400 line-clamp-1">
+                        <span style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
                           {order.lineItems.map((li) => li.productName).join(', ')}
                         </span>
                       </div>
                     </td>
 
-                    <td className="py-4 px-4">
+                    <td style={{ padding: '16px 16px' }}>
                       <OrderStatusBadge status={order.status} size="sm" />
                       {order.carrier && (
-                        <span className="text-[10px] text-slate-400 block mt-0.5">
+                        <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', marginTop: '3px' }}>
                           {order.carrier}
                         </span>
                       )}
                     </td>
 
-                    <td className="py-4 px-4 text-right">
-                      <span className="font-extrabold text-slate-900 block">
+                    <td style={{ padding: '16px 16px', textAlign: 'right' }}>
+                      <span style={{ fontWeight: 900, color: '#0f172a', display: 'block', fontSize: '13px' }}>
                         ${order.totalAmount.toFixed(2)}
                       </span>
-                      <span className="text-[10px] text-emerald-600 font-semibold">On-Account</span>
+                      <span style={{ fontSize: '10px', color: '#059669', fontWeight: 700 }}>On-Account</span>
                     </td>
 
-                    <td className="py-4 px-4 sm:px-6 text-right">
+                    <td style={{ padding: '16px 20px', textAlign: 'right' }}>
                       <Link
                         href={`/shop/orders/${order.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid #e2e8f0',
+                          backgroundColor: '#ffffff',
+                          color: '#334155',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                        }}
                       >
                         <Eye size={13} /> View
                       </Link>

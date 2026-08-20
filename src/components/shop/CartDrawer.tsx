@@ -9,6 +9,8 @@ import { X, ShoppingBag, ArrowRight, Trash2, ShieldCheck, ShoppingCart } from 'l
 import { useCart } from '@/context/CartContext';
 import { QuantitySelector } from './QuantitySelector';
 
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80';
+
 export function CartDrawer() {
   const {
     items,
@@ -18,14 +20,22 @@ export function CartDrawer() {
     setIsCartDrawerOpen,
     updateItemQty,
     removeItem,
-    clearCart,
   } = useCart();
 
   if (!isCartDrawerOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 999,
+          overflow: 'hidden',
+          display: 'flex',
+          justifyContent: 'flex-end',
+        }}
+      >
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -33,7 +43,12 @@ export function CartDrawer() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={() => setIsCartDrawerOpen(false)}
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.45)',
+            backdropFilter: 'blur(4px)',
+          }}
         />
 
         {/* Drawer Panel */}
@@ -41,18 +56,48 @@ export function CartDrawer() {
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-          className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col z-10"
+          transition={{ type: 'spring', damping: 26, stiffness: 240 }}
+          style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '420px',
+            backgroundColor: '#ffffff',
+            height: '100%',
+            boxShadow: '-10px 0 30px rgba(0,0,0,0.15)',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 10,
+          }}
         >
           {/* Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-pink-100 flex items-center justify-center text-[#F73582]">
+          <div
+            style={{
+              padding: '18px 20px',
+              borderBottom: '1px solid #f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#fafbfc',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  backgroundColor: '#fdf2f8',
+                  color: '#f73582',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <ShoppingCart size={18} />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-base">Shopping Cart</h3>
-                <p className="text-xs text-slate-500 font-medium">
+                <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Shopping Cart</h3>
+                <p style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, margin: 0 }}>
                   {totalCount} {totalCount === 1 ? 'item' : 'items'} ready for order
                 </p>
               </div>
@@ -60,26 +105,59 @@ export function CartDrawer() {
 
             <button
               onClick={() => setIsCartDrawerOpen(false)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#64748b',
+                cursor: 'pointer',
+                backgroundColor: '#f1f5f9',
+                border: 'none',
+              }}
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
 
           {/* Cart Body */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {items.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
+              <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '48px 16px' }}>
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '50%',
+                    backgroundColor: '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#94a3b8',
+                    marginBottom: '16px',
+                  }}
+                >
                   <ShoppingBag size={28} />
                 </div>
-                <h4 className="text-base font-bold text-slate-800">Your Cart is Empty</h4>
-                <p className="text-xs text-slate-500 max-w-xs mt-1 mb-6 leading-relaxed">
+                <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>Your Cart is Empty</h4>
+                <p style={{ fontSize: '13px', color: '#64748b', maxWidth: '280px', marginTop: '6px', marginBottom: '24px', lineHeight: 1.5 }}>
                   Browse your approved site marketing catalogue and add items to place a collateral order.
                 </p>
                 <button
                   onClick={() => setIsCartDrawerOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-[#F73582] text-white text-xs font-semibold hover:bg-[#de206d] transition-all shadow-sm"
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '12px',
+                    backgroundColor: '#f73582',
+                    color: '#ffffff',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    border: 'none',
+                    boxShadow: '0 3px 8px rgba(247, 53, 130, 0.3)',
+                  }}
                 >
                   Browse Catalogue
                 </button>
@@ -94,39 +172,84 @@ export function CartDrawer() {
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="flex gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors"
+                    style={{
+                      display: 'flex',
+                      gap: '12px',
+                      padding: '12px',
+                      borderRadius: '14px',
+                      border: '1px solid #f1f5f9',
+                      backgroundColor: '#f8fafc',
+                    }}
                   >
                     {/* Thumbnail */}
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-white border border-slate-200 shrink-0">
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #e2e8f0',
+                        flexShrink: 0,
+                      }}
+                    >
                       <Image
-                        src={item.product.thumbnailUrl || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'}
+                        src={item.product.thumbnailUrl || FALLBACK_IMAGE}
                         alt={item.product.name}
                         fill
-                        className="object-cover"
+                        unoptimized
+                        style={{ objectFit: 'cover' }}
                       />
                     </div>
 
                     {/* Details */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                      <div className="flex items-start justify-between gap-2">
+                    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
                         <div>
-                          <h4 className="text-xs font-bold text-slate-900 line-clamp-1">
+                          <h4
+                            style={{
+                              fontSize: '13px',
+                              fontWeight: 700,
+                              color: '#0f172a',
+                              margin: 0,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '190px',
+                            }}
+                          >
                             {item.product.name}
                           </h4>
-                          <span className="text-[11px] font-mono text-slate-400">
+                          <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#94a3b8' }}>
                             {item.product.sku}
                           </span>
                         </div>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="text-slate-400 hover:text-red-600 transition-colors p-1"
+                          style={{
+                            color: '#94a3b8',
+                            cursor: 'pointer',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            padding: '4px',
+                          }}
                           title="Remove item"
                         >
                           <Trash2 size={14} />
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-200/60">
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginTop: '8px',
+                          paddingTop: '6px',
+                          borderTop: '1px solid #e2e8f0',
+                        }}
+                      >
                         <QuantitySelector
                           product={item.product}
                           value={item.qty}
@@ -135,11 +258,11 @@ export function CartDrawer() {
                           showInlineHelp={false}
                         />
 
-                        <div className="text-right">
-                          <span className="text-xs font-bold text-slate-900">
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', display: 'block' }}>
                             ${item.lineTotal.toFixed(2)}
                           </span>
-                          <span className="text-[10px] text-slate-400 block">
+                          <span style={{ fontSize: '10px', color: '#94a3b8' }}>
                             ${item.unitPrice.toFixed(2)} / {item.product.uom}
                           </span>
                         </div>
@@ -153,25 +276,57 @@ export function CartDrawer() {
 
           {/* Footer / Summary */}
           {items.length > 0 && (
-            <div className="p-4 sm:p-5 border-t border-slate-100 bg-white space-y-3">
+            <div
+              style={{
+                padding: '16px 20px',
+                borderTop: '1px solid #f1f5f9',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
               {/* Account Billing Notice */}
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs">
-                <ShieldCheck size={16} className="shrink-0 text-emerald-600" />
-                <span>Billed on monthly consolidated account. No card payment required.</span>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  backgroundColor: '#ecfdf5',
+                  border: '1px solid #a7f3d0',
+                  color: '#065f46',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                }}
+              >
+                <ShieldCheck size={16} color="#059669" style={{ flexShrink: 0 }} />
+                <span>Billed on monthly consolidated account. No card required.</span>
               </div>
 
               {/* Subtotal */}
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-sm font-semibold text-slate-600">Order Subtotal:</span>
-                <span className="text-xl font-extrabold text-slate-900">${subtotal.toFixed(2)}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Order Subtotal:</span>
+                <span style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>${subtotal.toFixed(2)}</span>
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <Link
                   href="/shop/cart"
                   onClick={() => setIsCartDrawerOpen(false)}
-                  className="w-full py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold text-center transition-colors"
+                  style={{
+                    padding: '10px',
+                    borderRadius: '12px',
+                    border: '1.5px solid #e2e8f0',
+                    backgroundColor: '#ffffff',
+                    color: '#334155',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                  }}
                 >
                   View Full Cart
                 </Link>
@@ -179,7 +334,21 @@ export function CartDrawer() {
                 <Link
                   href="/shop/checkout/details"
                   onClick={() => setIsCartDrawerOpen(false)}
-                  className="w-full py-2.5 px-3 rounded-xl bg-[#F73582] hover:bg-[#de206d] text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-sm hover:shadow transition-all"
+                  style={{
+                    padding: '10px',
+                    borderRadius: '12px',
+                    backgroundColor: '#f73582',
+                    color: '#ffffff',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    boxShadow: '0 3px 8px rgba(247, 53, 130, 0.3)',
+                  }}
                 >
                   Checkout <ArrowRight size={14} />
                 </Link>

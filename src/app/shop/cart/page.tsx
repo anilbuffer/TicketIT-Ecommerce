@@ -15,130 +15,323 @@ import {
   Trash2,
   ShieldCheck,
   Building2,
-  AlertCircle,
-  Package,
   Receipt,
+  ShoppingCart,
 } from 'lucide-react';
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80';
 
 export default function CartPage() {
   const { user } = useAuth();
   const { items, subtotal, totalCount, updateItemQty, removeItem, clearCart } = useCart();
 
   return (
-    <div className="space-y-6 pb-16">
-      {/* 1. Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-slate-500 font-semibold mb-1">
-            <Building2 size={13} className="text-[#F73582]" />
-            <span>{user?.siteName || 'Apex Midtown Central Pharmacy'}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '48px' }}>
+      {/* 1. Header Banner */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '12px',
+              fontWeight: 700,
+              color: '#f73582',
+            }}
+          >
+            <Building2 size={14} />
+            <span>{user?.siteName || 'Apex Midtown Central Pharmacy'} ({user?.siteCode || 'APX-MID-101'})</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+
+          <h1
+            style={{
+              fontSize: '26px',
+              fontWeight: 800,
+              color: '#0f172a',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.2,
+              margin: 0,
+            }}
+          >
             Collateral Order Cart
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Review your items and amend quantities before proceeding to checkout.
+
+          <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+            Review your marketing materials, update order quantities, or proceed to on-account checkout.
           </p>
         </div>
 
         {items.length > 0 && (
           <button
             onClick={clearCart}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 transition-colors self-start sm:self-auto"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              borderRadius: '10px',
+              fontSize: '12px',
+              fontWeight: 700,
+              color: '#dc2626',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
           >
-            <Trash2 size={14} />
-            <span>Clear Entire Cart</span>
+            <Trash2 size={13} />
+            <span>Clear Cart</span>
           </button>
         )}
       </div>
 
-      {/* 2. Main Cart Layout */}
+      {/* 2. Main Cart Content */}
       {items.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-slate-200/90 p-12 text-center max-w-lg mx-auto shadow-sm my-8">
-          <div className="w-20 h-20 rounded-full bg-pink-50 text-[#F73582] flex items-center justify-center mx-auto mb-4">
-            <ShoppingBag size={36} />
+        <div
+          style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            border: '1px solid #e2e8f0',
+            padding: '56px 24px',
+            textAlign: 'center',
+            maxWidth: '500px',
+            margin: '32px auto',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: '72px',
+              height: '72px',
+              borderRadius: '50%',
+              backgroundColor: '#fdf2f8',
+              color: '#f73582',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '16px',
+              boxShadow: '0 4px 12px rgba(247, 53, 130, 0.15)',
+            }}
+          >
+            <ShoppingBag size={34} />
           </div>
-          <h2 className="text-lg font-bold text-slate-900">Your Cart is Empty</h2>
-          <p className="text-xs text-slate-500 mt-1.5 mb-6 max-w-sm mx-auto leading-relaxed">
-            You have not added any marketing collateral or packaging assets to your session cart yet.
+
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '0 0 6px 0' }}>
+            Your Collateral Cart is Empty
+          </h2>
+
+          <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 24px 0', lineHeight: 1.5, maxWidth: '360px' }}>
+            You haven't added any approved marketing materials or packaging assets to your session cart yet.
           </p>
+
           <Link
             href="/shop/catalogue"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#F73582] hover:bg-[#de206d] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              borderRadius: '12px',
+              backgroundColor: '#f73582',
+              color: '#ffffff',
+              fontSize: '13px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
+              transition: 'all 0.15s ease',
+            }}
           >
-            <ArrowLeft size={14} /> Return to Asset Catalogue
+            <ArrowLeft size={15} />
+            <span>Return to Asset Catalogue</span>
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Cart Items List (8 cols) */}
-          <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              <span>Item & Specification</span>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr) 360px',
+            gap: '24px',
+            alignItems: 'start',
+          }}
+        >
+          {/* Cart Items Column (Left) */}
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '20px',
+              border: '1px solid #e2e8f0',
+              padding: '24px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+          >
+            {/* Header row */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingBottom: '12px',
+                borderBottom: '1px solid #f1f5f9',
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#64748b',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              <span>Asset & Specification</span>
               <span>Quantity & Total</span>
             </div>
 
-            <div className="space-y-4">
+            {/* Items List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <AnimatePresence initial={false}>
                 {items.map((item) => (
                   <motion.div
                     key={item.id}
                     layout
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="p-4 rounded-2xl border border-slate-100 bg-slate-50/60 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+                    style={{
+                      padding: '16px',
+                      borderRadius: '14px',
+                      border: '1px solid #f1f5f9',
+                      backgroundColor: '#f8fafc',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '16px',
+                      flexWrap: 'wrap',
+                    }}
                   >
-                    {/* Thumbnail & Meta */}
-                    <div className="flex gap-3.5 items-center min-w-0">
-                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-white border border-slate-200 shrink-0">
+                    {/* Left: Thumbnail & Spec details */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: '240px', flex: 1 }}>
+                      {/* Image container with strict dimensions & relative positioning */}
+                      <div
+                        style={{
+                          position: 'relative',
+                          width: '68px',
+                          height: '68px',
+                          borderRadius: '10px',
+                          overflow: 'hidden',
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #e2e8f0',
+                          flexShrink: 0,
+                        }}
+                      >
                         <Image
-                          src={item.product.thumbnailUrl || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'}
+                          src={item.product.thumbnailUrl || FALLBACK_IMAGE}
                           alt={item.product.name}
                           fill
-                          className="object-cover"
+                          unoptimized
+                          sizes="68px"
+                          style={{ objectFit: 'cover' }}
                         />
                       </div>
 
-                      <div className="space-y-1 min-w-0">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: 0 }}>
                         <Link
                           href={`/shop/catalogue/${item.id}`}
-                          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-[#F73582] transition-colors line-clamp-1"
+                          style={{
+                            fontSize: '14px',
+                            fontWeight: 700,
+                            color: '#0f172a',
+                            textDecoration: 'none',
+                            lineHeight: 1.3,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '300px',
+                          }}
                         >
                           {item.product.name}
                         </Link>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
-                          <span>SKU: {item.product.sku}</span>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#64748b' }}>
+                          <span style={{ fontFamily: 'monospace' }}>SKU: {item.product.sku}</span>
                           <span>•</span>
-                          <span className="font-sans text-slate-600 bg-slate-200/70 px-1.5 py-0.5 rounded text-[10px]">
-                            {item.product.packSize || item.product.uom}
+                          <span
+                            style={{
+                              backgroundColor: '#e2e8f0',
+                              color: '#334155',
+                              padding: '1px 6px',
+                              borderRadius: '4px',
+                              fontWeight: 600,
+                              fontSize: '10px',
+                            }}
+                          >
+                            {item.product.packSize || `1 ${item.product.uom}`}
                           </span>
                         </div>
-                        <div className="text-xs font-semibold text-slate-700">
-                          ${item.unitPrice.toFixed(2)} <span className="text-[10px] text-slate-400 font-normal">/ {item.product.uom}</span>
+
+                        <div style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginTop: '2px' }}>
+                          ${item.unitPrice.toFixed(2)}{' '}
+                          <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>
+                            / {item.product.uom}
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Quantity & Actions */}
-                    <div className="flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/50">
+                    {/* Right: Quantity Selector & Line Total */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        gap: '20px',
+                        flexShrink: 0,
+                      }}
+                    >
                       <QuantitySelector
                         product={item.product}
                         value={item.qty}
                         onChange={(newQty) => updateItemQty(item.id, newQty)}
                         size="md"
+                        showInlineHelp={false}
                       />
 
-                      <div className="text-right min-w-[90px]">
-                        <span className="text-base font-extrabold text-slate-900 block">
+                      <div style={{ textAlign: 'right', minWidth: '90px' }}>
+                        <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', display: 'block' }}>
                           ${item.lineTotal.toFixed(2)}
                         </span>
                         <button
+                          type="button"
                           onClick={() => removeItem(item.id)}
-                          className="text-xs text-red-500 hover:text-red-700 font-medium inline-flex items-center gap-1 transition-colors mt-0.5"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            padding: '2px 0',
+                            marginTop: '2px',
+                          }}
                         >
-                          <Trash2 size={12} /> Remove
+                          <Trash2 size={12} />
+                          <span>Remove</span>
                         </button>
                       </div>
                     </div>
@@ -147,78 +340,172 @@ export default function CartPage() {
               </AnimatePresence>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            {/* Bottom helper info */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingTop: '12px',
+                borderTop: '1px solid #f1f5f9',
+                fontSize: '12px',
+                color: '#64748b',
+              }}
+            >
               <Link
                 href="/shop/catalogue"
-                className="inline-flex items-center gap-1 font-bold text-[#F73582] hover:underline"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: 700,
+                  color: '#f73582',
+                  textDecoration: 'none',
+                }}
               >
-                <ArrowLeft size={13} /> Add more collateral from catalogue
+                <ArrowLeft size={14} />
+                <span>Add more collateral from catalogue</span>
               </Link>
-              <span>{totalCount} total items in cart</span>
+
+              <span>
+                <strong>{totalCount}</strong> total items in session cart
+              </span>
             </div>
           </div>
 
-          {/* Order Summary Card (4 cols) */}
-          <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-5 sticky top-6">
-            <h3 className="text-base font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
-              <Receipt size={17} className="text-[#F73582]" />
-              <span>Order Summary</span>
-            </h3>
+          {/* Order Summary Column (Right - Sticky) */}
+          <div
+            style={{
+              position: 'sticky',
+              top: '80px',
+              backgroundColor: '#ffffff',
+              borderRadius: '20px',
+              border: '1px solid #e2e8f0',
+              padding: '24px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                paddingBottom: '12px',
+                borderBottom: '1px solid #f1f5f9',
+              }}
+            >
+              <Receipt size={18} color="#f73582" />
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                Order Summary
+              </h3>
+            </div>
 
-            {/* Account & Billing context */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5 text-xs">
-              <div className="flex justify-between text-slate-500">
+            {/* Site & Account Info Box */}
+            <div
+              style={{
+                padding: '14px',
+                borderRadius: '12px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                fontSize: '12px',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
                 <span>Customer Account:</span>
-                <span className="font-bold text-slate-800">{user?.accountName || 'Apex Healthcare Group'}</span>
+                <strong style={{ color: '#0f172a' }}>{user?.accountName || 'Apex Healthcare Group'}</strong>
               </div>
-              <div className="flex justify-between text-slate-500">
-                <span>Ordering Site:</span>
-                <span className="font-bold text-slate-800">{user?.siteCode || 'APX-MID-101'}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
+                <span>Ordering Branch:</span>
+                <strong style={{ color: '#0f172a' }}>{user?.siteCode || 'APX-MID-101'}</strong>
               </div>
-              <div className="flex justify-between text-slate-500">
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
                 <span>Payment Terms:</span>
-                <span className="font-bold text-emerald-700">Monthly On-Account</span>
+                <strong style={{ color: '#059669' }}>Monthly On-Account</strong>
               </div>
             </div>
 
             {/* Price Calculations */}
-            <div className="space-y-2.5 text-xs">
-              <div className="flex justify-between text-slate-600">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
                 <span>Items Subtotal:</span>
-                <span className="font-bold text-slate-900">${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-slate-600">
-                <span>Estimated Shipping:</span>
-                <span className="font-semibold text-emerald-600">Free (Consolidated Fleet)</span>
-              </div>
-              <div className="flex justify-between text-slate-600">
-                <span>Applicable Taxes:</span>
-                <span className="text-slate-500 font-medium">Billed to Head Office</span>
+                <strong style={{ color: '#0f172a' }}>${subtotal.toFixed(2)}</strong>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                <span>Consolidated Freight:</span>
+                <span style={{ color: '#059669', fontWeight: 700 }}>Free (Fleet Delivery)</span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                <span>Applicable Taxes:</span>
+                <span style={{ color: '#64748b' }}>Consolidated on HQ Invoice</span>
+              </div>
+
+              <div
+                style={{
+                  paddingTop: '12px',
+                  borderTop: '1px solid #f1f5f9',
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <div>
-                  <span className="text-sm font-bold text-slate-900 block">Total Order Value</span>
-                  <span className="text-[11px] text-slate-400">On-Account Billing</span>
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', display: 'block' }}>
+                    Total Order Value
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>On-Account Settlement</span>
                 </div>
-                <span className="text-2xl font-black text-slate-900">
+
+                <span style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>
                   ${subtotal.toFixed(2)}
                 </span>
               </div>
             </div>
 
             {/* Reassurance Notice */}
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-900 text-xs flex items-start gap-2">
-              <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
-              <span className="leading-snug">
-                No credit card or online payment required. Your order will be placed on-account.
-              </span>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '8px',
+                padding: '12px',
+                borderRadius: '12px',
+                backgroundColor: '#ecfdf5',
+                border: '1px solid #a7f3d0',
+                color: '#065f46',
+                fontSize: '11px',
+                lineHeight: 1.4,
+              }}
+            >
+              <ShieldCheck size={16} color="#059669" style={{ flexShrink: 0, marginTop: '1px' }} />
+              <span>No credit card or online payment required. Your order will be placed on-account.</span>
             </div>
 
-            {/* Checkout Button */}
+            {/* Checkout Action Button */}
             <Link
               href="/shop/checkout/details"
-              className="w-full py-3.5 px-4 rounded-xl bg-[#F73582] hover:bg-[#de206d] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '14px 20px',
+                borderRadius: '12px',
+                backgroundColor: '#f73582',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 800,
+                textDecoration: 'none',
+                boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
+                transition: 'all 0.15s ease',
+              }}
             >
               <span>Proceed to Checkout</span>
               <ArrowRight size={15} />

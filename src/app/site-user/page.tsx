@@ -12,8 +12,17 @@ export default function SiteUserRedirectPage() {
   }, [router]);
 
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="w-8 h-8 border-4 border-pink-200 border-t-[#F73582] rounded-full animate-spin"></div>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+      <div
+        style={{
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
+          border: '3px solid #fbcfe8',
+          borderTopColor: '#f73582',
+          animation: 'spin 1s linear infinite',
+        }}
+      />
     </div>
   );
 }

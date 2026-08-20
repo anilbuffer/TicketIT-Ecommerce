@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, AlertCircle, Check } from 'lucide-react';
+import { Plus, Minus, AlertCircle } from 'lucide-react';
 import type { Product, EffectiveProduct } from '@/lib/services/types';
 import { validateProductQty } from '@/context/CartContext';
 
@@ -48,7 +48,7 @@ export function QuantitySelector({
     } else {
       next = current - multiple;
       if (next < moq) {
-        next = moq; // don't step below MOQ with buttons
+        next = moq;
       }
     }
 
@@ -74,40 +74,45 @@ export function QuantitySelector({
     onChange(parsed, err === null);
   };
 
-  const sizeClasses = {
-    sm: {
-      btn: 'w-7 h-7 text-xs',
-      input: 'w-12 h-7 text-xs',
-      container: 'text-xs',
-    },
-    md: {
-      btn: 'w-9 h-9 text-sm',
-      input: 'w-16 h-9 text-sm',
-      container: 'text-sm',
-    },
-    lg: {
-      btn: 'w-11 h-11 text-base',
-      input: 'w-20 h-11 text-base',
-      container: 'text-base',
-    },
-  };
+  const dims = {
+    sm: { btn: 28, inputWidth: 44, fontSize: '12px' },
+    md: { btn: 34, inputWidth: 56, fontSize: '13px' },
+    lg: { btn: 42, inputWidth: 68, fontSize: '15px' },
+  }[size];
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="inline-flex items-center">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ display: 'inline-flex', alignItems: 'center' }}>
         <div
-          className={`flex items-center rounded-lg border bg-white shadow-sm overflow-hidden transition-colors ${
-            error
-              ? 'border-red-400 focus-within:ring-2 focus-within:ring-red-100'
-              : 'border-slate-200 hover:border-slate-300 focus-within:ring-2 focus-within:ring-pink-100 focus-within:border-[#F73582]'
-          } ${disabled ? 'opacity-50 cursor-not-allowed bg-slate-50' : ''}`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: '8px',
+            border: error ? '1.5px solid #ef4444' : '1px solid #cbd5e1',
+            backgroundColor: disabled ? '#f8fafc' : '#ffffff',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+            overflow: 'hidden',
+            opacity: disabled ? 0.6 : 1,
+          }}
         >
           <button
             type="button"
             onClick={() => handleStep('down')}
             disabled={disabled || value <= moq}
             aria-label="Decrease quantity"
-            className={`${sizeClasses[size].btn} flex items-center justify-center text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed`}
+            style={{
+              width: `${dims.btn}px`,
+              height: `${dims.btn}px`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#475569',
+              cursor: disabled || value <= moq ? 'not-allowed' : 'pointer',
+              backgroundColor: 'transparent',
+              border: 'none',
+              opacity: disabled || value <= moq ? 0.35 : 1,
+              transition: 'background-color 0.15s ease',
+            }}
           >
             <Minus size={size === 'sm' ? 12 : 14} />
           </button>
@@ -119,7 +124,20 @@ export function QuantitySelector({
             disabled={disabled}
             min={moq}
             step={multiple}
-            className={`${sizeClasses[size].input} font-semibold text-center text-slate-900 bg-transparent border-x border-slate-200 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+            style={{
+              width: `${dims.inputWidth}px`,
+              height: `${dims.btn}px`,
+              fontWeight: 700,
+              fontSize: dims.fontSize,
+              textAlign: 'center',
+              color: '#0f172a',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderLeft: '1px solid #e2e8f0',
+              borderRight: '1px solid #e2e8f0',
+              outline: 'none',
+              padding: 0,
+            }}
           />
 
           <button
@@ -127,34 +145,45 @@ export function QuantitySelector({
             onClick={() => handleStep('up')}
             disabled={disabled}
             aria-label="Increase quantity"
-            className={`${sizeClasses[size].btn} flex items-center justify-center text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed`}
+            style={{
+              width: `${dims.btn}px`,
+              height: `${dims.btn}px`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#475569',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              backgroundColor: 'transparent',
+              border: 'none',
+              transition: 'background-color 0.15s ease',
+            }}
           >
             <Plus size={size === 'sm' ? 12 : 14} />
           </button>
         </div>
 
-        {/* UOM / Pack note badge */}
-        <span className="ml-2.5 text-xs text-slate-500 font-medium whitespace-nowrap">
+        {/* UOM / Pack size */}
+        <span style={{ marginLeft: '8px', fontSize: '11px', fontWeight: 600, color: '#64748b', whiteSpace: 'nowrap' }}>
           {product.uom || 'units'}
           {product.packSize ? ` (${product.packSize})` : ''}
         </span>
       </div>
 
-      {/* Rules & Errors display */}
+      {/* Rules & error text */}
       {showInlineHelp && (
-        <div className="min-h-[18px]">
+        <div style={{ minHeight: '16px' }}>
           {error ? (
-            <div className="flex items-center gap-1.5 text-xs text-red-600 font-medium animate-fadeIn">
-              <AlertCircle size={13} className="shrink-0 text-red-500" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#dc2626', fontWeight: 600 }}>
+              <AlertCircle size={12} color="#dc2626" />
               <span>{error}</span>
             </div>
           ) : (moq > 1 || multiple > 1) ? (
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#64748b' }}>
+              <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#cbd5e1', display: 'inline-block' }}></span>
               <span>
                 {moq > 1 && `MOQ: ${moq}`}
                 {moq > 1 && multiple > 1 && ' • '}
-                {multiple > 1 && `Must order in multiples of ${multiple}`}
+                {multiple > 1 && `Multiple of ${multiple}`}
               </span>
             </div>
           ) : null}

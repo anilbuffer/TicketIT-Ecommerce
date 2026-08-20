@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { getProductWithPricing } from '@/lib/services/products.service';
@@ -15,19 +14,13 @@ import {
   ArrowLeft,
   ShoppingCart,
   Check,
-  Package,
-  Layers,
   ShieldCheck,
   ShieldAlert,
-  Info,
   Tag,
-  Truck,
-  Sparkles,
-  FileCheck,
-  HelpCircle,
-  Clock,
   AlertTriangle,
 } from 'lucide-react';
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -42,6 +35,7 @@ export default function ProductDetailPage() {
   const [isValidQty, setIsValidQty] = useState<boolean>(true);
   const [isAdded, setIsAdded] = useState<boolean>(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [imgSrc, setImgSrc] = useState<string>(FALLBACK_IMAGE);
 
   useEffect(() => {
     async function loadProduct() {
@@ -52,6 +46,7 @@ export default function ProductDetailPage() {
         if (item) {
           setProduct(item);
           setQty(item.moq || 1);
+          setImgSrc(item.thumbnailUrl || FALLBACK_IMAGE);
         }
       } catch (err) {
         console.error('Failed to load product detail', err);
@@ -65,27 +60,34 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-10 h-10 border-4 border-pink-200 border-t-[#F73582] rounded-full animate-spin"></div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '48px' }}>
+        <div style={{ width: '180px', height: '36px', borderRadius: '10px', backgroundColor: '#f1f5f9' }} />
+        <div style={{ height: '480px', borderRadius: '24px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0' }} />
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-md mx-auto my-12 shadow-sm">
-        <div className="w-16 h-16 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4">
-          <AlertTriangle size={30} />
-        </div>
-        <h3 className="text-base font-bold text-slate-900">Product Not Found</h3>
-        <p className="text-xs text-slate-500 mt-1 mb-6 leading-relaxed">
-          The requested marketing asset could not be found or is not approved for your site account.
+      <div style={{ backgroundColor: '#ffffff', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '48px 24px', textAlign: 'center', maxWidth: '440px', margin: '48px auto' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Product Not Found</h3>
+        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '6px', marginBottom: '20px' }}>
+          The requested marketing asset does not exist or is not available for your site.
         </p>
         <Link
           href="/shop/catalogue"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F73582] text-white text-xs font-bold shadow-sm"
+          style={{
+            padding: '10px 20px',
+            borderRadius: '12px',
+            backgroundColor: '#f73582',
+            color: '#ffffff',
+            fontSize: '13px',
+            fontWeight: 700,
+            textDecoration: 'none',
+            display: 'inline-block',
+          }}
         >
-          <ArrowLeft size={14} /> Back to Catalogue
+          Return to Catalogue
         </Link>
       </div>
     );
@@ -98,7 +100,7 @@ export default function ProductDetailPage() {
   const multiple = product.orderMultiple || 1;
 
   const handleAddToCart = () => {
-    if (!isAvailable) return;
+    if (!isAvailable || !isValidQty) return;
     const res = addItem(product, qty, unitPrice);
     if (!res.success) {
       setAddError(res.error || 'Cannot add product to cart');
@@ -109,50 +111,122 @@ export default function ProductDetailPage() {
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
-    }, 2000);
+    }, 2500);
   };
 
   return (
-    <div className="space-y-6 pb-16">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '48px' }}>
       {/* 1. Breadcrumbs */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link
           href="/shop/catalogue"
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#F73582] transition-colors bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '12px',
+            fontWeight: 700,
+            color: '#475569',
+            backgroundColor: '#ffffff',
+            padding: '8px 14px',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+            textDecoration: 'none',
+          }}
         >
           <ArrowLeft size={14} />
           <span>Back to Asset Catalogue</span>
         </Link>
 
-        <div className="flex items-center gap-2 text-xs text-slate-500 font-mono">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b', fontFamily: 'monospace' }}>
           <span>ID: {product.id}</span>
           <span>•</span>
           <span>SKU: {product.sku}</span>
         </div>
       </div>
 
-      {/* 2. Main Product Hero Grid */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
-        {/* Left Column: Image Gallery (5 cols) */}
-        <div className="lg:col-span-5 bg-slate-50 p-6 sm:p-8 flex flex-col justify-center items-center border-b lg:border-b-0 lg:border-r border-slate-100 relative">
-          <div className="relative aspect-square w-full max-w-md rounded-2xl overflow-hidden bg-white border border-slate-200/80 shadow-sm">
+      {/* 2. Main Product Hero */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '24px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(300px, 5fr) minmax(360px, 7fr)',
+          gap: 0,
+        }}
+      >
+        {/* Left Column: Image */}
+        <div
+          style={{
+            backgroundColor: '#f8fafc',
+            padding: '32px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRight: '1px solid #f1f5f9',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: '380px',
+              aspectRatio: '1 / 1',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            }}
+          >
             <Image
-              src={product.thumbnailUrl || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'}
+              src={imgSrc}
               alt={product.name}
               fill
               priority
-              className={`object-cover ${!isAvailable ? 'grayscale contrast-75' : ''}`}
+              unoptimized
+              sizes="(max-width: 768px) 100vw, 400px"
+              onError={() => setImgSrc(FALLBACK_IMAGE)}
+              style={{
+                objectFit: 'cover',
+                filter: !isAvailable ? 'grayscale(80%) contrast(85%)' : 'none',
+              }}
             />
 
-            {/* Status Overlay */}
             {!isAvailable && (
-              <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center p-4">
-                <div className="bg-white/95 rounded-2xl p-4 shadow-xl border border-red-200 text-center max-w-xs">
-                  <ShieldAlert size={28} className="text-red-500 mx-auto mb-2" />
-                  <h4 className="text-sm font-bold text-slate-900">
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: 'rgba(15, 23, 42, 0.45)',
+                  backdropFilter: 'blur(2px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '16px',
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                    textAlign: 'center',
+                    maxWidth: '280px',
+                  }}
+                >
+                  <ShieldAlert size={28} color="#ef4444" style={{ margin: '0 auto 8px auto' }} />
+                  <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
                     {product.status === 'SUPERSEDED' ? 'Item Superseded' : 'Item Unavailable'}
                   </h4>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', margin: 0 }}>
                     {product.status === 'SUPERSEDED'
                       ? 'This revision has been archived and replaced with an updated specification.'
                       : 'This asset is currently not available for site dispatch.'}
@@ -162,118 +236,160 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Rate Card tag badge if custom priced */}
           {product.isCustomPriced && (
-            <div className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#F73582] text-xs font-bold">
+            <div
+              style={{
+                marginTop: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '9999px',
+                backgroundColor: '#fdf2f8',
+                border: '1px solid #fbcfe8',
+                color: '#f73582',
+                fontSize: '12px',
+                fontWeight: 700,
+              }}
+            >
               <Tag size={13} />
               <span>Contract Pricing Applied ({product.discountPct}% Discount)</span>
             </div>
           )}
         </div>
 
-        {/* Right Column: Product Detail & Ordering Controls (7 cols) */}
-        <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-6">
-          <div className="space-y-4">
-            {/* Category & Status Row */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+        {/* Right Column: Details & Order Controls */}
+        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Category & Status */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  backgroundColor: '#f1f5f9',
+                  color: '#334155',
+                }}
+              >
                 {product.categoryName || 'Marketing Collateral'}
               </span>
 
               <span
-                className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                  product.status === 'ACTIVE'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : product.status === 'SUPERSEDED'
-                    ? 'bg-amber-100 text-amber-800'
-                    : 'bg-red-100 text-red-800'
-                }`}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  backgroundColor: product.status === 'ACTIVE' ? '#ecfdf5' : '#fef2f2',
+                  color: product.status === 'ACTIVE' ? '#065f46' : '#991b1b',
+                  border: product.status === 'ACTIVE' ? '1px solid #a7f3d0' : '1px solid #fecaca',
+                }}
               >
                 {product.status === 'ACTIVE' ? 'Approved for Site Orders' : product.status}
               </span>
 
-              <span className="font-mono text-xs text-slate-400 ml-auto">
+              <span style={{ fontFamily: 'monospace', fontSize: '12px', color: '#94a3b8', marginLeft: 'auto' }}>
                 SKU: {product.sku}
               </span>
             </div>
 
-            {/* Product Title */}
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight">
+            {/* Title */}
+            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, margin: 0 }}>
               {product.name}
             </h1>
 
             {/* Description */}
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
               {product.description}
             </p>
 
-            {/* Logistics & Pack Specs Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 border-y border-slate-100">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[11px] text-slate-400 font-medium block">Pack Size</span>
-                <span className="text-xs font-bold text-slate-800">{product.packSize || '1 Unit'}</span>
+            {/* Logistics Specs Grid */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '12px',
+                padding: '12px 0',
+                borderTop: '1px solid #f1f5f9',
+                borderBottom: '1px solid #f1f5f9',
+              }}
+            >
+              <div style={{ padding: '10px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block', fontWeight: 500 }}>Pack Size</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>{product.packSize || '1 Unit'}</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[11px] text-slate-400 font-medium block">Unit of Measure</span>
-                <span className="text-xs font-bold text-slate-800">{product.uom || 'EA'}</span>
+              <div style={{ padding: '10px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block', fontWeight: 500 }}>UOM</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>{product.uom || 'EA'}</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[11px] text-slate-400 font-medium block">Min Order Qty (MOQ)</span>
-                <span className="text-xs font-bold text-slate-800">{moq} {product.uom}</span>
+              <div style={{ padding: '10px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block', fontWeight: 500 }}>MOQ</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>{moq} {product.uom}</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[11px] text-slate-400 font-medium block">Order Multiple</span>
-                <span className="text-xs font-bold text-slate-800">
+              <div style={{ padding: '10px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block', fontWeight: 500 }}>Order Multiple</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>
                   {multiple > 1 ? `Multiples of ${multiple}` : 'Any Qty ≥ MOQ'}
                 </span>
               </div>
             </div>
 
             {/* Pricing Summary Box */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-              <div className="flex items-baseline justify-between">
+            <div
+              style={{
+                padding: '16px 20px',
+                borderRadius: '16px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                 <div>
-                  <span className="text-xs text-slate-500 font-medium block">Unit Contract Price:</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-slate-900">
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block' }}>Unit Contract Price:</span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                    <span style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>
                       ${unitPrice.toFixed(2)}
                     </span>
-                    <span className="text-xs text-slate-500 font-medium">/ {product.uom}</span>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>/ {product.uom}</span>
                     {product.isCustomPriced && product.discountPct > 0 && (
-                      <span className="text-xs font-semibold text-slate-400 line-through">
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', textDecoration: 'line-through' }}>
                         ${product.basePrice.toFixed(2)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Live Extended Total */}
-                <div className="text-right">
-                  <span className="text-xs text-slate-500 font-medium block">
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block' }}>
                     Extended Total ({qty} {product.uom}):
                   </span>
-                  <span className="text-2xl font-black text-[#F73582]">
+                  <span style={{ fontSize: '24px', fontWeight: 900, color: '#f73582' }}>
                     ${lineTotal.toFixed(2)}
                   </span>
                 </div>
               </div>
 
               {product.rateCardName && (
-                <div className="text-[11px] text-slate-500 flex items-center gap-1 pt-1 border-t border-slate-200/60">
-                  <Tag size={11} className="text-[#F73582]" />
+                <div style={{ fontSize: '11px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', paddingTop: '6px', borderTop: '1px solid #e2e8f0' }}>
+                  <Tag size={12} color="#f73582" />
                   <span>Rate Card Tier: <strong>{product.rateCardName}</strong></span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Ordering Validation & CTA Box */}
-          <div className="pt-2 space-y-4">
+          {/* Ordering Validation & CTA */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {isAvailable ? (
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <div className="flex-1">
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '180px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
                       Select Quantity ({product.uom}):
                     </label>
                     <QuantitySelector
@@ -287,68 +403,61 @@ export default function ProductDetailPage() {
                     />
                   </div>
 
-                  <div className="sm:self-end">
-                    <motion.button
-                      whileTap={{ scale: 0.97 }}
-                      onClick={handleAddToCart}
-                      disabled={!isValidQty}
-                      className={`w-full sm:w-auto px-8 py-3.5 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all ${
-                        isAdded
-                          ? 'bg-emerald-600 text-white shadow-emerald-200'
-                          : isValidQty
-                          ? 'bg-[#F73582] hover:bg-[#de206d] text-white shadow-pink-200 hover:shadow-lg'
-                          : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
-                      }`}
-                    >
-                      <AnimatePresence mode="wait">
-                        {isAdded ? (
-                          <motion.span
-                            key="added"
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                            className="flex items-center gap-1.5"
-                          >
-                            <Check size={16} /> Added to Cart!
-                          </motion.span>
-                        ) : (
-                          <motion.span
-                            key="add"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex items-center gap-1.5"
-                          >
-                            <ShoppingCart size={16} /> Add to Collateral Order
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </motion.button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    disabled={!isValidQty}
+                    style={{
+                      padding: '14px 28px',
+                      borderRadius: '14px',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      cursor: isValidQty ? 'pointer' : 'not-allowed',
+                      backgroundColor: isAdded ? '#059669' : isValidQty ? '#f73582' : '#cbd5e1',
+                      color: '#ffffff',
+                      border: 'none',
+                      boxShadow: isValidQty && !isAdded ? '0 4px 12px rgba(247, 53, 130, 0.3)' : 'none',
+                      transition: 'all 0.15s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    {isAdded ? (
+                      <>
+                        <Check size={16} /> Added to Cart!
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart size={16} /> Add to Collateral Order
+                      </>
+                    )}
+                  </button>
                 </div>
 
                 {addError && (
-                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2">
+                  <div style={{ padding: '10px 14px', borderRadius: '10px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <AlertTriangle size={15} />
                     <span>{addError}</span>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center space-y-2">
-                <p className="text-xs font-bold text-slate-700">
+              <div style={{ padding: '16px', borderRadius: '14px', backgroundColor: '#f1f5f9', textAlign: 'center' }}>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: '#475569', margin: 0 }}>
                   Ordering Disabled for this Asset
                 </p>
-                <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                  This product is unavailable or superseded by an updated marketing release. Please contact your Brand Administrator for latest marketing collateral assets.
+                <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>
+                  This product is unavailable or superseded by an updated marketing release.
                 </p>
               </div>
             )}
 
-            {/* On-Account reassurance notice */}
-            <div className="flex items-center gap-2 text-xs text-slate-500 pt-2">
-              <ShieldCheck size={15} className="text-emerald-600 shrink-0" />
+            {/* On-Account Reassurance */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b', paddingTop: '8px' }}>
+              <ShieldCheck size={16} color="#059669" style={{ flexShrink: 0 }} />
               <span>
-                Orders are processed on-account and consolidated into your monthly billing report. Zero credit card or payment gateway step required.
+                Orders are processed on-account and consolidated into your monthly billing report. Zero credit card required.
               </span>
             </div>
           </div>
