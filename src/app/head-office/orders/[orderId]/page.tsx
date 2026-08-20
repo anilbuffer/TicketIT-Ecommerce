@@ -181,12 +181,12 @@ export default function HOOrderDetailPage() {
       <SectionCard title="Status History" icon={<Calendar size={16} />}>
         <div style={{ display: 'flex', gap: '0', flexWrap: 'wrap' }}>
           {(['RECEIVED', 'PROCESSING', 'DISPATCHED', 'DELIVERED'] as OrderStatus[]).map((st, i, arr) => {
-            const statusOrder = { RECEIVED: 0, PROCESSING: 1, DISPATCHED: 2, DELIVERED: 3 };
-            const currentIdx = statusOrder[order.status];
-            const thisIdx = statusOrder[st];
+            const statusOrder: Record<string, number> = { RECEIVED: 0, PROCESSING: 1, DISPATCHED: 2, DELIVERED: 3 };
+            const currentIdx = statusOrder[order.status] ?? -1;
+            const thisIdx = statusOrder[st] ?? 0;
             const isPast = thisIdx < currentIdx;
             const isCurrent = thisIdx === currentIdx;
-            const dateMap: Record<OrderStatus, string | undefined> = {
+            const dateMap: Partial<Record<OrderStatus, string | undefined>> = {
               RECEIVED: order.createdAt,
               PROCESSING: order.updatedAt,
               DISPATCHED: order.dispatchedAt,

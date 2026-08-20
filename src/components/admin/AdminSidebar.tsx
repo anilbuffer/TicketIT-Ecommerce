@@ -77,6 +77,11 @@ export function AdminSidebar({
           href: '/admin/catalogue/categories',
           icon: Layers,
         },
+        {
+          title: 'Warehouse Inventory',
+          href: '/admin/inventory',
+          icon: Database,
+        },
       ],
     },
     {
@@ -119,6 +124,12 @@ export function AdminSidebar({
           badge: 'Live',
         },
         {
+          title: 'Approvals Queue',
+          href: '/admin/approvals',
+          icon: UserCheck,
+          badge: 'New',
+        },
+        {
           title: 'Fulfilment Queue',
           href: '/admin/orders/fulfilment',
           icon: Kanban,
@@ -143,6 +154,11 @@ export function AdminSidebar({
     {
       title: 'SYSTEM SETTINGS',
       items: [
+        {
+          title: 'Enterprise APIs',
+          href: '/admin/integrations',
+          icon: Sparkles,
+        },
         {
           title: 'General Config',
           href: '/admin/settings/general',

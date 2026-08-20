@@ -52,6 +52,40 @@ export default function AdminDashboardPage() {
         actionButton={
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Link
+              href="/admin/approvals"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                backgroundColor: '#F59E0B',
+                color: '#FFFFFF',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              <span>⚖️ Approvals</span>
+            </Link>
+            <Link
+              href="/admin/inventory"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                backgroundColor: '#3B82F6',
+                color: '#FFFFFF',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              <span>📦 Inventory</span>
+            </Link>
+            <Link
               href="/admin/catalogue/products"
               style={{
                 display: 'flex',

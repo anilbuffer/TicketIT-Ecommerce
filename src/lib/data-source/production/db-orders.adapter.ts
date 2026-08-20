@@ -94,3 +94,42 @@ export async function updateDetails(
     include: { lineItems: true },
   }) as any;
 }
+
+export async function approveOrder(
+  id: string,
+  approverName: string,
+  notes?: string
+): Promise<Order> {
+  const now = new Date().toISOString();
+  return prisma.order.update({
+    where: { id },
+    data: {
+      status: 'APPROVED',
+      approvedBy: approverName,
+      approvedAt: now,
+      approvalNotes: notes || 'Approved by Head Office Controller',
+      updatedAt: now,
+    } as any,
+    include: { lineItems: true },
+  }) as any;
+}
+
+export async function rejectOrder(
+  id: string,
+  approverName: string,
+  reason: string
+): Promise<Order> {
+  const now = new Date().toISOString();
+  return prisma.order.update({
+    where: { id },
+    data: {
+      status: 'REJECTED',
+      approvedBy: approverName,
+      approvedAt: now,
+      rejectedReason: reason || 'Budget allocation cap exceeded for this site',
+      updatedAt: now,
+    } as any,
+    include: { lineItems: true },
+  }) as any;
+}
+

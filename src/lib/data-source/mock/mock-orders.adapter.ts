@@ -134,3 +134,54 @@ export async function updateDetails(
 
   return JSON.parse(JSON.stringify(ordersStore[idx]));
 }
+
+export async function approveOrder(
+  id: string,
+  approverName: string,
+  notes?: string
+): Promise<Order> {
+  await simulateLatency();
+  const idx = ordersStore.findIndex((o) => o.id === id || o.orderNumber === id);
+  if (idx === -1) {
+    throw new Error(`Order with ID "${id}" not found`);
+  }
+
+  const now = new Date().toISOString();
+  const updated: Order = {
+    ...ordersStore[idx],
+    status: 'APPROVED',
+    approvedBy: approverName,
+    approvedAt: now,
+    approvalNotes: notes || 'Approved by Head Office Controller',
+    updatedAt: now,
+  };
+
+  ordersStore[idx] = updated;
+  return JSON.parse(JSON.stringify(updated));
+}
+
+export async function rejectOrder(
+  id: string,
+  approverName: string,
+  reason: string
+): Promise<Order> {
+  await simulateLatency();
+  const idx = ordersStore.findIndex((o) => o.id === id || o.orderNumber === id);
+  if (idx === -1) {
+    throw new Error(`Order with ID "${id}" not found`);
+  }
+
+  const now = new Date().toISOString();
+  const updated: Order = {
+    ...ordersStore[idx],
+    status: 'REJECTED',
+    approvedBy: approverName,
+    approvedAt: now,
+    rejectedReason: reason || 'Budget allocation cap exceeded for this site',
+    updatedAt: now,
+  };
+
+  ordersStore[idx] = updated;
+  return JSON.parse(JSON.stringify(updated));
+}
+

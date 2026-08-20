@@ -204,6 +204,13 @@ export default function OrderConfirmationPage() {
             <strong style={{ color: '#f73582', fontFamily: 'monospace' }}>{order.poReference || 'N/A'}</strong>
           </div>
 
+          {order.campaignCode && (
+            <div style={{ padding: '10px 16px', borderRadius: '12px', backgroundColor: '#EEF2FF', border: '1px solid #C7D2FE', textAlign: 'left' }}>
+              <span style={{ fontSize: '10px', color: '#6366F1', display: 'block' }}>Campaign Allocation</span>
+              <strong style={{ color: '#4338CA', fontFamily: 'monospace' }}>{order.campaignCode}</strong>
+            </div>
+          )}
+
           <div style={{ padding: '10px 16px', borderRadius: '12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', textAlign: 'left' }}>
             <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block' }}>Settlement Method</span>
             <strong style={{ color: '#059669' }}>Consolidated Account</strong>

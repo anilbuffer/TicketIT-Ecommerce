@@ -166,5 +166,40 @@ export async function createCategory(input: Omit<ProductCategory, 'id' | 'itemCo
   return { ...newCategory };
 }
 
+export async function bulkCreate(items: Omit<Product, 'id'>[]): Promise<Product[]> {
+  await simulateLatency();
+  const createdList: Product[] = items.map((input, idx) => ({
+    ...input,
+    id: `prod-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 5)}`,
+    stockRemaining: input.stockRemaining ?? 100,
+    lowStockThreshold: input.lowStockThreshold ?? 15,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
+
+  productsStore = [...createdList, ...productsStore];
+  return createdList;
+}
+
+export async function updateStock(id: string, deltaQty: number): Promise<Product> {
+  await simulateLatency();
+  const idx = productsStore.findIndex((p) => p.id === id);
+  if (idx === -1) {
+    throw new Error(`Product with ID "${id}" not found`);
+  }
+
+  const currentStock = productsStore[idx].stockRemaining ?? 100;
+  const newStock = Math.max(0, currentStock + deltaQty);
+
+  productsStore[idx] = {
+    ...productsStore[idx],
+    stockRemaining: newStock,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return { ...productsStore[idx] };
+}
+
+
 
 

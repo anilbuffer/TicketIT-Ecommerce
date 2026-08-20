@@ -102,3 +102,31 @@ export async function getByIdWithPricing(id: string, accountId?: string) {
   };
 }
 
+export async function bulkCreate(items: Omit<Product, 'id'>[]): Promise<Product[]> {
+  const createdList: Product[] = [];
+  for (const item of items) {
+    const created = await create(item);
+    createdList.push(created);
+  }
+  return createdList;
+}
+
+export async function updateStock(id: string, deltaQty: number): Promise<Product> {
+  const product = await prisma.product.findUnique({ where: { id } });
+  if (!product) {
+    throw new Error(`Product with ID "${id}" not found`);
+  }
+  const currentStock = (product as any).stockRemaining ?? 100;
+  const newStock = Math.max(0, currentStock + deltaQty);
+
+  const updated = await prisma.product.update({
+    where: { id },
+    data: {
+      stockRemaining: newStock,
+    } as any,
+  });
+
+  return { ...updated, basePrice: Number(updated.basePrice) } as any;
+}
+
+

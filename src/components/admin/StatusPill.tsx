@@ -13,6 +13,31 @@ interface StatusPillProps {
 export function StatusPill({ status, size = 'md' }: StatusPillProps) {
   const getStatusStyles = () => {
     switch (status) {
+      case 'PENDING_APPROVAL':
+        return {
+          bg: '#FFFBEB',
+          text: '#B45309',
+          border: 'rgba(245, 158, 11, 0.35)',
+          dot: '#F59E0B',
+          label: 'Pending Approval',
+        };
+      case 'APPROVED':
+        return {
+          bg: '#ECFDF5',
+          text: '#047857',
+          border: 'rgba(16, 185, 129, 0.3)',
+          dot: '#10B981',
+          label: 'Approved',
+        };
+      case 'REJECTED':
+      case 'CANCELLED':
+        return {
+          bg: '#FEF2F2',
+          text: '#B91C1C',
+          border: 'rgba(239, 68, 68, 0.3)',
+          dot: '#EF4444',
+          label: status === 'REJECTED' ? 'Rejected' : 'Cancelled',
+        };
       case 'RECEIVED':
         return {
           bg: '#FFF0F6',

@@ -22,6 +22,34 @@ export function OrderStatusBadge({ status, size = 'md', showIcon = true }: Order
       icon: React.ReactNode;
     }
   > = {
+    PENDING_APPROVAL: {
+      label: 'Pending Approval',
+      bg: 'rgba(245, 158, 11, 0.12)',
+      text: '#b45309',
+      border: 'rgba(245, 158, 11, 0.35)',
+      icon: <Clock size={size === 'sm' ? 12 : 14} color="#b45309" />,
+    },
+    APPROVED: {
+      label: 'Approved',
+      bg: 'rgba(16, 185, 129, 0.12)',
+      text: '#047857',
+      border: 'rgba(16, 185, 129, 0.35)',
+      icon: <CheckCircle2 size={size === 'sm' ? 12 : 14} color="#047857" />,
+    },
+    REJECTED: {
+      label: 'Rejected',
+      bg: 'rgba(239, 68, 68, 0.12)',
+      text: '#b91c1c',
+      border: 'rgba(239, 68, 68, 0.35)',
+      icon: <Clock size={size === 'sm' ? 12 : 14} color="#b91c1c" />,
+    },
+    CANCELLED: {
+      label: 'Cancelled',
+      bg: 'rgba(100, 116, 139, 0.12)',
+      text: '#475569',
+      border: 'rgba(100, 116, 139, 0.3)',
+      icon: <Clock size={size === 'sm' ? 12 : 14} color="#475569" />,
+    },
     RECEIVED: {
       label: 'Order Received',
       bg: 'rgba(59, 130, 246, 0.08)',

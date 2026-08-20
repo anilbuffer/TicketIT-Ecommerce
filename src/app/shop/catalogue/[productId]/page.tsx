@@ -20,7 +20,6 @@ import {
   AlertTriangle,
   Download,
   FileDown,
-  FileText,
   Sparkles,
 } from 'lucide-react';
 
@@ -41,6 +40,12 @@ export default function ProductDetailPage() {
   const [addError, setAddError] = useState<string | null>(null);
   const [imgSrc, setImgSrc] = useState<string>(FALLBACK_IMAGE);
 
+  // Dynamic Personalization state
+  const [customBranchHeadline, setCustomBranchHeadline] = useState('');
+  const [customPromoTag, setCustomPromoTag] = useState('Spring Health & Wellness Campaign');
+  const [customPhone, setCustomPhone] = useState('+1 (212) 555-0199');
+  const [customHours, setCustomHours] = useState('Mon-Sat 8AM-9PM');
+
   useEffect(() => {
     async function loadProduct() {
       if (!productId) return;
@@ -51,6 +56,7 @@ export default function ProductDetailPage() {
           setProduct(item);
           setQty(item.moq || 1);
           setImgSrc(item.thumbnailUrl || FALLBACK_IMAGE);
+          setCustomBranchHeadline(user?.siteName || 'Apex Midtown Central Pharmacy');
         }
       } catch (err) {
         console.error('Failed to load product detail', err);
@@ -60,7 +66,7 @@ export default function ProductDetailPage() {
     }
 
     loadProduct();
-  }, [productId, user?.accountId]);
+  }, [productId, user?.accountId, user?.siteName]);
 
   if (isLoading) {
     return (
@@ -202,6 +208,30 @@ export default function ProductDetailPage() {
                 filter: !isAvailable ? 'grayscale(80%) contrast(85%)' : 'none',
               }}
             />
+
+            {/* Customization live overlay badge on preview */}
+            {customBranchHeadline && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '12px',
+                  left: '12px',
+                  right: '12px',
+                  backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                  backdropFilter: 'blur(6px)',
+                  borderRadius: '10px',
+                  padding: '8px 12px',
+                  color: '#fff',
+                  fontSize: '11px',
+                }}
+              >
+                <div style={{ fontWeight: 800, color: '#F472B6' }}>✓ Custom Template:</div>
+                <div style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {customBranchHeadline}
+                </div>
+                <div style={{ fontSize: '10px', color: '#94A3B8' }}>{customPromoTag}</div>
+              </div>
+            )}
 
             {!isAvailable && (
               <div
@@ -391,6 +421,120 @@ export default function ProductDetailPage() {
               )}
             </div>
 
+            {/* Dynamic Template Personalization Tool */}
+            <div
+              style={{
+                padding: '16px 18px',
+                borderRadius: '16px',
+                backgroundColor: '#FDF2F8',
+                border: '1px solid #FBCFE8',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={18} color="#BE185D" />
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#9D174D' }}>
+                    Personalize Marketing Asset Template
+                  </span>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', backgroundColor: '#fff', color: '#BE185D', border: '1px solid #FBCFE8' }}>
+                  Web-to-Print Ready
+                </span>
+              </div>
+              <p style={{ fontSize: '12px', color: '#831843', margin: 0, lineHeight: 1.4 }}>
+                Customize this asset with your branch details before submission. Customized graphics are rendered and attached to your order.
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9D174D', marginBottom: '4px' }}>
+                    Branch / Location Headline
+                  </label>
+                  <input
+                    type="text"
+                    value={customBranchHeadline}
+                    onChange={(e) => setCustomBranchHeadline(e.target.value)}
+                    placeholder="e.g. Apex Midtown Central"
+                    style={{
+                      width: '100%',
+                      padding: '7px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #FBCFE8',
+                      fontSize: '12px',
+                      backgroundColor: '#fff',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9D174D', marginBottom: '4px' }}>
+                    Campaign Promo Tagline
+                  </label>
+                  <input
+                    type="text"
+                    value={customPromoTag}
+                    onChange={(e) => setCustomPromoTag(e.target.value)}
+                    placeholder="e.g. Spring Health & Wellness Expo"
+                    style={{
+                      width: '100%',
+                      padding: '7px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #FBCFE8',
+                      fontSize: '12px',
+                      backgroundColor: '#fff',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9D174D', marginBottom: '4px' }}>
+                    Local Branch Phone
+                  </label>
+                  <input
+                    type="text"
+                    value={customPhone}
+                    onChange={(e) => setCustomPhone(e.target.value)}
+                    placeholder="e.g. +1 (212) 555-0199"
+                    style={{
+                      width: '100%',
+                      padding: '7px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #FBCFE8',
+                      fontSize: '12px',
+                      backgroundColor: '#fff',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9D174D', marginBottom: '4px' }}>
+                    Operating Hours / Date Note
+                  </label>
+                  <input
+                    type="text"
+                    value={customHours}
+                    onChange={(e) => setCustomHours(e.target.value)}
+                    placeholder="e.g. Mon-Sat 8AM-9PM"
+                    style={{
+                      width: '100%',
+                      padding: '7px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #FBCFE8',
+                      fontSize: '12px',
+                      backgroundColor: '#fff',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Optional Downloadable Artwork / Reference File */}
             <div
               style={{
@@ -445,6 +589,10 @@ export default function ProductDetailPage() {
                     `Order Multiples: ${multiple}\n` +
                     `Status: ${product.status}\n` +
                     `Description: ${product.description}\n` +
+                    `Customization Headline: ${customBranchHeadline}\n` +
+                    `Customization Tagline: ${customPromoTag}\n` +
+                    `Customization Phone: ${customPhone}\n` +
+                    `Customization Hours: ${customHours}\n` +
                     `Reference URL: ${product.thumbnailUrl}\n` +
                     `Generated On: ${new Date().toISOString()}\n`
                   ], { type: 'text/plain;charset=utf-8' });

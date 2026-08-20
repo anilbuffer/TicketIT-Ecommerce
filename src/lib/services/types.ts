@@ -17,6 +17,11 @@ export type Product = {
   moq: number;
   orderMultiple: number;
   status: ProductStatus;
+  stockRemaining?: number;
+  lowStockThreshold?: number;
+  isPersonalizable?: boolean;
+  personalizationTemplate?: string;
+  artworkUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -63,6 +68,9 @@ export type Account = {
   activeRateCardId?: string;
   activeRateCardName?: string;
   totalMonthlySpend?: number;
+  approvalThreshold?: number;
+  requirePoNumber?: boolean;
+  poPrefix?: string;
   createdAt?: string;
 };
 
@@ -86,7 +94,15 @@ export type PortalUser = {
   createdAt?: string;
 };
 
-export type OrderStatus = 'RECEIVED' | 'PROCESSING' | 'DISPATCHED' | 'DELIVERED';
+export type OrderStatus =
+  | 'PENDING_APPROVAL'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'RECEIVED'
+  | 'PROCESSING'
+  | 'DISPATCHED'
+  | 'DELIVERED'
+  | 'CANCELLED';
 
 export type OrderLineItem = {
   id: string;
@@ -100,6 +116,7 @@ export type OrderLineItem = {
   lineTotal: number;
   packSize?: string;
   uom?: string;
+  customizations?: Record<string, string>;
 };
 
 export type Order = {
@@ -114,9 +131,16 @@ export type Order = {
   userName: string;
   userEmail: string;
   poReference?: string;
+  campaignCode?: string;
+  projectCode?: string;
   status: OrderStatus;
   totalAmount: number;
   itemCount: number;
+  requiresApproval?: boolean;
+  approvalNotes?: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedReason?: string;
   createdAt: string;
   updatedAt: string;
   dispatchedAt?: string;
@@ -333,4 +357,35 @@ export type OrderDeliveryDetails = {
   deliveryInstructions?: string;
   isCustomShippingAddress?: boolean;
 };
+
+// ─── Enterprise Integrations & Webhooks ─────────────────────────────────────
+
+export type TargetIntegrationSystem = 'PRINT_PRODUCTION' | 'WAREHOUSE_3PL' | 'ERP_FINANCE';
+
+export type IntegrationWebhook = {
+  id: string;
+  name: string;
+  targetSystem: TargetIntegrationSystem;
+  url: string;
+  events: string[];
+  status: 'ACTIVE' | 'PAUSED';
+  secretKey: string;
+  lastTriggeredAt?: string;
+  successRatePct: number;
+  totalCalls: number;
+};
+
+export type WebhookDeliveryLog = {
+  id: string;
+  webhookId: string;
+  webhookName: string;
+  targetSystem: TargetIntegrationSystem;
+  event: string;
+  status: 'SUCCESS' | 'FAILED' | 'RETRYING';
+  httpCode: number;
+  payloadSummary: string;
+  timestamp: string;
+  responseTimeMs: number;
+};
+
 

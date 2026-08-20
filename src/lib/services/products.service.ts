@@ -18,6 +18,14 @@ export async function getProductById(id: string): Promise<Product | null> {
   return ds.products.getById(id);
 }
 
+export async function getProductWithPricing(
+  id: string,
+  accountId?: string
+): Promise<EffectiveProduct | null> {
+  const ds = getDataSource();
+  return ds.products.getByIdWithPricing(id, accountId);
+}
+
 export async function createProduct(input: Omit<Product, 'id'>): Promise<Product> {
   const ds = getDataSource();
   const created = await ds.products.create(input);
@@ -108,11 +116,32 @@ export async function getVisibleProductsForAccount(
   return ds.products.listVisibleForAccount(accountId, params);
 }
 
-export async function getProductWithPricing(
-  id: string,
-  accountId?: string
-): Promise<EffectiveProduct | null> {
+export async function bulkCreateProducts(items: Omit<Product, 'id'>[]): Promise<Product[]> {
   const ds = getDataSource();
-  return ds.products.getByIdWithPricing(id, accountId);
+  const createdList = await ds.products.bulkCreate(items);
+
+  try {
+    await ds.audit.log({
+      actorId: 'usr_admin_999',
+      actorName: 'Sarah Jenkins',
+      actorEmail: 'admin@ticketit.io',
+      actorRole: 'ADMIN',
+      action: 'BULK_PRODUCTS_IMPORTED',
+      entityType: 'PRODUCT',
+      entityId: `batch-${Date.now()}`,
+      entityName: `${items.length} Products Imported via CSV`,
+      details: { count: items.length },
+    });
+  } catch (err) {
+    console.error('Audit log failed', err);
+  }
+
+  return createdList;
 }
+
+export async function updateProductStock(id: string, deltaQty: number): Promise<Product> {
+  const ds = getDataSource();
+  return ds.products.updateStock(id, deltaQty);
+}
+
 

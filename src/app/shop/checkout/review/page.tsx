@@ -43,6 +43,9 @@ export default function CheckoutReviewPage() {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    const requiresApproval = subtotal > 1000;
+    const initialStatus = requiresApproval ? 'PENDING_APPROVAL' : 'RECEIVED';
+
     try {
       const orderPayload = {
         accountId: user?.accountId || 'acc-001',
@@ -54,7 +57,10 @@ export default function CheckoutReviewPage() {
         userName: user?.name || 'Marcus Vance',
         userEmail: user?.email || 'marcus.vance@apexhealth.org',
         poReference: checkoutState.poReference || `PO-APX-${Math.floor(1000 + Math.random() * 9000)}`,
-        status: 'RECEIVED' as const,
+        campaignCode: checkoutState.campaignCode || 'CMP-SPRING-2026',
+        projectCode: checkoutState.projectCode || 'PRJ-REBRAND-Q3',
+        status: initialStatus as any,
+        requiresApproval,
         totalAmount: subtotal,
         deliveryNotes: `${checkoutState.deliveryInstructions || 'Standard site delivery'} | Contact: ${checkoutState.deliveryContactName} (${checkoutState.deliveryContactPhone})`,
         lineItems: items.map((item, idx) => ({
@@ -373,13 +379,32 @@ export default function CheckoutReviewPage() {
             </div>
           </div>
 
-          {/* On-Account Banner */}
+          {/* Campaign Code Badge */}
+          {checkoutState.campaignCode && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                backgroundColor: '#EEF2FF',
+                border: '1px solid #C7D2FE',
+                fontSize: '12px',
+              }}
+            >
+              <span style={{ color: '#4338CA', fontWeight: 600 }}>Allocated Campaign:</span>
+              <strong style={{ color: '#312E81', fontFamily: 'monospace' }}>{checkoutState.campaignCode}</strong>
+            </div>
+          )}
+
+          {/* On-Account Banner / Approval Notice */}
           <div
             style={{
               padding: '14px',
               borderRadius: '12px',
-              backgroundColor: '#fdf2f8',
-              border: '1px solid #fbcfe8',
+              backgroundColor: subtotal > 1000 ? '#FFFBEB' : '#fdf2f8',
+              border: subtotal > 1000 ? '1px solid #FDE68A' : '1px solid #fbcfe8',
               display: 'flex',
               flexDirection: 'column',
               gap: '6px',
@@ -388,11 +413,13 @@ export default function CheckoutReviewPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: '#0f172a' }}>
-              <ShieldCheck size={16} color="#059669" />
-              <span>Charge-to-Account Order</span>
+              <ShieldCheck size={16} color={subtotal > 1000 ? '#D97706' : '#059669'} />
+              <span>{subtotal > 1000 ? 'Managerial Sign-Off Required' : 'Charge-to-Account Order'}</span>
             </div>
-            <p style={{ margin: 0, color: '#64748b' }}>
-              No online card payment required. This order will be routed to Central Fulfilment and consolidated on your Head Office statement.
+            <p style={{ margin: 0, color: subtotal > 1000 ? '#92400E' : '#64748b' }}>
+              {subtotal > 1000
+                ? 'Order exceeds the $1,000 threshold and will be routed to your Head Office Controller queue for approval before fulfillment.'
+                : 'No online card payment required. This order will be routed to Central Fulfilment and consolidated on your Head Office statement.'}
             </p>
           </div>
 

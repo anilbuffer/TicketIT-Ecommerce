@@ -82,6 +82,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
 
   const headOfficeNav: NavItem[] = [
     { label: 'HQ Dashboard', href: '/head-office/dashboard', icon: <LayoutDashboard size={19} /> },
+    { label: 'Approvals Queue', href: '/head-office/approvals', icon: <CheckCircle2 size={19} />, badge: 'New', badgeColor: '#b45309' },
     { label: 'Cross-Site Orders', href: '/head-office/orders/all', icon: <ShoppingCart size={19} />, badge: 'Live' },
     { label: 'Monthly Billing', href: '/head-office/billing/monthly', icon: <FileSpreadsheet size={19} />, badge: 'Reports' },
     { label: 'Spend Insights', href: '/head-office/reports/spend-by-site', icon: <TrendingUp size={19} /> },

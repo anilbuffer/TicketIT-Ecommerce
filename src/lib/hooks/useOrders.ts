@@ -101,6 +101,32 @@ export function useFulfilmentQueue() {
   return { queue, isLoading, refetch: fetchQueue };
 }
 
+export function usePendingApprovals(accountId?: string) {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchApprovals = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { getPendingApprovals } = await import('@/lib/services/orders.service');
+      const result = await getPendingApprovals(accountId);
+      setOrders(result);
+    } catch (err: any) {
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accountId]);
+
+  useEffect(() => {
+    fetchApprovals();
+  }, [fetchApprovals]);
+
+  return { orders, isLoading, error, refetch: fetchApprovals };
+}
+
 export function useOrderMutations() {
   const [isPending, setIsPending] = useState(false);
 
@@ -138,10 +164,33 @@ export function useOrderMutations() {
     }
   };
 
+  const approveOrder = async (id: string, approverName: string, notes?: string) => {
+    setIsPending(true);
+    try {
+      const { approveOrder: approveService } = await import('@/lib/services/orders.service');
+      return await approveService(id, approverName, notes);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const rejectOrder = async (id: string, approverName: string, reason: string) => {
+    setIsPending(true);
+    try {
+      const { rejectOrder: rejectService } = await import('@/lib/services/orders.service');
+      return await rejectService(id, approverName, reason);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return {
     createOrder,
     updateOrderStatus,
     updateOrderDetails,
+    approveOrder,
+    rejectOrder,
     isPending,
   };
 }
+

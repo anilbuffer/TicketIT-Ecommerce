@@ -126,10 +126,33 @@ export function useProductMutations() {
     }
   };
 
+  const bulkCreateProducts = async (items: Omit<Product, 'id'>[]) => {
+    setIsPending(true);
+    try {
+      const { bulkCreateProducts: bulkService } = await import('@/lib/services/products.service');
+      return await bulkService(items);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const updateProductStock = async (id: string, deltaQty: number) => {
+    setIsPending(true);
+    try {
+      const { updateProductStock: stockService } = await import('@/lib/services/products.service');
+      return await stockService(id, deltaQty);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return {
     createProduct,
     updateProduct,
     deleteProduct,
+    bulkCreateProducts,
+    updateProductStock,
     isPending,
   };
 }
+

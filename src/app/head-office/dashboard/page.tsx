@@ -187,6 +187,15 @@ export default function HODashboardPage() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <Link href="/head-office/approvals" style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            background: '#F59E0B', color: '#ffffff',
+            border: '1px solid transparent', borderRadius: '10px',
+            padding: '0.6rem 1.1rem', fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none',
+            boxShadow: '0 4px 14px rgba(245,158,11,0.3)',
+          }}>
+            <span>⚖️ Approvals Queue</span>
+          </Link>
           <Link href="/head-office/orders/all" style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem',
             background: 'rgba(255,255,255,0.1)', color: '#ffffff',

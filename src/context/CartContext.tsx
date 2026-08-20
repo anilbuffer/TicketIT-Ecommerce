@@ -14,6 +14,8 @@ export interface CartItem {
 
 export interface CheckoutState {
   poReference: string;
+  campaignCode?: string;
+  projectCode?: string;
   deliveryContactName: string;
   deliveryContactPhone: string;
   deliveryInstructions: string;

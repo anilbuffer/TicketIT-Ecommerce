@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Lock,
   Info,
+  Tag,
 } from 'lucide-react';
 
 export default function CheckoutDetailsPage() {
@@ -25,6 +26,7 @@ export default function CheckoutDetailsPage() {
 
   const [accountRules, setAccountRules] = useState<AccountOrderRules | null>(null);
   const [poReference, setPoReference] = useState<string>(checkoutState.poReference || '');
+  const [campaignCode, setCampaignCode] = useState<string>(checkoutState.campaignCode || 'CMP-SPRING-2026');
   const [poError, setPoError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -280,6 +282,79 @@ export default function CheckoutDetailsPage() {
                 <span>{poError}</span>
               </div>
             )}
+          </div>
+
+          {/* Marketing Campaign / Project Code */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <label
+                htmlFor="campaignCode"
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: '#0f172a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Tag size={15} color="#f73582" />
+                <span>Campaign or Project Allocation Code</span>
+                <span style={{ color: '#94a3b8', fontWeight: 400, fontSize: '12px' }}>(Optional)</span>
+              </label>
+            </div>
+
+            <p style={{ fontSize: '12px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
+              Attach a campaign code to attribute this collateral order to specific brand initiatives, seasonal rollouts, or Capex project budgets.
+            </p>
+
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {['CMP-SPRING-2026', 'CMP-SUMMER-PROMO', 'PRJ-REBRAND-Q3'].map((suggestedCode) => (
+                <button
+                  key={suggestedCode}
+                  type="button"
+                  onClick={() => {
+                    setCampaignCode(suggestedCode);
+                    updateCheckoutState({ campaignCode: suggestedCode });
+                  }}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    backgroundColor: campaignCode === suggestedCode ? '#EEF2FF' : '#F8FAFC',
+                    color: campaignCode === suggestedCode ? '#4F46E5' : '#475569',
+                    border: campaignCode === suggestedCode ? '1px solid #C7D2FE' : '1px solid #E2E8F0',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {suggestedCode}
+                </button>
+              ))}
+            </div>
+
+            <input
+              id="campaignCode"
+              type="text"
+              value={campaignCode}
+              onChange={(e) => {
+                setCampaignCode(e.target.value);
+                updateCheckoutState({ campaignCode: e.target.value });
+              }}
+              placeholder="e.g. CMP-SPRING-2026"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                border: '1.5px solid #cbd5e1',
+                fontSize: '13px',
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                color: '#0f172a',
+                backgroundColor: '#ffffff',
+                outline: 'none',
+              }}
+            />
           </div>
 
           {/* Buttons */}

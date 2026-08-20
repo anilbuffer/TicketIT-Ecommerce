@@ -92,6 +92,78 @@ export async function updateOrderDetails(
   return ds.orders.updateDetails(id, details);
 }
 
+export async function approveOrder(
+  id: string,
+  approverName: string,
+  notes?: string
+): Promise<Order> {
+  const ds = getDataSource();
+  const updated = await ds.orders.approveOrder(id, approverName, notes);
+
+  try {
+    await ds.audit.log({
+      actorId: 'usr_headoffice_001',
+      actorName: approverName,
+      actorEmail: 'approver@ticketit.io',
+      actorRole: 'HEAD_OFFICE',
+      action: 'ORDER_APPROVED',
+      entityType: 'ORDER',
+      entityId: updated.id,
+      entityName: updated.orderNumber,
+      details: {
+        totalAmount: updated.totalAmount,
+        siteCode: updated.siteCode,
+        notes,
+      },
+    });
+  } catch (err) {
+    console.error('Audit log failed', err);
+  }
+
+  return updated;
+}
+
+export async function rejectOrder(
+  id: string,
+  approverName: string,
+  reason: string
+): Promise<Order> {
+  const ds = getDataSource();
+  const updated = await ds.orders.rejectOrder(id, approverName, reason);
+
+  try {
+    await ds.audit.log({
+      actorId: 'usr_headoffice_001',
+      actorName: approverName,
+      actorEmail: 'approver@ticketit.io',
+      actorRole: 'HEAD_OFFICE',
+      action: 'ORDER_REJECTED',
+      entityType: 'ORDER',
+      entityId: updated.id,
+      entityName: updated.orderNumber,
+      details: {
+        totalAmount: updated.totalAmount,
+        siteCode: updated.siteCode,
+        reason,
+      },
+    });
+  } catch (err) {
+    console.error('Audit log failed', err);
+  }
+
+  return updated;
+}
+
+export async function getPendingApprovals(accountId?: string): Promise<Order[]> {
+  const ds = getDataSource();
+  const res = await ds.orders.list({
+    accountId,
+    status: 'PENDING_APPROVAL',
+    pageSize: 100,
+  });
+  return res.items;
+}
+
 export async function getFulfilmentQueue(): Promise<{
   received: Order[];
   processing: Order[];
@@ -107,3 +179,4 @@ export async function getFulfilmentQueue(): Promise<{
     delivered: all.items.filter((o) => o.status === 'DELIVERED'),
   };
 }
+

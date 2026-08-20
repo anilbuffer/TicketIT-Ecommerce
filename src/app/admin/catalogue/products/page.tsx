@@ -34,12 +34,18 @@ export default function ProductsCataloguePage() {
     search: searchQuery || undefined,
   });
 
-  const { createProduct, updateProduct, deleteProduct } = useProductMutations();
+  const { createProduct, updateProduct, deleteProduct, bulkCreateProducts } = useProductMutations();
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     product: Product | null;
   }>({ isOpen: false, product: null });
+
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [csvText, setCsvText] = useState('');
+  const [bulkError, setBulkError] = useState<string | null>(null);
+  const [bulkSuccess, setBulkSuccess] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
 
   const handleOpenCreate = () => {
     setModalState({ isOpen: true, product: null });
@@ -68,31 +74,123 @@ export default function ProductsCataloguePage() {
     }
   };
 
+  const handleBulkImport = async () => {
+    if (!csvText.trim()) {
+      setBulkError('Please provide CSV data to import.');
+      return;
+    }
+
+    setIsImporting(true);
+    setBulkError(null);
+
+    try {
+      const lines = csvText.trim().split('\n');
+      const itemsToImport: Omit<Product, 'id'>[] = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line || (i === 0 && line.toLowerCase().includes('sku'))) continue; // skip header
+        const parts = line.split(',').map((p) => p.replace(/^"|"$/g, '').trim());
+
+        if (parts.length < 5) continue;
+        const [sku, name, categoryName, basePriceStr, moqStr, packSize, uom] = parts;
+
+        itemsToImport.push({
+          sku: sku || `SKU-${Date.now()}-${i}`,
+          name: name || 'Imported Asset',
+          description: `Bulk imported marketing collateral asset specification.`,
+          thumbnailUrl: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=600&auto=format&fit=crop&q=80',
+          categoryId: 'cat-pos',
+          categoryName: categoryName || 'Point of Sale',
+          packSize: packSize || 'Pack of 10',
+          uom: uom || 'PK',
+          basePrice: parseFloat(basePriceStr) || 99.0,
+          moq: parseInt(moqStr) || 1,
+          orderMultiple: 1,
+          status: 'ACTIVE',
+          stockRemaining: 150,
+          lowStockThreshold: 20,
+        });
+      }
+
+      if (itemsToImport.length === 0) {
+        setBulkError('No valid product rows found in CSV data.');
+        setIsImporting(false);
+        return;
+      }
+
+      await bulkCreateProducts(itemsToImport);
+      setBulkSuccess(`Successfully imported ${itemsToImport.length} products into catalogue.`);
+      setCsvText('');
+      refetch();
+      setTimeout(() => {
+        setIsBulkModalOpen(false);
+        setBulkSuccess(null);
+      }, 2000);
+    } catch (err: any) {
+      setBulkError(err.message || 'Failed to import CSV');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
     <>
       <AdminHeader
         title="Product Catalogue & DAM"
         subtitle="Manage collateral products, packaging specifications, MOQ rules, and pricing"
         actionButton={
-          <button
-            type="button"
-            onClick={handleOpenCreate}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              backgroundColor: '#F73582',
-              color: '#FFFFFF',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
-            }}
-          >
-            <Plus size={16} />
-            <span>Add New Product</span>
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setCsvText(
+                  `SKU,Name,Category,BasePrice,MOQ,PackSize,UOM\n` +
+                  `POS-BANNER-SUMMER,Summer Campaign Tension Banner,Point of Sale,165.00,1,Single Unit,EA\n` +
+                  `PKG-TOTE-INSULATED-20L,Validated Insulated Cold Tote 20L,Specialized Packaging,320.00,2,Pack of 5,PK\n` +
+                  `APR-SCRUBS-NAVY-M,Premium Antimicrobial Scrubs Navy (M),Apparel,75.00,5,Pack of 2,PK`
+                );
+                setIsBulkModalOpen(true);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid rgba(43, 37, 62, 0.15)',
+                color: '#2B253E',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              <span>Bulk CSV Import</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                backgroundColor: '#F73582',
+                color: '#FFFFFF',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
+              }}
+            >
+              <Plus size={16} />
+              <span>Add New Product</span>
+            </button>
+          </div>
         }
       />
 
@@ -375,6 +473,115 @@ export default function ProductsCataloguePage() {
         onClose={() => setModalState({ isOpen: false, product: null })}
         onSave={handleSaveProduct}
       />
+
+      {/* Bulk CSV Import Modal */}
+      <AnimatePresence>
+        {isBulkModalOpen && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.6)',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              style={{
+                width: '100%',
+                maxWidth: '600px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                margin: '16px',
+              }}
+            >
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px' }}>
+                Bulk CSV Catalogue Import
+              </h3>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 16px' }}>
+                Paste or upload comma-separated values to batch-create marketing collateral products.
+              </p>
+
+              {bulkSuccess && (
+                <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>
+                  ✓ {bulkSuccess}
+                </div>
+              )}
+
+              {bulkError && (
+                <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>
+                  ⚠️ {bulkError}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>
+                  CSV Payload (Header: SKU, Name, Category, BasePrice, MOQ, PackSize, UOM)
+                </label>
+                <textarea
+                  rows={7}
+                  value={csvText}
+                  onChange={(e) => setCsvText(e.target.value)}
+                  placeholder="SKU,Name,Category,BasePrice,MOQ,PackSize,UOM..."
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #CBD5E1',
+                    fontFamily: 'monospace',
+                    fontSize: '12px',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsBulkModalOpen(false)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F1F5F9',
+                    color: '#475569',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkImport}
+                  disabled={isImporting}
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '8px',
+                    backgroundColor: '#059669',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {isImporting ? 'Ingesting...' : 'Import Products'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

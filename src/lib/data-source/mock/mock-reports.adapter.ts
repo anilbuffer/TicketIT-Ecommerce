@@ -125,10 +125,14 @@ export async function getDashboardKPIs(): Promise<DashboardKPIs> {
   const accounts = initialAccounts as Account[];
 
   const statusMap: Record<OrderStatus, { count: number; value: number }> = {
+    PENDING_APPROVAL: { count: 0, value: 0 },
+    APPROVED: { count: 0, value: 0 },
+    REJECTED: { count: 0, value: 0 },
     RECEIVED: { count: 0, value: 0 },
     PROCESSING: { count: 0, value: 0 },
     DISPATCHED: { count: 0, value: 0 },
     DELIVERED: { count: 0, value: 0 },
+    CANCELLED: { count: 0, value: 0 },
   };
 
   orders.forEach((o) => {

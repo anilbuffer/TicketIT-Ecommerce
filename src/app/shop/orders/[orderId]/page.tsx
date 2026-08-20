@@ -302,7 +302,7 @@ export default function SiteOrderDetailPage() {
           gap: '24px',
         }}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', paddingBottom: '20px', borderBottom: '1px solid #f1f5f9', fontSize: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', paddingBottom: '20px', borderBottom: '1px solid #f1f5f9', fontSize: '12px' }}>
           <div>
             <span style={{ color: '#64748b', display: 'block' }}>Site & Branch:</span>
             <strong style={{ color: '#0f172a', fontSize: '13px', display: 'block', marginTop: '2px' }}>{order.siteName}</strong>
@@ -318,6 +318,14 @@ export default function SiteOrderDetailPage() {
           </div>
 
           <div>
+            <span style={{ color: '#64748b', display: 'block' }}>Campaign Attribution:</span>
+            <strong style={{ color: '#4338CA', fontFamily: 'monospace', fontSize: '13px', display: 'block', marginTop: '2px' }}>
+              {order.campaignCode || 'General Allocation'}
+            </strong>
+            <span style={{ color: '#64748b' }}>{order.projectCode || 'Standard Capex'}</span>
+          </div>
+
+          <div>
             <span style={{ color: '#64748b', display: 'block' }}>Billing & Settlement:</span>
             <strong style={{ color: '#059669', fontSize: '13px', display: 'block', marginTop: '2px' }}>
               Monthly Consolidated
@@ -325,6 +333,25 @@ export default function SiteOrderDetailPage() {
             <span style={{ color: '#64748b' }}>Account: {order.accountName}</span>
           </div>
         </div>
+
+        {order.approvedBy && (
+          <div
+            style={{
+              padding: '10px 14px',
+              borderRadius: '10px',
+              backgroundColor: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              fontSize: '12px',
+              color: '#065F46',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <CheckCircle2 size={16} />
+            <span>Authorized by <strong>{order.approvedBy}</strong> {order.approvalNotes ? `(${order.approvalNotes})` : ''}</span>
+          </div>
+        )}
 
         {/* Line Items */}
         <div>
