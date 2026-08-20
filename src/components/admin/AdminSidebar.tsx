@@ -404,35 +404,35 @@ export function AdminSidebar({
               </button>
               <button
                 type="button"
-                onClick={() => handleRoleSwitch('site_user')}
-                style={{
-                  padding: '5px 2px',
-                  borderRadius: '6px',
-                  fontSize: '0.7rem',
-                  fontWeight: role === 'site_user' ? 700 : 500,
-                  backgroundColor: role === 'site_user' ? '#2563eb' : 'transparent',
-                  color: '#FFFFFF',
-                  textAlign: 'center',
-                  transition: 'all 120ms ease',
-                }}
-              >
-                Pharmacy
-              </button>
-              <button
-                type="button"
                 onClick={() => handleRoleSwitch('head_office')}
                 style={{
                   padding: '5px 2px',
                   borderRadius: '6px',
                   fontSize: '0.7rem',
                   fontWeight: role === 'head_office' ? 700 : 500,
-                  backgroundColor: role === 'head_office' ? '#f59e0b' : 'transparent',
+                  backgroundColor: role === 'head_office' ? '#2563eb' : 'transparent',
                   color: '#FFFFFF',
                   textAlign: 'center',
                   transition: 'all 120ms ease',
                 }}
               >
-                Driver
+                Head Office
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRoleSwitch('site_user')}
+                style={{
+                  padding: '5px 2px',
+                  borderRadius: '6px',
+                  fontSize: '0.7rem',
+                  fontWeight: role === 'site_user' ? 700 : 500,
+                  backgroundColor: role === 'site_user' ? '#f73582' : 'transparent',
+                  color: '#FFFFFF',
+                  textAlign: 'center',
+                  transition: 'all 120ms ease',
+                }}
+              >
+                Site User
               </button>
             </div>
           </div>

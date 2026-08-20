@@ -3,17 +3,17 @@ import './globals.css';
 import { AuthProvider } from '../context/AuthContext';
 
 export const metadata: Metadata = {
-  title: 'Rahhawan | Pharmaceutical Logistics & SaaS Platform',
-  description: 'Enterprise pharmaceutical logistics, dispensing hub fulfillment, and courier routing management portal.',
-  keywords: ['pharmaceutical logistics', 'dispensing hub', 'courier portal', 'SaaS platform', 'healthcare logistics', 'HIPAA compliant'],
-  authors: [{ name: 'Rahhawan Platform HQ' }],
+  title: 'TicketIT | Marketing Collateral & Digital Asset Ordering Platform',
+  description: 'Self-service digital asset library and collateral ordering portal with consolidated monthly multi-site billing and DAM integration.',
+  keywords: ['TicketIT', 'marketing collateral', 'digital asset management', 'DAM', 'point of sale', 'consolidated billing', 'multi-site ordering'],
+  authors: [{ name: 'TicketIT Platform HQ' }],
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#059669',
+  themeColor: '#f73582',
 };
 
 export default function RootLayout({

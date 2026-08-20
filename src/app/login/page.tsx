@@ -10,14 +10,18 @@ import {
   Check,
   CheckCircle2,
   ShieldCheck,
+  Building2,
+  Store,
+  Shield,
+  Layers,
+  ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole, DEMO_USERS, ROLE_DETAILS } from '../../types/auth';
+import { TicketITLogo } from '../../components/ui/TicketITLogo';
 
-// Custom SVG Icons matching the reference designs
-
-// 1. Super Admin Shield Icon
-function SuperAdminShieldIcon({ size = 30 }: { size?: number }) {
+// 1. Admin Shield & Crown Icon (Full Operations HQ)
+function AdminRoleIcon({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Outer shield container */}
@@ -27,16 +31,17 @@ function SuperAdminShieldIcon({ size = 30 }: { size?: number }) {
         stroke="#cbd5e1"
         strokeWidth="1.5"
       />
-      {/* Inner red shield badge */}
+      {/* Inner red/crimson shield badge */}
       <path
         d="M16 6L8.5 9.5V14.5C8.5 19.8 11.7 24.7 16 26C20.3 24.7 23.5 19.8 23.5 14.5V9.5L16 6Z"
         fill="#e11d48"
       />
-      {/* Shield emblem / reflection */}
+      {/* Shield emblem reflection */}
       <path
         d="M16 6V26C19.8 24.7 22.8 20.3 23.3 15.5H16V6Z"
         fill="#be123c"
       />
+      {/* Center checkmark */}
       <path
         d="M12.5 14.5L15 17L19.5 12"
         stroke="#ffffff"
@@ -48,72 +53,54 @@ function SuperAdminShieldIcon({ size = 30 }: { size?: number }) {
   );
 }
 
-// 2. Pharmacy Angled Capsule Pill Icon
-function PharmacyPillIcon({ size = 30 }: { size?: number }) {
+// 2. Head Office Building & Billing Icon (Consolidated Billing)
+function HeadOfficeRoleIcon({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g transform="rotate(-45 16 16)">
-        {/* Top half: Red */}
-        <path
-          d="M10 16H22V10C22 6.68629 19.3137 4 16 4C12.6863 4 10 6.68629 10 10V16Z"
-          fill="#e11d48"
-        />
-        {/* Bottom half: Yellow/Amber */}
-        <path
-          d="M10 16H22V22C22 25.3137 19.3137 28 16 28C12.6863 28 10 25.3137 10 22V16Z"
-          fill="#f59e0b"
-        />
-        {/* Capsule outline */}
-        <rect
-          x="10"
-          y="4"
-          width="12"
-          height="24"
-          rx="6"
-          stroke="#0f172a"
-          strokeWidth="1.5"
-        />
-        {/* Center divider line */}
-        <line x1="10" y1="16" x2="22" y2="16" stroke="#0f172a" strokeWidth="1.5" />
-        {/* Capsule shine */}
-        <path
-          d="M12.5 8C12.5 6.5 13.5 5.5 15 5.5"
-          stroke="#ffffff"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </g>
+      {/* Background circle badge */}
+      <rect x="4" y="5" width="24" height="22" rx="5" fill="#f0fdf4" stroke="#cbd5e1" strokeWidth="1.2" />
+      {/* Main Corporate Building */}
+      <rect x="7" y="9" width="11" height="16" rx="2" fill="#2563eb" />
+      {/* Windows in building */}
+      <rect x="9.5" y="12" width="2" height="2" rx="0.5" fill="#ffffff" />
+      <rect x="13.5" y="12" width="2" height="2" rx="0.5" fill="#ffffff" />
+      <rect x="9.5" y="16" width="2" height="2" rx="0.5" fill="#ffffff" />
+      <rect x="13.5" y="16" width="2" height="2" rx="0.5" fill="#ffffff" />
+      <rect x="9.5" y="20" width="2" height="2" rx="0.5" fill="#ffffff" />
+      <rect x="13.5" y="20" width="2" height="2" rx="0.5" fill="#ffffff" />
+      {/* Side tower / billing stack */}
+      <rect x="19" y="14" width="6" height="11" rx="1.5" fill="#60a5fa" />
+      <rect x="20.5" y="17" width="3" height="1.5" rx="0.5" fill="#ffffff" />
+      <rect x="20.5" y="20" width="3" height="1.5" rx="0.5" fill="#ffffff" />
+      {/* Roof antenna */}
+      <line x1="12.5" y1="6" x2="12.5" y2="9" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="12.5" cy="5.5" r="1.5" fill="#ef4444" />
     </svg>
   );
 }
 
-// 3. Driver Delivery Truck Icon
-function DriverTruckIcon({ size = 30 }: { size?: number }) {
+// 3. Site User Storefront / Shopping Cart Icon (Branch Asset Orders)
+function SiteUserRoleIcon({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Truck Cargo Box */}
-      <rect x="4" y="9" width="15" height="12" rx="2" fill="#ea580c" stroke="#0f172a" strokeWidth="1.5" />
-      {/* Truck Cabin */}
+      {/* Storefront Awning */}
       <path
-        d="M19 13H24.5L27 16.5V21H19V13Z"
-        fill="#ef4444"
-        stroke="#0f172a"
-        strokeWidth="1.5"
+        d="M6 12L7.5 7H24.5L26 12C26 13.5 24.5 14.5 23 14.5C21.5 14.5 20.5 13.5 20.5 13.5C20.5 13.5 19.5 14.5 18 14.5C16.5 14.5 15.5 13.5 15.5 13.5C15.5 13.5 14.5 14.5 13 14.5C11.5 14.5 10.5 13.5 10.5 13.5C10.5 13.5 9.5 14.5 8 14.5C6.5 14.5 6 13.5 6 12Z"
+        fill="#f73582"
+        stroke="#2b253e"
+        strokeWidth="1.2"
         strokeLinejoin="round"
       />
-      {/* Cabin Window */}
-      <path
-        d="M20.5 14.5H23.8L25.5 17H20.5V14.5Z"
-        fill="#93c5fd"
-      />
-      {/* Wheels */}
-      <circle cx="9" cy="22" r="3" fill="#0f172a" stroke="#f8fafc" strokeWidth="1.5" />
-      <circle cx="9" cy="22" r="1" fill="#f8fafc" />
-      <circle cx="23" cy="22" r="3" fill="#0f172a" stroke="#f8fafc" strokeWidth="1.5" />
-      <circle cx="23" cy="22" r="1" fill="#f8fafc" />
-      {/* Cargo lines */}
-      <line x1="7" y1="13" x2="15" y2="13" stroke="#fed7aa" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="7" y1="16" x2="13" y2="16" stroke="#fed7aa" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Store Walls & Window */}
+      <rect x="7" y="14" width="18" height="12" rx="1.5" fill="#ffffff" stroke="#2b253e" strokeWidth="1.2" />
+      {/* Store Door */}
+      <rect x="13" y="18" width="6" height="8" rx="1" fill="#f73582" />
+      {/* Store Display Window */}
+      <rect x="9" y="17" width="3" height="4" rx="0.5" fill="#93c5fd" />
+      <rect x="20" y="17" width="3" height="4" rx="0.5" fill="#93c5fd" />
+      {/* Floating Shopping Bag / Star */}
+      <circle cx="24" cy="8" r="4.5" fill="#58b97d" stroke="#ffffff" strokeWidth="1.2" />
+      <path d="M22.5 8L23.5 9L25.5 7" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -180,31 +167,35 @@ function LoginForm() {
     title: string;
     sub: string;
     badgeColor: string;
+    selectedBg: string;
     borderColor: string;
   }[] = [
     {
       key: 'admin',
-      icon: <SuperAdminShieldIcon size={32} />,
-      title: 'Super Admin',
-      sub: 'Platform HQ',
+      icon: <AdminRoleIcon size={32} />,
+      title: 'Admin',
+      sub: 'Full Operations HQ',
       badgeColor: '#059669',
+      selectedBg: '#f0fdf9',
       borderColor: '#059669',
     },
     {
-      key: 'site_user',
-      icon: <PharmacyPillIcon size={32} />,
-      title: 'Pharmacy',
-      sub: 'Dispensing Hub',
-      badgeColor: '#3b82f6',
-      borderColor: '#0f172a',
+      key: 'head_office',
+      icon: <HeadOfficeRoleIcon size={32} />,
+      title: 'Head Office',
+      sub: 'Consolidated Billing',
+      badgeColor: '#2563eb',
+      selectedBg: '#eff6ff',
+      borderColor: '#2563eb',
     },
     {
-      key: 'head_office',
-      icon: <DriverTruckIcon size={32} />,
-      title: 'Driver',
-      sub: 'Courier Portal',
-      badgeColor: '#f59e0b',
-      borderColor: '#0f172a',
+      key: 'site_user',
+      icon: <SiteUserRoleIcon size={32} />,
+      title: 'Site User',
+      sub: 'Branch Asset Orders',
+      badgeColor: '#f73582',
+      selectedBg: '#fdf2f8',
+      borderColor: '#f73582',
     },
   ];
 
@@ -221,28 +212,28 @@ function LoginForm() {
     }
     if (selectedRole === 'admin') {
       return {
-        text: 'Enter Super Admin Portal',
+        text: 'Enter Admin Portal',
         bgColor: '#059669',
         textColor: '#ffffff',
         shadow: '0 8px 20px rgba(5, 150, 105, 0.28)',
         disabled: false,
       };
     }
-    if (selectedRole === 'site_user') {
+    if (selectedRole === 'head_office') {
       return {
-        text: 'Enter Pharmacy Portal',
-        bgColor: '#3b82f6',
+        text: 'Enter Head Office Portal',
+        bgColor: '#2563eb',
         textColor: '#ffffff',
-        shadow: '0 8px 20px rgba(59, 130, 246, 0.28)',
+        shadow: '0 8px 20px rgba(37, 99, 235, 0.28)',
         disabled: false,
       };
     }
-    // Head office / Driver
+    // Site User
     return {
-      text: 'Enter Driver Portal',
-      bgColor: '#f59e0b',
+      text: 'Enter Site User Portal',
+      bgColor: '#f73582',
       textColor: '#ffffff',
-      shadow: '0 8px 20px rgba(245, 158, 11, 0.28)',
+      shadow: '0 8px 20px rgba(247, 53, 130, 0.28)',
       disabled: false,
     };
   };
@@ -260,11 +251,11 @@ function LoginForm() {
         padding: '2.5rem 1rem',
         backgroundColor: '#eef2f6',
         backgroundImage: `
-          radial-gradient(at 10% 15%, rgba(204, 251, 241, 0.55) 0px, transparent 50%),
-          radial-gradient(at 90% 15%, rgba(224, 231, 255, 0.55) 0px, transparent 50%),
-          radial-gradient(at 50% 90%, rgba(254, 243, 199, 0.45) 0px, transparent 50%)
+          radial-gradient(at 10% 15%, rgba(253, 232, 242, 0.6) 0px, transparent 50%),
+          radial-gradient(at 90% 15%, rgba(224, 231, 255, 0.6) 0px, transparent 50%),
+          radial-gradient(at 50% 90%, rgba(204, 251, 241, 0.45) 0px, transparent 50%)
         `,
-        fontFamily: 'inherit',
+        fontFamily: '"Acumin Pro", "Acumin", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
     >
       {/* Central Login Card */}
@@ -283,51 +274,9 @@ function LoginForm() {
           position: 'relative',
         }}
       >
-        {/* Brand Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.6rem' }}>
-          <div
-            style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '12px',
-              background: '#059669',
-              color: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '1.45rem',
-              letterSpacing: '-0.02em',
-              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
-              flexShrink: 0,
-            }}
-          >
-            R
-          </div>
-          <div>
-            <h2
-              style={{
-                fontSize: '1.35rem',
-                fontWeight: 800,
-                color: '#0f172a',
-                letterSpacing: '-0.02em',
-                lineHeight: 1.15,
-                margin: 0,
-              }}
-            >
-              Rahhawan
-            </h2>
-            <div
-              style={{
-                fontSize: '0.78rem',
-                color: '#64748b',
-                fontWeight: 500,
-                marginTop: '3px',
-              }}
-            >
-              Pharmaceutical Logistics Platform
-            </div>
-          </div>
+        {/* Brand Header: Exact TicketIT Logo */}
+        <div style={{ marginBottom: '1.6rem' }}>
+          <TicketITLogo size="md" showTagline={true} />
         </div>
 
         {/* Heading & Subtitle */}
@@ -419,7 +368,7 @@ function LoginForm() {
                     type="button"
                     onClick={() => handleSelectRole(item.key)}
                     style={{
-                      background: isSelected ? (item.key === 'admin' ? '#f0fdf9' : item.key === 'head_office' ? '#fefce8' : '#eff6ff') : '#f8fafc',
+                      background: isSelected ? item.selectedBg : '#f8fafc',
                       borderRadius: '16px',
                       padding: '1.15rem 0.5rem',
                       display: 'flex',
@@ -530,7 +479,13 @@ function LoginForm() {
                 width: '100%',
                 padding: '0.82rem 1rem',
                 borderRadius: '12px',
-                border: selectedRole ? '1.5px solid #059669' : '1.5px solid #e2e8f0',
+                border: selectedRole
+                  ? selectedRole === 'site_user'
+                    ? '1.5px solid #f73582'
+                    : selectedRole === 'head_office'
+                    ? '1.5px solid #2563eb'
+                    : '1.5px solid #059669'
+                  : '1.5px solid #e2e8f0',
                 background: selectedRole ? '#ffffff' : '#f8fafc',
                 color: '#0f172a',
                 fontSize: '0.9rem',
@@ -565,7 +520,13 @@ function LoginForm() {
                   width: '100%',
                   padding: '0.82rem 2.75rem 0.82rem 1rem',
                   borderRadius: '12px',
-                  border: selectedRole ? '1.5px solid #059669' : '1.5px solid #e2e8f0',
+                  border: selectedRole
+                    ? selectedRole === 'site_user'
+                      ? '1.5px solid #f73582'
+                      : selectedRole === 'head_office'
+                      ? '1.5px solid #2563eb'
+                      : '1.5px solid #059669'
+                    : '1.5px solid #e2e8f0',
                   background: selectedRole ? '#ffffff' : '#f8fafc',
                   color: '#0f172a',
                   fontSize: '0.9rem',
@@ -597,7 +558,7 @@ function LoginForm() {
             </div>
           </div>
 
-          {/* Auto-filled Demo Credentials Green Callout */}
+          {/* Auto-filled Demo Credentials Green/Pink Callout */}
           <AnimatePresence>
             {selectedRole && (
               <motion.div
@@ -692,7 +653,7 @@ function LoginForm() {
           </motion.button>
         </form>
 
-        {/* Footer info & HIPAA badge */}
+        {/* Footer info & Security badge */}
         <div
           style={{
             marginTop: '1.75rem',
@@ -706,7 +667,7 @@ function LoginForm() {
           }}
         >
           <div style={{ fontSize: '0.73rem', color: '#64748b', fontWeight: 500 }}>
-            © 2024 Rahhawan LLC. All rights reserved.
+            © 2026 TicketIT. All rights reserved.
           </div>
 
           <div
@@ -724,7 +685,7 @@ function LoginForm() {
             }}
           >
             <ShieldCheck size={14} color="#16a34a" />
-            <span>HIPAA Compliant</span>
+            <span>SOC 2 Type II Certified</span>
           </div>
         </div>
       </motion.div>
@@ -747,7 +708,7 @@ export default function LoginPage() {
             fontWeight: 600,
           }}
         >
-          Loading Rahhawan Portal...
+          Loading TicketIT Portal...
         </div>
       }
     >

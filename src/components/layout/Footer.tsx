@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ShieldCheck, FileSpreadsheet, Store, Layers, Building2, Shield, Lock } from 'lucide-react';
 import { Container } from './Container';
 
+import { TicketITLogo } from '../ui/TicketITLogo';
+
 export const Footer: React.FC = () => {
   return (
     <footer
@@ -35,8 +37,8 @@ export const Footer: React.FC = () => {
                 width: '46px',
                 height: '46px',
                 borderRadius: '12px',
-                background: 'rgba(16, 185, 129, 0.15)',
-                color: '#10b981',
+                background: 'rgba(247, 53, 130, 0.15)',
+                color: 'var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -57,8 +59,8 @@ export const Footer: React.FC = () => {
                 width: '46px',
                 height: '46px',
                 borderRadius: '12px',
-                background: 'rgba(124, 92, 219, 0.15)',
-                color: '#7c5cdb',
+                background: 'rgba(37, 99, 235, 0.15)',
+                color: '#60a5fa',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -79,8 +81,8 @@ export const Footer: React.FC = () => {
                 width: '46px',
                 height: '46px',
                 borderRadius: '12px',
-                background: 'rgba(247, 53, 130, 0.15)',
-                color: 'var(--color-primary)',
+                background: 'rgba(88, 185, 125, 0.15)',
+                color: '#58b97d',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -106,29 +108,11 @@ export const Footer: React.FC = () => {
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
-              <div
-                style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#ffffff',
-                  fontWeight: 900,
-                  fontSize: '1.1rem',
-                }}
-              >
-                Y
-              </div>
-              <span style={{ fontWeight: 800, fontSize: 'var(--font-size-lg)', letterSpacing: '-0.02em' }}>
-                Yellow <span style={{ color: '#10b981' }}>Marketing</span>
-              </span>
+            <div style={{ marginBottom: '1rem' }}>
+              <TicketITLogo size="sm" showTagline={true} theme="dark" />
             </div>
             <p style={{ color: '#a6a0b8', fontSize: 'var(--font-size-sm)', lineHeight: 1.6 }}>
-              Enterprise digital asset management, store collateral fulfillment, and automated multi-entity billing platform.
+              Enterprise digital asset management, store collateral self-service ordering, and automated multi-site consolidated billing platform.
             </p>
           </div>
 
@@ -139,26 +123,26 @@ export const Footer: React.FC = () => {
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: 'var(--font-size-sm)', color: '#a6a0b8' }}>
               <li>
                 <Link href="/site-user" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Store size={14} color="#58b97d" />
-                  <span>Site Collateral Hub</span>
+                  <Store size={14} color="#f73582" />
+                  <span>Site User (Branch Orders)</span>
                 </Link>
               </li>
               <li>
                 <Link href="/head-office" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Building2 size={14} color="#7c5cdb" />
-                  <span>Head Office Invoicing</span>
+                  <Building2 size={14} color="#60a5fa" />
+                  <span>Head Office (Consolidated Billing)</span>
                 </Link>
               </li>
               <li>
                 <Link href="/admin" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Shield size={14} color="#f73582" />
-                  <span>Admin DAM HQ</span>
+                  <Shield size={14} color="#58b97d" />
+                  <span>Admin (Full Operations HQ)</span>
                 </Link>
               </li>
               <li>
                 <Link href="/login" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <Lock size={14} color="#38bdf8" />
-                  <span>Role Access & Switcher</span>
+                  <span>Login & Role Switcher</span>
                 </Link>
               </li>
             </ul>
@@ -169,11 +153,11 @@ export const Footer: React.FC = () => {
               Collateral Categories
             </div>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: 'var(--font-size-sm)', color: '#a6a0b8' }}>
-              <li><span>POS & Window Signage</span></li>
-              <li><span>Direct Mail & EDDMs</span></li>
-              <li><span>Digital Screen Packs</span></li>
-              <li><span>Event Rollups & Banners</span></li>
-              <li><span>Social Media Templates</span></li>
+              <li><span>Point of Sale Displays</span></li>
+              <li><span>Digital & Signage Assets</span></li>
+              <li><span>Staff Uniforms & Apparel</span></li>
+              <li><span>Print Collateral & Lookbooks</span></li>
+              <li><span>VIP Branded Merchandise</span></li>
             </ul>
           </div>
 
@@ -182,18 +166,18 @@ export const Footer: React.FC = () => {
               Compliance & Security
             </div>
             <p style={{ color: '#a6a0b8', fontSize: 'var(--font-size-xs)', marginBottom: '0.8rem', lineHeight: 1.5 }}>
-              All collateral assets, PO authorization thresholds, and billing feeds comply with SOC-2 Type II standards.
+              All marketing collateral assets, PO authorization thresholds, and consolidated billing exports comply with enterprise SOC-2 Type II standards.
             </p>
             <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                background: 'rgba(16, 185, 129, 0.12)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
+                background: 'rgba(88, 185, 125, 0.12)',
+                border: '1px solid rgba(88, 185, 125, 0.3)',
                 padding: '0.35rem 0.75rem',
                 borderRadius: '8px',
-                color: '#34d399',
+                color: '#58b97d',
                 fontSize: '0.75rem',
                 fontWeight: 700,
               }}
@@ -219,7 +203,7 @@ export const Footer: React.FC = () => {
           }}
         >
           <div>
-            © 2026 Yellow Marketing Delivery LLC. All rights reserved. Enterprise Collateral & Asset Delivery System.
+            © 2026 TicketIT. All rights reserved. Content—Automation—Display.
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <span>Privacy Policy</span>

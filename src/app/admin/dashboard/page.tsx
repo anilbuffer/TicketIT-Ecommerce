@@ -48,7 +48,7 @@ export default function AdminDashboardPage() {
     <>
       <AdminHeader
         title="Operational Platform Overview"
-        subtitle="Live multi-tenant pharmaceutical logistics, order pipeline & revenue dashboard"
+        subtitle="Live multi-tenant marketing collateral orders, fulfilment pipeline & consolidated revenue dashboard"
         actionButton={
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Link

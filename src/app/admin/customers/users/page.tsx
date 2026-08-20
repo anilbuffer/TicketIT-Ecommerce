@@ -40,7 +40,7 @@ export default function UserManagementPage() {
         siteName: site?.name,
         accountId: site?.accountId,
         accountName: site?.accountName,
-        department: department || 'Pharmacy Operations',
+        department: department || 'Store Operations',
         monthlyBudgetCap: Number(monthlyBudgetCap),
         status: 'ACTIVE',
       });
@@ -108,7 +108,7 @@ export default function UserManagementPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Dr. Alex Morgan"
+                  placeholder="e.g. Marcus Vance"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.85rem' }}
@@ -121,7 +121,7 @@ export default function UserManagementPage() {
                 <input
                   type="email"
                   required
-                  placeholder="amorgan@dispensary.org"
+                  placeholder="marcus.vance@sydney-flagship.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.85rem' }}
@@ -138,9 +138,9 @@ export default function UserManagementPage() {
                   onChange={(e) => setRole(e.target.value as any)}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.85rem' }}
                 >
-                  <option value="ADMIN">Super Admin (Platform HQ)</option>
-                  <option value="HEAD_OFFICE">Head Office (Driver / Fleet View)</option>
-                  <option value="SITE_USER">Site User (Pharmacy Dispensing)</option>
+                  <option value="ADMIN">Admin (Full Operations HQ)</option>
+                  <option value="HEAD_OFFICE">Head Office (Consolidated Multi-Site View)</option>
+                  <option value="SITE_USER">Site User (Branch Marketing & Orders)</option>
                 </select>
               </div>
               <div>
@@ -263,7 +263,7 @@ export default function UserManagementPage() {
                               : '#D97706',
                         }}
                       >
-                        {u.role === 'ADMIN' ? 'Platform HQ Admin' : u.role === 'HEAD_OFFICE' ? 'Driver / Head Office' : 'Pharmacy Site User'}
+                        {u.role === 'ADMIN' ? 'Admin (Operations HQ)' : u.role === 'HEAD_OFFICE' ? 'Head Office' : 'Site User'}
                       </span>
                     </td>
                     <td style={{ padding: '14px 16px', color: '#2B253E', fontWeight: 600 }}>

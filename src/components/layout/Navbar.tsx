@@ -19,6 +19,8 @@ import { useAuth } from '../../context/AuthContext';
 import { ROLE_DETAILS } from '../../types/auth';
 import { Button } from '../ui/Button';
 
+import { TicketITLogo } from '../ui/TicketITLogo';
+
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -84,66 +86,9 @@ export const Navbar: React.FC = () => {
         {/* Brand Logo */}
         <Link
           href={role && ROLE_DETAILS[role] ? ROLE_DETAILS[role].defaultRedirect : '/login'}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}
+          style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
         >
-          <motion.div
-            whileHover={{ rotate: 8, scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
-              color: '#ffffff',
-              fontWeight: 900,
-              fontSize: '1.2rem',
-            }}
-          >
-            Y
-          </motion.div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <span
-                style={{
-                  fontFamily: 'var(--font-family-display)',
-                  fontWeight: 800,
-                  fontSize: 'var(--font-size-xl)',
-                  color: 'var(--color-secondary)',
-                  letterSpacing: '-0.03em',
-                }}
-              >
-                Yellow
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-family-display)',
-                  fontWeight: 800,
-                  fontSize: 'var(--font-size-xl)',
-                  color: '#10b981',
-                  letterSpacing: '-0.03em',
-                }}
-              >
-                Delivery
-              </span>
-            </div>
-            <span
-              style={{
-                fontSize: '0.65rem',
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--color-text-muted)',
-                display: 'block',
-                marginTop: '-3px',
-              }}
-            >
-              Marketing Asset Delivery & Ecommerce CMS
-            </span>
-          </div>
+          <TicketITLogo size="sm" showTagline={true} />
         </Link>
 
         {/* Desktop Nav Links */}

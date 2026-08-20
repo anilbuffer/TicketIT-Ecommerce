@@ -38,7 +38,7 @@ export function OrderActionModal({
   onStatusUpdate,
 }: OrderActionModalProps) {
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(order?.status || 'RECEIVED');
-  const [carrier, setCarrier] = useState(order?.carrier || 'Rahhawan Direct Logistics');
+  const [carrier, setCarrier] = useState(order?.carrier || 'TicketIT Express Fulfilment');
   const [trackingNumber, setTrackingNumber] = useState(order?.trackingNumber || '');
   const [deliveryNotes, setDeliveryNotes] = useState(order?.deliveryNotes || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,7 +48,7 @@ export function OrderActionModal({
   React.useEffect(() => {
     if (order) {
       setSelectedStatus(order.status);
-      setCarrier(order.carrier || 'Rahhawan Direct Logistics');
+      setCarrier(order.carrier || 'TicketIT Express Fulfilment');
       setTrackingNumber(order.trackingNumber || '');
       setDeliveryNotes(order.deliveryNotes || '');
       setFeedback(null);
@@ -321,7 +321,7 @@ export function OrderActionModal({
                   type="text"
                   value={carrier}
                   onChange={(e) => setCarrier(e.target.value)}
-                  placeholder="e.g. Rahhawan Direct Fleet, FedEx, UPS"
+                  placeholder="e.g. TicketIT Express Fulfilment, FedEx, DHL"
                   style={{
                     width: '100%',
                     padding: '8px 12px',

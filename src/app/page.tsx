@@ -29,7 +29,7 @@ export default function RootHomePage() {
           fontWeight: 600,
         }}
       >
-        Initializing Rahhawan SaaS Portal...
+        Initializing TicketIT Portal...
       </div>
     );
   }

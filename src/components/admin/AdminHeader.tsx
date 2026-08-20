@@ -128,10 +128,10 @@ export function AdminHeader({
               </div>
               <div style={{ fontSize: '0.78rem', color: '#64748B', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ padding: '8px', backgroundColor: '#FFF0F6', borderRadius: '6px', color: '#B01654' }}>
-                  <strong>New Order Received:</strong> ORD-2026-0891 ($1,420.00) from Apex Midtown.
+                  <strong>New Collateral Order:</strong> ORD-2026-8819 ($630.00) from Downtown Flagship.
                 </div>
                 <div style={{ padding: '8px', backgroundColor: '#EAF8EF', borderRadius: '6px', color: '#228B53' }}>
-                  <strong>Courier Dispatch Confirmed:</strong> Driver Elena Rostova accepted route.
+                  <strong>Fulfilment Dispatched:</strong> Carrier assigned & tracking updated.
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@ export function AdminHeader({
                 {user?.name || 'Administrator'}
               </div>
               <div style={{ fontSize: '0.68rem', color: '#F73582', fontWeight: 600 }}>
-                Platform HQ Admin
+                Operations HQ Admin
               </div>
             </div>
             <ChevronDown size={14} color="#64748B" />
@@ -202,7 +202,7 @@ export function AdminHeader({
               <div style={{ padding: '8px 12px', borderBottom: '1px solid #F1F5F9' }}>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Signed in as</div>
                 <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2B253E', wordBreak: 'break-all' }}>
-                  {user?.email || 'sarah.jenkins@rahhawan.com'}
+                  {user?.email || 'sarah.jenkins@ticketit.com'}
                 </div>
               </div>
               <Link

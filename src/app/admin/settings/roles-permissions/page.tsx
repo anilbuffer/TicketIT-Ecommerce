@@ -26,9 +26,9 @@ export default function RolesPermissionsPage() {
   ];
 
   const roles: { id: UserRole; title: string; subtitle: string; color: string; bg: string }[] = [
-    { id: 'ADMIN', title: 'Super Admin', subtitle: 'Platform HQ Operations', color: '#F73582', bg: '#FFF0F6' },
-    { id: 'HEAD_OFFICE', title: 'Head Office / Driver', subtitle: 'Logistics Fleet & Accounting', color: '#10B981', bg: '#EAF8EF' },
-    { id: 'SITE_USER', title: 'Site User', subtitle: 'Pharmacy Dispensing Hub', color: '#D97706', bg: '#FEF3C7' },
+    { id: 'ADMIN', title: 'Admin', subtitle: 'Full Operations HQ', color: '#059669', bg: '#EAF8EF' },
+    { id: 'HEAD_OFFICE', title: 'Head Office', subtitle: 'Consolidated Billing (All Sites)', color: '#2563EB', bg: '#EFF6FF' },
+    { id: 'SITE_USER', title: 'Site User', subtitle: 'Branch Marketing & Orders', color: '#F73582', bg: '#FFF0F6' },
   ];
 
   return (
