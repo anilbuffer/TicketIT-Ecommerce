@@ -138,19 +138,19 @@ export const Footer: React.FC = () => {
             </div>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: 'var(--font-size-sm)', color: '#a6a0b8' }}>
               <li>
-                <Link href="/portal/site-user" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Link href="/site-user" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <Store size={14} color="#58b97d" />
                   <span>Site Collateral Hub</span>
                 </Link>
               </li>
               <li>
-                <Link href="/portal/head-office" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Link href="/head-office" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <Building2 size={14} color="#7c5cdb" />
                   <span>Head Office Invoicing</span>
                 </Link>
               </li>
               <li>
-                <Link href="/portal/admin" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Link href="/admin" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <Shield size={14} color="#f73582" />
                   <span>Admin DAM HQ</span>
                 </Link>

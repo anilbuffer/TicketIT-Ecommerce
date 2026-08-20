@@ -65,7 +65,7 @@ export default function AdminLayout({
                 </span>
               </div>
               <Link
-                href="/portal/head-office"
+                href="/head-office"
                 style={{
                   color: '#b45309',
                   textDecoration: 'underline',

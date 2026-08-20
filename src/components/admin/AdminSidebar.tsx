@@ -165,11 +165,11 @@ export function AdminSidebar({
   const handleRoleSwitch = (newRole: UserRole) => {
     switchUserRole(newRole);
     if (newRole === 'site_user') {
-      router.push('/portal/site-user');
+      router.push('/site-user');
     } else if (newRole === 'head_office') {
-      router.push('/portal/head-office');
+      router.push('/head-office');
     } else {
-      router.push('/admin/dashboard');
+      router.push('/admin');
     }
   };
 

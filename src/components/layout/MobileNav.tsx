@@ -11,9 +11,9 @@ export const MobileNav: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   const items = [
-    { label: 'Site Hub', href: '/portal/site-user', icon: Store },
-    { label: 'Head Office', href: '/portal/head-office', icon: Building2 },
-    { label: 'Admin DAM', href: '/portal/admin', icon: Shield },
+    { label: 'Site Hub', href: '/site-user', icon: Store },
+    { label: 'Head Office', href: '/head-office', icon: Building2 },
+    { label: 'Admin DAM', href: '/admin', icon: Shield },
     { label: isAuthenticated ? 'Switch Role' : 'Login', href: '/login', icon: KeyRound },
   ];
 

@@ -97,17 +97,17 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   ];
 
   const pharmacyNav: NavItem[] = [
-    { label: 'Dispensing Dashboard', href: '/portal/site-user', icon: <LayoutDashboard size={19} /> },
-    { label: 'Medication & Collateral Order', href: '/portal/site-user#order', icon: <Package size={19} />, badge: 'Active' },
-    { label: 'Prescriptions & PO Queue', href: '/portal/site-user#orders', icon: <ClipboardList size={19} />, badge: '4 Pending' },
-    { label: 'Courier Dispatch Tracking', href: '/portal/site-user#dispatch', icon: <Truck size={19} /> },
+    { label: 'Dispensing Dashboard', href: '/site-user', icon: <LayoutDashboard size={19} /> },
+    { label: 'Medication & Collateral Order', href: '/site-user#order', icon: <Package size={19} />, badge: 'Active' },
+    { label: 'Prescriptions & PO Queue', href: '/site-user#orders', icon: <ClipboardList size={19} />, badge: '4 Pending' },
+    { label: 'Courier Dispatch Tracking', href: '/site-user#dispatch', icon: <Truck size={19} /> },
   ];
 
   const driverNav: NavItem[] = [
-    { label: 'Courier Fleet Dashboard', href: '/portal/head-office', icon: <LayoutDashboard size={19} /> },
-    { label: 'Active Delivery Manifest', href: '/portal/head-office#deliveries', icon: <MapPin size={19} />, badge: '12 Drops' },
-    { label: 'Consolidated Route Billing', href: '/portal/head-office#billing', icon: <FileText size={19} /> },
-    { label: 'Vehicle & Cold-Chain Logs', href: '/portal/head-office#fleet', icon: <ShieldCheck size={19} /> },
+    { label: 'Courier Fleet Dashboard', href: '/head-office', icon: <LayoutDashboard size={19} /> },
+    { label: 'Active Delivery Manifest', href: '/head-office#deliveries', icon: <MapPin size={19} />, badge: '12 Drops' },
+    { label: 'Consolidated Route Billing', href: '/head-office#billing', icon: <FileText size={19} /> },
+    { label: 'Vehicle & Cold-Chain Logs', href: '/head-office#fleet', icon: <ShieldCheck size={19} /> },
   ];
 
   const activeNavList =

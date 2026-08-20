@@ -47,9 +47,9 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { label: 'Site Ordering Hub', href: '/portal/site-user', icon: Store, role: 'site_user' },
-    { label: 'Head Office Billing', href: '/portal/head-office', icon: Building2, role: 'head_office' },
-    { label: 'Admin DAM HQ', href: '/portal/admin', icon: Shield, role: 'admin' },
+    { label: 'Site Ordering Hub', href: '/site-user', icon: Store, role: 'site_user' },
+    { label: 'Head Office Billing', href: '/head-office', icon: Building2, role: 'head_office' },
+    { label: 'Admin DAM HQ', href: '/admin', icon: Shield, role: 'admin' },
   ];
 
   const currentRoleMeta = role ? ROLE_DETAILS[role] : null;
@@ -294,7 +294,7 @@ export const Navbar: React.FC = () => {
                     {/* Direct Portal Links */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.75rem' }}>
                       <Link
-                        href="/portal/site-user"
+                        href="/site-user"
                         onClick={() => setIsProfileMenuOpen(false)}
                         style={{
                           display: 'flex',
@@ -313,7 +313,7 @@ export const Navbar: React.FC = () => {
                       </Link>
 
                       <Link
-                        href="/portal/head-office"
+                        href="/head-office"
                         onClick={() => setIsProfileMenuOpen(false)}
                         style={{
                           display: 'flex',
@@ -332,7 +332,7 @@ export const Navbar: React.FC = () => {
                       </Link>
 
                       <Link
-                        href="/portal/admin"
+                        href="/admin"
                         onClick={() => setIsProfileMenuOpen(false)}
                         style={{
                           display: 'flex',
