@@ -7,7 +7,7 @@ export default function LegacySiteUserPortalRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/site-user');
+    router.replace('/shop/catalogue');
   }, [router]);
 
   return (

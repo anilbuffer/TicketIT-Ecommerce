@@ -74,3 +74,31 @@ export async function listCategories(): Promise<ProductCategory[]> {
 export async function createCategory(input: Omit<ProductCategory, 'id' | 'itemCount'>): Promise<ProductCategory> {
   return { ...input, id: input.code.toLowerCase(), itemCount: 0 };
 }
+
+export async function listVisibleForAccount(
+  accountId?: string,
+  params?: any
+) {
+  const result = await list(params);
+  return {
+    ...result,
+    items: result.items.map((p) => ({
+      ...p,
+      effectivePrice: p.basePrice,
+      discountPct: 0,
+      isCustomPriced: false,
+    })),
+  };
+}
+
+export async function getByIdWithPricing(id: string, accountId?: string) {
+  const p = await getById(id);
+  if (!p) return null;
+  return {
+    ...p,
+    effectivePrice: p.basePrice,
+    discountPct: 0,
+    isCustomPriced: false,
+  };
+}
+

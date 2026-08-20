@@ -112,3 +112,37 @@ export async function createUser(input: Omit<PortalUser, 'id' | 'createdAt'>): P
 
   return created;
 }
+
+export async function getAccountOrderRules(accountId: string) {
+  const ds = getDataSource();
+  if ('getOrderRules' in ds.accounts) {
+    return (ds.accounts as any).getOrderRules(accountId);
+  }
+  return {
+    accountId,
+    accountName: 'Customer Account',
+    requirePoNumber: false,
+    poPrefix: 'PO',
+    allowCustomDeliveryAddress: true,
+    monthlyBudgetCap: 10000,
+    requireDeliveryNotes: false,
+    defaultCarrier: 'Standard Delivery',
+  };
+}
+
+export async function getSiteAddresses(siteId: string) {
+  const ds = getDataSource();
+  if ('getSiteAddresses' in ds.accounts) {
+    return (ds.accounts as any).getSiteAddresses(siteId);
+  }
+  const site = await ds.accounts.getSiteById(siteId);
+  if (!site) return null;
+  return {
+    siteId: site.id,
+    siteName: site.name,
+    siteCode: site.code,
+    billToAddress: site.billToAddress,
+    shipToAddress: site.shipToAddress,
+  };
+}
+

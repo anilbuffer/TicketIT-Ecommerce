@@ -165,7 +165,7 @@ export function AdminSidebar({
   const handleRoleSwitch = (newRole: UserRole) => {
     switchUserRole(newRole);
     if (newRole === 'site_user') {
-      router.push('/site-user');
+      router.push('/shop/catalogue');
     } else if (newRole === 'head_office') {
       router.push('/head-office');
     } else {

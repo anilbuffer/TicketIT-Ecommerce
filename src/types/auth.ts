@@ -20,6 +20,9 @@ export interface User {
   avatar: string;
   title: string;
   organization: string;
+  accountId?: string;
+  accountName?: string;
+  siteId?: string;
   siteCode?: string;
   siteName?: string;
   department: string;
@@ -74,11 +77,11 @@ export const ROLE_DETAILS: Record<
     title: 'Site User',
     subtitle: 'Branch Asset Orders',
     description: 'Self-service marketing asset library and checkout with a read-only status view strictly limited to their own branch orders.',
-    defaultRedirect: '/site-user',
+    defaultRedirect: '/shop/catalogue',
     themeColor: '#f73582',
     buttonColor: '#f73582',
-    buttonText: 'Enter Site User Portal',
-    badgeText: 'Site User • Branch Portal',
+    buttonText: 'Enter Shop / Ordering Hub',
+    badgeText: 'Site User • Branch Ordering',
   },
 };
 
@@ -127,9 +130,11 @@ export const DEMO_USERS: Record<UserRole, DemoUserCredential> = {
       role: 'head_office',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       title: 'Group Brand Director & Multi-Site Financial Controller',
-      organization: 'Apex Retail Group HQ',
+      organization: 'Apex Healthcare Group',
+      accountId: 'acc-001',
+      accountName: 'Apex Healthcare Group',
       siteCode: 'APEX-HQ-GLOBAL',
-      siteName: 'Apex Corporate Head Office (34 Sites)',
+      siteName: 'Apex Corporate Head Office (4 Sites)',
       department: 'Multi-Site Marketing Oversight & Billing Consolidation',
       poPrefix: 'PO-APEX-HQ',
       permissions: [
@@ -142,23 +147,26 @@ export const DEMO_USERS: Record<UserRole, DemoUserCredential> = {
     },
   },
   site_user: {
-    email: 'marcus.vance@sydney-flagship.com',
+    email: 'marcus.vance@apexhealth.org',
     role: 'site_user',
     roleTitle: 'Site User',
     roleSubtitle: 'Branch Asset Orders',
     defaultPassword: 'password123',
     user: {
-      id: 'usr_site_104',
+      id: 'usr_site_101',
       name: 'Marcus Vance',
-      email: 'marcus.vance@sydney-flagship.com',
+      email: 'marcus.vance@apexhealth.org',
       role: 'site_user',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-      title: 'Store General Manager & Visual Merchandising Lead',
-      organization: 'Apex Retail Flagship #104',
-      siteCode: 'APEX-NYC-104',
-      siteName: 'Downtown Flagship #104 (5th Ave, NY)',
-      department: 'Store Operations & Local Collateral',
-      poPrefix: 'PO-APX104',
+      title: 'Pharmacy Operations Lead & Visual Merchandising',
+      organization: 'Apex Healthcare Group',
+      accountId: 'acc-001',
+      accountName: 'Apex Healthcare Group',
+      siteId: 'site-101',
+      siteCode: 'APX-MID-101',
+      siteName: 'Apex Midtown Central Pharmacy',
+      department: 'Dispensary Operations & Marketing Collateral',
+      poPrefix: 'PO-APX-MID',
       monthlyBudgetCap: 8500,
       permissions: ['browse_dam', 'order_collateral', 'view_site_orders'],
     },

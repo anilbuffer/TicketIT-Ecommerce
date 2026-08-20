@@ -84,3 +84,30 @@ export async function listUsers(params?: {
 export async function createUser(input: Omit<PortalUser, 'id' | 'createdAt'>): Promise<PortalUser> {
   return prisma.user.create({ data: input as any });
 }
+
+export async function getOrderRules(accountId: string) {
+  const account = await prisma.account.findUnique({ where: { id: accountId } });
+  return {
+    accountId,
+    accountName: account?.name || 'Customer Account',
+    requirePoNumber: true,
+    poPrefix: 'PO-APX',
+    allowCustomDeliveryAddress: true,
+    monthlyBudgetCap: 25000,
+    requireDeliveryNotes: false,
+    defaultCarrier: 'Rahhawan Direct Logistics',
+  };
+}
+
+export async function getSiteAddresses(siteId: string) {
+  const site = await prisma.site.findUnique({ where: { id: siteId } });
+  if (!site) return null;
+  return {
+    siteId: site.id,
+    siteName: site.name,
+    siteCode: site.code,
+    billToAddress: site.billToAddress as any,
+    shipToAddress: site.shipToAddress as any,
+  };
+}
+

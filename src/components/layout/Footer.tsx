@@ -122,7 +122,7 @@ export const Footer: React.FC = () => {
             </div>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: 'var(--font-size-sm)', color: '#a6a0b8' }}>
               <li>
-                <Link href="/site-user" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Link href="/shop/catalogue" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <Store size={14} color="#f73582" />
                   <span>Site User (Branch Orders)</span>
                 </Link>

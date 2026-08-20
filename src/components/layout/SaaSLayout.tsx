@@ -74,11 +74,11 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   ];
 
   const siteUserNav: NavItem[] = [
-    { label: 'Asset Library & DAM', href: '/site-user', icon: <Package size={19} /> },
-    { label: 'New Collateral Order', href: '/site-user#order', icon: <ShoppingCart size={19} />, badge: 'Active' },
-    { label: 'My Site Orders', href: '/site-user#orders', icon: <ClipboardList size={19} />, badge: '2 Live' },
-    { label: 'Delivery & Tracking', href: '/site-user#dispatch', icon: <Truck size={19} /> },
+    { label: 'Asset Catalogue', href: '/shop/catalogue', icon: <Package size={19} /> },
+    { label: 'Collateral Cart', href: '/shop/cart', icon: <ShoppingCart size={19} /> },
+    { label: 'My Site Orders', href: '/shop/orders/history', icon: <ClipboardList size={19} />, badge: 'History' },
   ];
+
 
   const headOfficeNav: NavItem[] = [
     { label: 'HQ Dashboard', href: '/head-office/dashboard', icon: <LayoutDashboard size={19} /> },

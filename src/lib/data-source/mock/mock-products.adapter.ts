@@ -1,7 +1,7 @@
-// src/lib/data-source/mock/mock-products.adapter.ts
 import initialProducts from './fixtures/products.json';
 import initialCategories from './fixtures/categories.json';
-import type { Product, ProductCategory, PaginatedResult } from '@/lib/services/types';
+import type { Product, ProductCategory, PaginatedResult, EffectiveProduct } from '@/lib/services/types';
+import { calculateItemPrice } from './mock-pricing.adapter';
 import { simulateLatency, paginate } from './utils';
 
 let productsStore: Product[] = [...(initialProducts as Product[])];
@@ -83,6 +83,70 @@ export async function remove(id: string): Promise<void> {
   productsStore = productsStore.filter((p) => p.id !== id);
 }
 
+export async function listVisibleForAccount(
+  accountId?: string,
+  params?: {
+    page?: number;
+    pageSize?: number;
+    categoryId?: string;
+    search?: string;
+    includeUnavailable?: boolean;
+  }
+): Promise<PaginatedResult<EffectiveProduct>> {
+  await simulateLatency();
+  let results = [...productsStore];
+
+  // If includeUnavailable is false, we keep products that are active, or if true, we include all so UI can show disabled state
+  if (params?.categoryId && params.categoryId !== 'All') {
+    results = results.filter((p) => p.categoryId === params.categoryId);
+  }
+
+  if (params?.search) {
+    const q = params.search.toLowerCase().trim();
+    results = results.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.sku.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        (p.categoryName && p.categoryName.toLowerCase().includes(q))
+    );
+  }
+
+  // Calculate pricing for each product
+  const effectiveItems: EffectiveProduct[] = await Promise.all(
+    results.map(async (p) => {
+      const pricing = await calculateItemPrice(p.id, p.basePrice, accountId);
+      return {
+        ...p,
+        effectivePrice: pricing.effectivePrice,
+        discountPct: pricing.discountPct,
+        rateCardName: pricing.rateCardName,
+        isCustomPriced: pricing.discountPct > 0 || !!pricing.rateCardName,
+      };
+    })
+  );
+
+  return paginate(effectiveItems, params?.page ?? 1, params?.pageSize ?? 24);
+}
+
+export async function getByIdWithPricing(
+  id: string,
+  accountId?: string
+): Promise<EffectiveProduct | null> {
+  await simulateLatency();
+  const product = productsStore.find((p) => p.id === id || p.sku === id);
+  if (!product) return null;
+
+  const pricing = await calculateItemPrice(product.id, product.basePrice, accountId);
+  return {
+    ...product,
+    effectivePrice: pricing.effectivePrice,
+    discountPct: pricing.discountPct,
+    rateCardName: pricing.rateCardName,
+    isCustomPriced: pricing.discountPct > 0 || !!pricing.rateCardName,
+  };
+}
+
 export async function listCategories(): Promise<ProductCategory[]> {
   await simulateLatency();
   return categoriesStore.map((cat) => ({
@@ -101,3 +165,6 @@ export async function createCategory(input: Omit<ProductCategory, 'id' | 'itemCo
   categoriesStore.push(newCategory);
   return { ...newCategory };
 }
+
+
+

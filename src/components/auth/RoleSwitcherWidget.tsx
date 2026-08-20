@@ -33,7 +33,7 @@ export const RoleSwitcherWidget: React.FC = () => {
     {
       role: 'site_user',
       icon: <Store size={18} />,
-      path: '/site-user',
+      path: '/shop/catalogue',
     },
     {
       role: 'head_office',

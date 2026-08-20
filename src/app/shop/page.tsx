@@ -1,10 +1,10 @@
-// src/app/site-user/page.tsx
+// src/app/shop/page.tsx
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function SiteUserRedirectPage() {
+export default function ShopIndexPage() {
   const router = useRouter();
 
   useEffect(() => {

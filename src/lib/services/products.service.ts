@@ -1,6 +1,6 @@
 // src/lib/services/products.service.ts
 import { getDataSource } from '@/lib/data-source';
-import type { Product, ProductCategory, PaginatedResult } from './types';
+import type { Product, ProductCategory, PaginatedResult, EffectiveProduct } from './types';
 
 export async function getProducts(params?: {
   page?: number;
@@ -93,3 +93,26 @@ export async function createProductCategory(input: Omit<ProductCategory, 'id' | 
   const ds = getDataSource();
   return ds.products.createCategory(input);
 }
+
+export async function getVisibleProductsForAccount(
+  accountId?: string,
+  params?: {
+    page?: number;
+    pageSize?: number;
+    categoryId?: string;
+    search?: string;
+    includeUnavailable?: boolean;
+  }
+): Promise<PaginatedResult<EffectiveProduct>> {
+  const ds = getDataSource();
+  return ds.products.listVisibleForAccount(accountId, params);
+}
+
+export async function getProductWithPricing(
+  id: string,
+  accountId?: string
+): Promise<EffectiveProduct | null> {
+  const ds = getDataSource();
+  return ds.products.getByIdWithPricing(id, accountId);
+}
+

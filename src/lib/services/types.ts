@@ -305,3 +305,32 @@ export type HOMonthlyBillingReport = {
   categoryBreakdown: { category: string; spend: number; percentage: number }[];
 };
 
+// ─── Site User / Shop Module Types ──────────────────────────────────────────
+
+export type AccountOrderRules = {
+  accountId: string;
+  accountName: string;
+  requirePoNumber: boolean;
+  poPrefix?: string;
+  allowCustomDeliveryAddress: boolean;
+  monthlyBudgetCap?: number;
+  requireDeliveryNotes?: boolean;
+  defaultCarrier?: string;
+};
+
+export type EffectiveProduct = Product & {
+  effectivePrice: number;
+  discountPct: number;
+  rateCardName?: string;
+  isCustomPriced: boolean;
+};
+
+export type OrderDeliveryDetails = {
+  billToAddress: Address;
+  shipToAddress: Address;
+  deliveryContactName: string;
+  deliveryContactPhone?: string;
+  deliveryInstructions?: string;
+  isCustomShippingAddress?: boolean;
+};
+

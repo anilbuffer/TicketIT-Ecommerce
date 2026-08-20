@@ -1,7 +1,7 @@
 // src/lib/data-source/mock/mock-accounts.adapter.ts
 import initialAccounts from './fixtures/accounts.json';
 import initialSites from './fixtures/sites.json';
-import type { Account, Site, PortalUser, PaginatedResult } from '@/lib/services/types';
+import type { Account, Site, PortalUser, PaginatedResult, Address, AccountOrderRules } from '@/lib/services/types';
 import { simulateLatency, paginate } from './utils';
 
 let accountsStore: Account[] = [...(initialAccounts as Account[])];
@@ -203,3 +203,69 @@ export async function createUser(input: Omit<PortalUser, 'id' | 'createdAt'>): P
   usersStore.unshift(newUser);
   return { ...newUser };
 }
+
+export async function getOrderRules(accountId: string): Promise<AccountOrderRules> {
+  await simulateLatency(30);
+  const account = accountsStore.find((a) => a.id === accountId);
+  const accountName = account?.name || 'Customer Account';
+
+  // Configured business rules per account:
+  // Apex Healthcare (acc-001): Mandatory PO (PO-APX-*), Restricted to saved addresses by default
+  // Metro Dispensaries (acc-002): Mandatory PO (RX-MET-*), Allows custom address entry
+  // Beacon (acc-003): Optional PO, Restricted to saved addresses
+  // Default: Optional PO, Allowed custom address
+  if (accountId === 'acc-001') {
+    return {
+      accountId,
+      accountName,
+      requirePoNumber: true,
+      poPrefix: 'PO-APX',
+      allowCustomDeliveryAddress: true,
+      monthlyBudgetCap: 25000,
+      requireDeliveryNotes: false,
+      defaultCarrier: 'Rahhawan Direct Logistics',
+    };
+  } else if (accountId === 'acc-002') {
+    return {
+      accountId,
+      accountName,
+      requirePoNumber: true,
+      poPrefix: 'PO-METRO',
+      allowCustomDeliveryAddress: true,
+      monthlyBudgetCap: 15000,
+      requireDeliveryNotes: false,
+      defaultCarrier: 'FedEx Priority',
+    };
+  }
+
+  return {
+    accountId,
+    accountName,
+    requirePoNumber: false,
+    poPrefix: 'PO-REF',
+    allowCustomDeliveryAddress: true,
+    monthlyBudgetCap: 10000,
+    requireDeliveryNotes: false,
+    defaultCarrier: 'Standard Carrier',
+  };
+}
+
+export async function getSiteAddresses(siteId: string): Promise<{
+  siteId: string;
+  siteName: string;
+  siteCode: string;
+  billToAddress: Address;
+  shipToAddress: Address;
+} | null> {
+  await simulateLatency(30);
+  const site = sitesStore.find((s) => s.id === siteId || s.code === siteId);
+  if (!site) return null;
+  return {
+    siteId: site.id,
+    siteName: site.name,
+    siteCode: site.code,
+    billToAddress: site.billToAddress,
+    shipToAddress: site.shipToAddress,
+  };
+}
+
