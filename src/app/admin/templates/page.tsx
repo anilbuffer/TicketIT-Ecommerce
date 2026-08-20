@@ -26,7 +26,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { useTemplates, useTemplateMutations } from '@/lib/hooks/useTemplates';
 import type { PrintTemplate } from '@/lib/services/types';
 
-const CATEGORIES = ['All', 'Signs', 'Posters', 'Banners', 'Flyers', 'Business Cards', 'Brochures'];
+const CATEGORIES = ['All', 'Signs', 'Banners', 'Business Cards', 'Flyers', 'Catalogue', 'Template Design', 'Posters', 'Brochures'];
 
 export default function AdminTemplatesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -64,7 +64,7 @@ export default function AdminTemplatesPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '48px' }}>
+    <>
       {/* 1. Header Banner */}
       <AdminHeader
         title="Master Design Template Library"
@@ -77,13 +77,13 @@ export default function AdminTemplatesPage() {
               alignItems: 'center',
               gap: '8px',
               padding: '10px 18px',
-              borderRadius: '12px',
-              backgroundColor: '#059669',
+              borderRadius: '8px',
+              backgroundColor: '#F73582',
               color: '#ffffff',
               fontSize: '13px',
               fontWeight: 700,
               textDecoration: 'none',
-              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)',
+              boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
             }}
           >
             <Plus size={16} />
@@ -91,6 +91,9 @@ export default function AdminTemplatesPage() {
           </Link>
         }
       />
+
+      {/* Main Content Area */}
+      <main style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
       {/* 2. Filter & Search Controls */}
       <div
@@ -204,7 +207,7 @@ export default function AdminTemplatesPage() {
             margin: '24px auto',
           }}
         >
-          <LayoutTemplate size={36} color="#059669" style={{ margin: '0 auto 12px auto' }} />
+          <LayoutTemplate size={36} color="#F73582" style={{ margin: '0 auto 12px auto' }} />
           <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>No Templates Found</h3>
           <p style={{ fontSize: '13px', color: '#64748b', marginTop: '6px', marginBottom: '20px' }}>
             No design templates match your filter criteria. Try resetting filters or create a new template.
@@ -216,12 +219,13 @@ export default function AdminTemplatesPage() {
               alignItems: 'center',
               gap: '8px',
               padding: '10px 18px',
-              borderRadius: '10px',
-              backgroundColor: '#059669',
+              borderRadius: '8px',
+              backgroundColor: '#F73582',
               color: '#ffffff',
               fontSize: '13px',
               fontWeight: 700,
               textDecoration: 'none',
+              boxShadow: '0 4px 12px rgba(247, 53, 130, 0.3)',
             }}
           >
             <Plus size={16} />
@@ -389,13 +393,14 @@ export default function AdminTemplatesPage() {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '5px',
-                          padding: '6px 12px',
+                          padding: '6px 14px',
                           borderRadius: '8px',
-                          backgroundColor: '#0f172a',
+                          backgroundColor: '#F73582',
                           color: '#ffffff',
                           fontSize: '12px',
                           fontWeight: 700,
                           textDecoration: 'none',
+                          boxShadow: '0 2px 8px rgba(247, 53, 130, 0.25)',
                         }}
                       >
                         <Edit3 size={13} />
@@ -455,6 +460,7 @@ export default function AdminTemplatesPage() {
           })}
         </div>
       )}
-    </div>
+      </main>
+    </>
   );
 }

@@ -4,55 +4,48 @@
     "name": "Signs & Posters",
     "code": "SIGNS",
     "description": "Yard signs, acrylic office signs, aluminum composite boards, and high-gloss posters",
-    "itemCount": 4
+    "itemCount": 2
   },
   {
     "id": "cat-banners",
     "name": "Banners & Displays",
     "code": "BAN",
     "description": "Vinyl retractable rollup banners, mesh outdoor banners, step & repeat backdrops",
-    "itemCount": 3
+    "itemCount": 1
   },
   {
     "id": "cat-cards",
     "name": "Business Cards & Stationery",
     "code": "CARD",
     "description": "Executive soft-touch cards, linen textured cards, foil stamped cards, and envelopes",
-    "itemCount": 2
+    "itemCount": 1
   },
   {
     "id": "cat-flyers",
     "name": "Flyers & Brochures",
     "code": "FLY",
-    "description": "Tri-fold medical brochures, promotional club flyers, and bi-fold product guides",
-    "itemCount": 3
+    "description": "Tri-fold promotional brochures, club flyers, and bi-fold product guides",
+    "itemCount": 1
   },
   {
     "id": "cat-pos",
     "name": "Point of Sale",
     "code": "POS",
-    "description": "Storefront displays, LED stands, retail window graphics, and shelf talkers",
-    "itemCount": 3
+    "description": "Table tents, counter displays, retail window graphics, and shelf talkers",
+    "itemCount": 1
   },
   {
-    "id": "cat-pkg",
-    "name": "Specialized Packaging",
-    "code": "PKG",
-    "description": "Cold-chain thermal totes, tamper-evident security bags, and dispensing vials",
-    "itemCount": 2
+    "id": "cat-catalogue",
+    "name": "Catalogue",
+    "code": "CAT",
+    "description": "Printed product catalogues, look-books, and multi-page marketing materials for business promotions",
+    "itemCount": 6
   },
   {
-    "id": "cat-lbl",
-    "name": "Labels & Signage",
-    "code": "LBL",
-    "description": "Direct thermal labels, hazardous material alerts, and directional clinic signage",
-    "itemCount": 2
-  },
-  {
-    "id": "cat-merch",
-    "name": "Marketing & Branded Merch",
-    "code": "MERCH",
-    "description": "Branded event tablecloths, promotional kits, staff apparel, and lanyards",
-    "itemCount": 2
+    "id": "cat-template-design",
+    "name": "Template Design",
+    "code": "TPL",
+    "description": "Ready-to-use design templates for business signs, promotional materials, and branded marketing collateral",
+    "itemCount": 6
   }
 ]
