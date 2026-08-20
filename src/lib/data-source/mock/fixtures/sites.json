@@ -133,5 +133,32 @@
     "totalOrdersCount": 22,
     "monthlySpend": 8200.00,
     "createdAt": "2026-01-20T15:45:00.000Z"
+  },
+  {
+    "id": "site-106",
+    "accountId": "acc-001",
+    "accountName": "Apex Healthcare Group",
+    "name": "Apex Queens Specialist Centre",
+    "code": "APX-QNS-106",
+    "billToAddress": {
+      "street": "550 Lexington Avenue",
+      "suite": "14th Floor",
+      "city": "New York",
+      "state": "NY",
+      "postalCode": "10022",
+      "country": "USA"
+    },
+    "shipToAddress": {
+      "street": "90-21 Queens Blvd",
+      "suite": "Medical Suite 4F",
+      "city": "Elmhurst",
+      "state": "NY",
+      "postalCode": "11373",
+      "country": "USA"
+    },
+    "activeUsersCount": 3,
+    "totalOrdersCount": 18,
+    "monthlySpend": 7100.00,
+    "createdAt": "2026-03-10T09:00:00.000Z"
   }
 ]

@@ -217,3 +217,91 @@ export type ServiceError = {
   message: string;
   field?: string;
 };
+
+// ─── Head Office Module Types ────────────────────────────────────────────────
+
+export type HOSpendBysite = {
+  siteId: string;
+  siteCode: string;
+  siteName: string;
+  ordersCount: number;
+  totalSpend: number;
+  percentageOfTotal: number;
+};
+
+export type HOSpendTrend = {
+  month: string;
+  spend: number;
+  orders: number;
+};
+
+export type HODashboardKPIs = {
+  accountId: string;
+  accountName: string;
+  totalSpendThisMonth: number;
+  totalSpendLastMonth: number;
+  spendDeltaPct: number;
+  orderCountThisMonth: number;
+  orderCountLastMonth: number;
+  ordersDeltaPct: number;
+  activeSitesCount: number;
+  topSite: { siteName: string; siteCode: string; spend: number };
+  recentOrders: Order[];
+  spendBySite: HOSpendBysite[];
+  spendTrend: HOSpendTrend[];
+};
+
+export type HOBillingLineItem = {
+  // Identity
+  orderNumber: string;
+  orderDate: string;
+  // Account / Site
+  accountName: string;
+  accountId: string;
+  siteName: string;
+  siteId: string;
+  siteCode: string;
+  // User / Contact
+  orderedByUser: string;
+  orderedByEmail: string;
+  // PO Reference
+  poReference: string;
+  // Product
+  productName: string;
+  sku: string;
+  packSize: string;
+  uom: string;
+  // Qty / Pricing
+  qty: number;
+  unitPrice: number;
+  lineValue: number;
+  taxTreatment: string;
+  // Order totals
+  orderTotal: number;
+  // Addresses
+  shipToAddress: string;
+  deliveryContact: string;
+  deliveryInstructions: string;
+  billToAddress: string;
+  billToEntity: string;
+  // Status
+  status: OrderStatus;
+  notes: string;
+};
+
+export type HOMonthlyBillingReport = {
+  accountId: string;
+  accountName: string;
+  period: string;
+  periodLabel: string;
+  generatedAt: string;
+  invoiceRef: string;
+  totalSpend: number;
+  totalOrders: number;
+  totalLineItems: number;
+  activeSitesCount: number;
+  siteBreakdowns: HOSpendBysite[];
+  lineItems: HOBillingLineItem[];
+  categoryBreakdown: { category: string; spend: number; percentage: number }[];
+};
+

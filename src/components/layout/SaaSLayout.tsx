@@ -30,7 +30,9 @@ import {
   Building2,
   FileSpreadsheet,
   ShoppingCart,
+  TrendingUp,
 } from 'lucide-react';
+
 import { useAuth } from '../../context/AuthContext';
 import { UserRole, ROLE_DETAILS, DEMO_USERS } from '../../types/auth';
 import { TicketITLogo } from '../ui/TicketITLogo';
@@ -79,10 +81,10 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   ];
 
   const headOfficeNav: NavItem[] = [
-    { label: 'Multi-Site Overview', href: '/head-office', icon: <Building2 size={19} /> },
-    { label: 'Consolidated Monthly Billing', href: '/head-office#billing', icon: <FileSpreadsheet size={19} />, badge: '34 Sites' },
-    { label: 'Site Spend Breakdown', href: '/head-office#sites', icon: <Store size={19} /> },
-    { label: 'Audit Backing & Exports', href: '/head-office#export', icon: <ShieldCheck size={19} /> },
+    { label: 'HQ Dashboard', href: '/head-office/dashboard', icon: <LayoutDashboard size={19} /> },
+    { label: 'Cross-Site Orders', href: '/head-office/orders/all', icon: <ShoppingCart size={19} />, badge: 'Live' },
+    { label: 'Monthly Billing', href: '/head-office/billing/monthly', icon: <FileSpreadsheet size={19} />, badge: 'Reports' },
+    { label: 'Spend Insights', href: '/head-office/reports/spend-by-site', icon: <TrendingUp size={19} /> },
   ];
 
   const activeNavList =
@@ -91,6 +93,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
       : role === 'head_office'
       ? headOfficeNav
       : siteUserNav;
+
 
   const handleLogout = () => {
     logout();
