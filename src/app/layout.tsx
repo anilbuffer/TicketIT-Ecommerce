@@ -1,11 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { AuthProvider } from '../context/AuthContext';
-import { CartProvider } from '../context/CartContext';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { MobileNav } from '../components/layout/MobileNav';
-import { CartDrawer } from '../components/features/CartDrawer';
 import { RoleSwitcherWidget } from '../components/auth/RoleSwitcherWidget';
 
 export const metadata: Metadata = {
@@ -19,7 +17,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#58b97d',
+  themeColor: '#10b981',
 };
 
 export default function RootLayout({
@@ -31,16 +29,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <CartProvider>
-            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-              <Navbar />
-              <main style={{ flex: 1 }}>{children}</main>
-              <Footer />
-              <CartDrawer />
-              <MobileNav />
-              <RoleSwitcherWidget />
-            </div>
-          </CartProvider>
+          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Navbar />
+            <main style={{ flex: 1 }}>{children}</main>
+            <Footer />
+            <MobileNav />
+            <RoleSwitcherWidget />
+          </div>
         </AuthProvider>
       </body>
     </html>

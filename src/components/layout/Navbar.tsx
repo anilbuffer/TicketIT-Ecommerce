@@ -5,21 +5,16 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Ticket,
-  ShoppingBag,
-  Sparkles,
-  Search,
-  User as UserIcon,
   LogOut,
   ChevronDown,
   Building2,
   Store,
   Shield,
   KeyRound,
-  ExternalLink,
+  Sparkles,
+  ArrowRight,
   Layers,
 } from 'lucide-react';
-import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { ROLE_DETAILS } from '../../types/auth';
 import { Button } from '../ui/Button';
@@ -27,7 +22,6 @@ import { Button } from '../ui/Button';
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const { summary, toggleCart } = useCart();
   const { user, role, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -35,7 +29,7 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 15);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -53,10 +47,9 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { label: 'Explore Events', href: '/' },
-    { label: 'Site Ordering', href: '/portal/site-user' },
-    { label: 'Head Office Billing', href: '/portal/head-office' },
-    { label: 'Admin DAM', href: '/portal/admin' },
+    { label: 'Site Ordering Hub', href: '/portal/site-user', icon: Store, role: 'site_user' },
+    { label: 'Head Office Billing', href: '/portal/head-office', icon: Building2, role: 'head_office' },
+    { label: 'Admin DAM HQ', href: '/portal/admin', icon: Shield, role: 'admin' },
   ];
 
   const currentRoleMeta = role ? ROLE_DETAILS[role] : null;
@@ -68,12 +61,12 @@ export const Navbar: React.FC = () => {
         top: 0,
         zIndex: 900,
         height: 'var(--navbar-height)',
-        background: isScrolled ? 'rgba(231, 234, 239, 0.92)' : 'rgba(231, 234, 239, 0.78)',
+        background: isScrolled ? 'rgba(231, 234, 239, 0.94)' : 'rgba(231, 234, 239, 0.82)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderBottom: isScrolled
           ? '1px solid rgba(43, 37, 62, 0.12)'
-          : '1px solid rgba(255, 255, 255, 0.4)',
+          : '1px solid rgba(255, 255, 255, 0.5)',
         boxShadow: isScrolled ? '0 4px 20px rgba(43, 37, 62, 0.06)' : 'none',
         transition: 'all var(--transition-normal)',
         display: 'flex',
@@ -89,14 +82,17 @@ export const Navbar: React.FC = () => {
         }}
       >
         {/* Brand Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+        <Link
+          href={role && ROLE_DETAILS[role] ? ROLE_DETAILS[role].defaultRedirect : '/login'}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}
+        >
           <motion.div
-            whileHover={{ rotate: 12, scale: 1.08 }}
+            whileHover={{ rotate: 8, scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: 'var(--radius-md)',
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               display: 'flex',
               alignItems: 'center',
@@ -104,13 +100,13 @@ export const Navbar: React.FC = () => {
               boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
               color: '#ffffff',
               fontWeight: 900,
-              fontSize: '1.25rem',
+              fontSize: '1.2rem',
             }}
           >
             Y
           </motion.div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               <span
                 style={{
                   fontFamily: 'var(--font-family-display)',
@@ -145,7 +141,7 @@ export const Navbar: React.FC = () => {
                 marginTop: '-3px',
               }}
             >
-              Marketing DAM & Ecommerce
+              Marketing Asset Delivery & Ecommerce CMS
             </span>
           </div>
         </Link>
@@ -155,12 +151,13 @@ export const Navbar: React.FC = () => {
           style={{
             display: 'none',
             alignItems: 'center',
-            gap: '1.5rem',
+            gap: '1.75rem',
           }}
           className="desktop-nav-links"
         >
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname.startsWith(link.href);
+            const Icon = link.icon;
             return (
               <Link
                 key={link.label}
@@ -171,15 +168,19 @@ export const Navbar: React.FC = () => {
                   color: isActive ? 'var(--color-primary)' : 'var(--color-text-main)',
                   position: 'relative',
                   padding: '0.35rem 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
                 }}
               >
-                {link.label}
+                <Icon size={16} color={isActive ? 'var(--color-primary)' : 'var(--color-text-sub)'} />
+                <span>{link.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="activeNav"
                     style={{
                       position: 'absolute',
-                      bottom: -2,
+                      bottom: -4,
                       left: 0,
                       right: 0,
                       height: '2.5px',
@@ -195,54 +196,6 @@ export const Navbar: React.FC = () => {
 
         {/* Action Controls & Auth State */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          {/* Cart Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleCart}
-            aria-label="View Cart"
-            id="cart-trigger-btn"
-            style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.55rem 0.9rem',
-              borderRadius: 'var(--radius-full)',
-              background: summary.totalTickets > 0 ? 'var(--color-secondary)' : 'var(--color-surface-glass)',
-              color: summary.totalTickets > 0 ? '#ffffff' : 'var(--color-secondary)',
-              border: '1px solid rgba(43, 37, 62, 0.15)',
-              boxShadow: summary.totalTickets > 0 ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-              fontWeight: 700,
-              fontSize: 'var(--font-size-sm)',
-            }}
-          >
-            <ShoppingBag size={17} />
-            <span style={{ display: 'none' }} className="cart-btn-label">
-              Tickets
-            </span>
-            {summary.totalTickets > 0 && (
-              <span
-                style={{
-                  background: 'var(--color-primary)',
-                  color: '#ffffff',
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  minWidth: '19px',
-                  height: '19px',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0 4px',
-                }}
-              >
-                {summary.totalTickets}
-              </span>
-            )}
-          </motion.button>
-
-          {/* User Auth Profile Menu */}
           {isAuthenticated && user ? (
             <div style={{ position: 'relative' }} ref={menuRef}>
               <motion.button
@@ -252,8 +205,8 @@ export const Navbar: React.FC = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.6rem',
-                  padding: '0.4rem 0.75rem 0.4rem 0.4rem',
+                  gap: '0.65rem',
+                  padding: '0.4rem 0.85rem 0.4rem 0.45rem',
                   borderRadius: 'var(--radius-full)',
                   background: '#ffffff',
                   border: '1.5px solid var(--color-border)',
@@ -268,7 +221,7 @@ export const Navbar: React.FC = () => {
                     height: '32px',
                     borderRadius: '50%',
                     overflow: 'hidden',
-                    background: currentRoleMeta?.themeColor || 'var(--color-secondary)',
+                    background: currentRoleMeta?.themeColor || '#10b981',
                     color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
@@ -283,10 +236,10 @@ export const Navbar: React.FC = () => {
                 {/* Role Pill */}
                 <div style={{ textAlign: 'left', display: 'none' }} className="user-profile-label">
                   <div style={{ fontWeight: 800, fontSize: '0.8rem', color: 'var(--color-secondary)', lineHeight: 1.1 }}>
-                    {user.name.split(' ')[0]}
+                    {user.name}
                   </div>
                   <div style={{ fontSize: '0.65rem', color: currentRoleMeta?.themeColor, fontWeight: 700 }}>
-                    {currentRoleMeta?.title.split(' / ')[0]}
+                    {currentRoleMeta?.title}
                   </div>
                 </div>
 
@@ -305,7 +258,7 @@ export const Navbar: React.FC = () => {
                       position: 'absolute',
                       right: 0,
                       top: 'calc(100% + 8px)',
-                      width: '280px',
+                      width: '290px',
                       background: '#ffffff',
                       borderRadius: 'var(--radius-lg)',
                       boxShadow: '0 16px 36px rgba(43, 37, 62, 0.18)',
@@ -334,7 +287,7 @@ export const Navbar: React.FC = () => {
                           fontWeight: 800,
                         }}
                       >
-                        {currentRoleMeta?.badgeText}
+                        {currentRoleMeta?.badgeText} • {user.organization}
                       </div>
                     </div>
 
@@ -347,7 +300,7 @@ export const Navbar: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.5rem',
-                          padding: '0.45rem 0.6rem',
+                          padding: '0.5rem 0.6rem',
                           borderRadius: '6px',
                           fontSize: 'var(--font-size-xs)',
                           fontWeight: 700,
@@ -366,7 +319,7 @@ export const Navbar: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.5rem',
-                          padding: '0.45rem 0.6rem',
+                          padding: '0.5rem 0.6rem',
                           borderRadius: '6px',
                           fontSize: 'var(--font-size-xs)',
                           fontWeight: 700,
@@ -385,7 +338,7 @@ export const Navbar: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.5rem',
-                          padding: '0.45rem 0.6rem',
+                          padding: '0.5rem 0.6rem',
                           borderRadius: '6px',
                           fontSize: 'var(--font-size-xs)',
                           fontWeight: 700,
@@ -394,18 +347,18 @@ export const Navbar: React.FC = () => {
                         }}
                       >
                         <Shield size={15} color="#f73582" />
-                        <span>Portal Admin DAM & Audit</span>
+                        <span>Portal Admin DAM HQ</span>
                       </Link>
                     </div>
 
                     {/* Footer Actions */}
-                    <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Link
                         href="/login"
                         onClick={() => setIsProfileMenuOpen(false)}
-                        style={{ fontSize: '0.72rem', color: 'var(--color-secondary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                        style={{ fontSize: '0.75rem', color: 'var(--color-secondary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}
                       >
-                        <KeyRound size={12} />
+                        <KeyRound size={13} />
                         <span>Switch Portal</span>
                       </Link>
 
@@ -416,16 +369,18 @@ export const Navbar: React.FC = () => {
                           router.push('/login');
                         }}
                         style={{
-                          fontSize: '0.72rem',
+                          fontSize: '0.75rem',
                           color: 'var(--color-primary)',
                           fontWeight: 700,
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.25rem',
+                          background: 'none',
+                          border: 'none',
                           cursor: 'pointer',
                         }}
                       >
-                        <LogOut size={12} />
+                        <LogOut size={13} />
                         <span>Sign Out</span>
                       </button>
                     </div>
@@ -447,9 +402,6 @@ export const Navbar: React.FC = () => {
         @media (min-width: 768px) {
           .desktop-nav-links {
             display: flex !important;
-          }
-          .cart-btn-label {
-            display: inline !important;
           }
           .user-profile-label {
             display: block !important;

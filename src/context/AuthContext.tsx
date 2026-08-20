@@ -24,19 +24,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Initialize from localStorage or default to Site User for instant demo readiness
+  // Initialize from localStorage
   useEffect(() => {
     try {
       const storedRole = localStorage.getItem(AUTH_STORAGE_KEY) as UserRole | null;
       if (storedRole && DEMO_USERS[storedRole]) {
         setUser(DEMO_USERS[storedRole].user);
       } else {
-        // Default pre-authenticated as site_user for smooth initial exploration
-        setUser(DEMO_USERS.site_user.user);
-        localStorage.setItem(AUTH_STORAGE_KEY, 'site_user');
+        setUser(null);
       }
     } catch (e) {
-      setUser(DEMO_USERS.site_user.user);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -57,8 +55,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(
     async (email: string, password: string, selectedRole?: UserRole): Promise<{ success: boolean; error?: string }> => {
       setIsLoading(true);
-      // Simulate network authentication delay
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      // Simulate rapid authentication delay
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
       // Find user by role or email match
       let targetUserRole: UserRole | null = selectedRole || null;

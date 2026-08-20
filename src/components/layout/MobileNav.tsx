@@ -3,17 +3,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Compass, Calendar, ShoppingBag, Sparkles } from 'lucide-react';
-import { useCart } from '../../context/CartContext';
+import { Store, Building2, Shield, KeyRound } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const MobileNav: React.FC = () => {
   const pathname = usePathname();
-  const { summary, toggleCart } = useCart();
+  const { isAuthenticated } = useAuth();
 
   const items = [
-    { label: 'Explore', href: '/', icon: Compass },
-    { label: 'Trending', href: '/#trending', icon: Sparkles },
-    { label: 'Calendar', href: '/#calendar', icon: Calendar },
+    { label: 'Site Hub', href: '/portal/site-user', icon: Store },
+    { label: 'Head Office', href: '/portal/head-office', icon: Building2 },
+    { label: 'Admin DAM', href: '/portal/admin', icon: Shield },
+    { label: isAuthenticated ? 'Switch Role' : 'Login', href: '/login', icon: KeyRound },
   ];
 
   return (
@@ -25,7 +26,7 @@ export const MobileNav: React.FC = () => {
         right: 0,
         zIndex: 890,
         height: 'var(--mobile-nav-height)',
-        background: 'rgba(255, 255, 255, 0.92)',
+        background: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderTop: '1px solid rgba(43, 37, 62, 0.1)',
@@ -39,7 +40,7 @@ export const MobileNav: React.FC = () => {
     >
       {items.map((item) => {
         const Icon = item.icon;
-        const isActive = pathname === item.href;
+        const isActive = pathname === item.href || (item.href !== '/login' && pathname.startsWith(item.href));
         return (
           <Link
             key={item.label}
@@ -53,57 +54,14 @@ export const MobileNav: React.FC = () => {
               color: isActive ? 'var(--color-primary)' : 'var(--color-text-sub)',
               fontSize: '0.7rem',
               fontWeight: 700,
-              padding: '0.4rem 0.8rem',
+              padding: '0.4rem 0.6rem',
             }}
           >
-            <Icon size={20} color={isActive ? 'var(--color-primary)' : 'var(--color-text-sub)'} />
+            <Icon size={19} color={isActive ? 'var(--color-primary)' : 'var(--color-text-sub)'} />
             <span>{item.label}</span>
           </Link>
         );
       })}
-
-      {/* Mobile Cart Trigger */}
-      <button
-        onClick={toggleCart}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.2rem',
-          color: summary.totalTickets > 0 ? 'var(--color-primary)' : 'var(--color-text-sub)',
-          fontSize: '0.7rem',
-          fontWeight: 700,
-          padding: '0.4rem 0.8rem',
-          position: 'relative',
-        }}
-      >
-        <div style={{ position: 'relative' }}>
-          <ShoppingBag size={20} />
-          {summary.totalTickets > 0 && (
-            <span
-              style={{
-                position: 'absolute',
-                top: -4,
-                right: -8,
-                background: 'var(--color-primary)',
-                color: '#ffffff',
-                fontSize: '0.65rem',
-                fontWeight: 800,
-                width: '16px',
-                height: '16px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {summary.totalTickets}
-            </span>
-          )}
-        </div>
-        <span>Tickets</span>
-      </button>
 
       <style jsx>{`
         @media (min-width: 769px) {

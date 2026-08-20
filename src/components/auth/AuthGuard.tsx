@@ -105,9 +105,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
                 Go to Portal Login
               </Button>
             </Link>
-            <Link href="/">
+            <Link href="/login">
               <Button variant="outline" size="md" fullWidth leftIcon={<ArrowLeft size={16} />}>
-                Return to Public Marketplace
+                Go to Portal Selection
               </Button>
             </Link>
           </div>
@@ -311,7 +311,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
             >
               Go Back
             </Button>
-            <Link href={currentRoleDetails?.defaultRedirect || '/'} style={{ flex: 1 }}>
+            <Link href={currentRoleDetails?.defaultRedirect || '/login'} style={{ flex: 1 }}>
               <Button variant="secondary" size="md" fullWidth rightIcon={<ArrowRight size={16} />}>
                 Go to My Assigned Portal
               </Button>
