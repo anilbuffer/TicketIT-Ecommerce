@@ -266,26 +266,52 @@ export default function AllOrdersPage() {
                       </td>
                       <td style={{ padding: '14px 24px', textAlign: 'right' }}>
                         {isAdmin ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenOrder(order);
-                            }}
-                            style={{
-                              padding: '6px 12px',
-                              borderRadius: '6px',
-                              backgroundColor: '#2B253E',
-                              color: '#FFFFFF',
-                              fontSize: '0.75rem',
-                              fontWeight: 700,
-                            }}
-                          >
-                            Action
-                          </button>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                            <Link
+                              href={`/admin/orders/${order.id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              style={{
+                                padding: '6px 10px',
+                                borderRadius: '6px',
+                                backgroundColor: '#F1F5F9',
+                                border: '1px solid #CBD5E1',
+                                color: '#475569',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              <Eye size={12} />
+                              <span>Full Details</span>
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenOrder(order);
+                              }}
+                              style={{
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                backgroundColor: '#2B253E',
+                                color: '#FFFFFF',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                border: 'none',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              Manage
+                            </button>
+                          </div>
                         ) : (
                           <Link
-                            href={`/admin/orders/${order.id}`}
+                            href={`/head-office/orders/${order.id}`}
                             onClick={(e) => e.stopPropagation()}
                             style={{
                               padding: '6px 12px',
@@ -302,7 +328,7 @@ export default function AllOrdersPage() {
                             }}
                           >
                             <Eye size={13} />
-                            <span>Inspect</span>
+                            <span>Full Details</span>
                           </Link>
                         )}
                       </td>

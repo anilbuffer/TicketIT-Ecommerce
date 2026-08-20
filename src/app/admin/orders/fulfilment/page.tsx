@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Kanban,
@@ -276,7 +277,10 @@ export default function FulfilmentKanbanPage() {
                             color: '#475569',
                           }}
                         >
-                          <div style={{ fontWeight: 600 }}>{order.itemCount} unit(s) across {order.lineItems.length} item(s)</div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ fontWeight: 600 }}>{order.itemCount} unit(s) across {order.lineItems.length} item(s)</div>
+                            <span style={{ fontWeight: 800, color: '#F73582', fontSize: '0.82rem' }}>${order.totalAmount.toFixed(2)}</span>
+                          </div>
                           <div style={{ color: '#94A3B8', fontSize: '0.7rem', marginTop: '2px' }}>
                             {order.lineItems[0]?.productName} {order.lineItems.length > 1 ? `+${order.lineItems.length - 1} more` : ''}
                           </div>
@@ -293,9 +297,21 @@ export default function FulfilmentKanbanPage() {
                             marginTop: '2px',
                           }}
                         >
-                          <span style={{ fontWeight: 800, color: '#F73582', fontSize: '0.88rem' }}>
-                            ${order.totalAmount.toFixed(2)}
-                          </span>
+                          <Link
+                            href={`/admin/orders/${order.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              color: '#64748B',
+                              textDecoration: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '3px',
+                            }}
+                          >
+                            <ExternalLink size={11} /> Full Details
+                          </Link>
 
                           {isAdmin && col.nextStatus && col.nextLabel ? (
                             <button
@@ -312,6 +328,7 @@ export default function FulfilmentKanbanPage() {
                                 border: `1px solid ${col.color}40`,
                                 fontSize: '0.72rem',
                                 fontWeight: 700,
+                                cursor: 'pointer',
                               }}
                             >
                               <span>{col.nextLabel}</span>

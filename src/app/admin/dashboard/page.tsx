@@ -371,23 +371,48 @@ export default function AdminDashboardPage() {
                         ${order.totalAmount.toFixed(2)}
                       </td>
                       <td style={{ padding: '14px 24px', textAlign: 'right' }}>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenOrder(order);
-                          }}
-                          style={{
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            backgroundColor: '#2B253E',
-                            color: '#FFFFFF',
-                            fontSize: '0.75rem',
-                            fontWeight: 700,
-                          }}
-                        >
-                          Manage
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                          <Link
+                            href={`/admin/orders/${order.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              padding: '6px 10px',
+                              borderRadius: '6px',
+                              backgroundColor: '#F1F5F9',
+                              border: '1px solid #CBD5E1',
+                              color: '#475569',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <ChevronRight size={11} /> Full Details
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenOrder(order);
+                            }}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              backgroundColor: '#2B253E',
+                              color: '#FFFFFF',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              border: 'none',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Manage
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

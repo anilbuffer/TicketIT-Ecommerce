@@ -301,6 +301,23 @@ export default function ProductsCataloguePage() {
                       </td>
                       <td style={{ padding: '14px 24px', textAlign: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                          <Link
+                            href={`/admin/catalogue/products/${prod.id}`}
+                            title="View Full Details"
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '6px',
+                              backgroundColor: '#EFF6FF',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#3B82F6',
+                              textDecoration: 'none',
+                            }}
+                          >
+                            <Eye size={14} />
+                          </Link>
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(prod)}
@@ -314,6 +331,8 @@ export default function ProductsCataloguePage() {
                               alignItems: 'center',
                               justifyContent: 'center',
                               color: '#475569',
+                              border: 'none',
+                              cursor: 'pointer',
                             }}
                           >
                             <Edit3 size={14} />
@@ -331,6 +350,8 @@ export default function ProductsCataloguePage() {
                               alignItems: 'center',
                               justifyContent: 'center',
                               color: '#EF4444',
+                              border: 'none',
+                              cursor: 'pointer',
                             }}
                           >
                             <Trash2 size={14} />

@@ -24,6 +24,7 @@ import { useAuth } from '@/context/AuthContext';
 export default function SingleOrderDetailPage() {
   const { role } = useAuth();
   const isAdmin = role === 'admin';
+  const backHref = isAdmin ? '/admin/orders/all' : '/head-office/orders/all';
   const params = useParams();
   const orderId = (params.orderId as string) || '';
 
@@ -55,7 +56,7 @@ export default function SingleOrderDetailPage() {
         <div style={{ padding: '40px', textAlign: 'center', color: '#64748B' }}>
           <Package size={40} color="#CBD5E1" style={{ margin: '0 auto 12px auto' }} />
           <div style={{ fontWeight: 700, fontSize: '1rem', color: '#2B253E' }}>Order not found</div>
-          <Link href="/admin/orders/all" style={{ display: 'inline-block', marginTop: '12px', color: '#F73582', fontWeight: 700 }}>
+          <Link href={backHref} style={{ display: 'inline-block', marginTop: '12px', color: '#F73582', fontWeight: 700 }}>
             ← Back to Orders
           </Link>
         </div>
@@ -90,7 +91,7 @@ export default function SingleOrderDetailPage() {
         actionButton={
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Link
-              href="/admin/orders/all"
+              href={backHref}
               style={{
                 display: 'flex',
                 alignItems: 'center',
