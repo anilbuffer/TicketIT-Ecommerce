@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { AuthGuard } from '../../../components/auth/AuthGuard';
 import { useAuth } from '../../../context/AuthContext';
+import { SaaSLayout } from '../../../components/layout/SaaSLayout';
 import { Container } from '../../../components/layout/Container';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -601,7 +602,9 @@ function AdminPortalContent() {
 export default function AdminPortalPage() {
   return (
     <AuthGuard allowedRoles={['admin']} requiredPermission="manage_catalogue">
-      <AdminPortalContent />
+      <SaaSLayout>
+        <AdminPortalContent />
+      </SaaSLayout>
     </AuthGuard>
   );
 }

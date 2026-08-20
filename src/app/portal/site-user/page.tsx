@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { AuthGuard } from '../../../components/auth/AuthGuard';
 import { useAuth } from '../../../context/AuthContext';
+import { SaaSLayout } from '../../../components/layout/SaaSLayout';
 import { Container } from '../../../components/layout/Container';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -802,7 +803,9 @@ function SiteUserPortalContent() {
 export default function SiteUserPortalPage() {
   return (
     <AuthGuard allowedRoles={['site_user', 'admin']} requiredPermission="order_collateral">
-      <SiteUserPortalContent />
+      <SaaSLayout>
+        <SiteUserPortalContent />
+      </SaaSLayout>
     </AuthGuard>
   );
 }

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { AuthGuard } from '../../../components/auth/AuthGuard';
 import { useAuth } from '../../../context/AuthContext';
+import { SaaSLayout } from '../../../components/layout/SaaSLayout';
 import { Container } from '../../../components/layout/Container';
 import { Button } from '../../../components/ui/Button';
 import {
@@ -565,7 +566,9 @@ function HeadOfficePortalContent() {
 export default function HeadOfficePortalPage() {
   return (
     <AuthGuard allowedRoles={['head_office', 'admin']} requiredPermission="view_consolidated_billing">
-      <HeadOfficePortalContent />
+      <SaaSLayout>
+        <HeadOfficePortalContent />
+      </SaaSLayout>
     </AuthGuard>
   );
 }

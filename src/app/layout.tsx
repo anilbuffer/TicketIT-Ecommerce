@@ -1,23 +1,19 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { AuthProvider } from '../context/AuthContext';
-import { Navbar } from '../components/layout/Navbar';
-import { Footer } from '../components/layout/Footer';
-import { MobileNav } from '../components/layout/MobileNav';
-import { RoleSwitcherWidget } from '../components/auth/RoleSwitcherWidget';
 
 export const metadata: Metadata = {
-  title: 'Yellow Marketing | Digital Asset Delivery & Ecommerce CMS Portal',
-  description: 'Enterprise self-service portal for approved marketing assets, collateral ordering, and multi-site consolidated billing.',
-  keywords: ['marketing collateral', 'DAM', 'digital asset management', 'ecommerce cms', 'consolidated billing', 'self-service portal'],
-  authors: [{ name: 'Yellow Marketing Delivery Platform' }],
+  title: 'Rahhawan | Pharmaceutical Logistics & SaaS Platform',
+  description: 'Enterprise pharmaceutical logistics, dispensing hub fulfillment, and courier routing management portal.',
+  keywords: ['pharmaceutical logistics', 'dispensing hub', 'courier portal', 'SaaS platform', 'healthcare logistics', 'HIPAA compliant'],
+  authors: [{ name: 'Rahhawan Platform HQ' }],
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#10b981',
+  themeColor: '#059669',
 };
 
 export default function RootLayout({
@@ -30,11 +26,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Navbar />
-            <main style={{ flex: 1 }}>{children}</main>
-            <Footer />
-            <MobileNav />
-            <RoleSwitcherWidget />
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</main>
           </div>
         </AuthProvider>
       </body>
