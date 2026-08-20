@@ -3,6 +3,36 @@
 
 export type ProductStatus = 'ACTIVE' | 'UNAVAILABLE' | 'SUPERSEDED';
 
+export type ProductSizeOption = {
+  id: string;
+  label: string;
+  dimensions: string;
+  widthInches: number;
+  heightInches: number;
+  priceMultiplier: number;
+  isPopular?: boolean;
+};
+
+export type ProductMaterialOption = {
+  id: string;
+  name: string;
+  description: string;
+  priceAddon: number;
+  recommendedFor?: string;
+};
+
+export type ProductFinishOption = {
+  id: string;
+  name: string;
+  description: string;
+  priceAddon: number;
+};
+
+export type ProductVolumeDiscount = {
+  minQty: number;
+  discountPercent: number;
+};
+
 export type Product = {
   id: string;
   sku: string;
@@ -22,6 +52,13 @@ export type Product = {
   isPersonalizable?: boolean;
   personalizationTemplate?: string;
   artworkUrl?: string;
+  printCategory?: 'Signs' | 'Posters' | 'Banners' | 'Flyers' | 'Business Cards' | 'Brochures' | 'Marketing Materials' | 'Promotional Products';
+  availableSizes?: ProductSizeOption[];
+  materials?: ProductMaterialOption[];
+  finishingOptions?: ProductFinishOption[];
+  volumeDiscounts?: ProductVolumeDiscount[];
+  turnaroundDays?: number;
+  templatesCount?: number;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -32,6 +69,107 @@ export type ProductCategory = {
   code: string;
   description: string;
   itemCount: number;
+};
+
+// ─── Master Design Template Types (Admin & Site User) ───────────────────────
+
+export type TemplateFieldKey =
+  | 'businessName'
+  | 'contactName'
+  | 'phone'
+  | 'email'
+  | 'website'
+  | 'address'
+  | 'hours'
+  | 'logo'
+  | 'tagline'
+  | 'promoOffer'
+  | 'qrCode'
+  | 'customNotes';
+
+export type TemplateLayerType = 'text' | 'image' | 'logo' | 'shape' | 'badge' | 'qrcode' | 'divider';
+
+export type TemplateLayerStyle = {
+  fontSize?: number;
+  fontFamily?: string;
+  fontWeight?: string | number;
+  fontStyle?: 'normal' | 'italic';
+  color?: string;
+  textAlign?: 'left' | 'center' | 'right';
+  backgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  borderRadius?: number;
+  opacity?: number;
+  letterSpacing?: number;
+  lineHeight?: number;
+  textTransform?: 'uppercase' | 'lowercase' | 'none';
+  boxShadow?: string;
+  padding?: number;
+};
+
+export type TemplateLayer = {
+  id: string;
+  type: TemplateLayerType;
+  name: string;
+  isEditableBySiteUser: boolean; // Admin defines this rule!
+  fieldKey?: TemplateFieldKey;
+  label: string;
+  helperText?: string;
+  x: number; // percentage (0-100) or pixels
+  y: number; // percentage (0-100) or pixels
+  width: number; // percentage (0-100) or pixels
+  height: number; // percentage (0-100) or pixels
+  content: string; // text string, image url, svg, or qr payload
+  style: TemplateLayerStyle;
+  zIndex?: number;
+  isRequired?: boolean;
+};
+
+export type TemplateTheme = 'modern' | 'corporate' | 'healthcare' | 'promotional' | 'minimalist' | 'luxury' | 'vibrant';
+
+export type PrintTemplate = {
+  id: string;
+  productId: string;
+  productName: string;
+  category: string;
+  name: string;
+  description: string;
+  thumbnailUrl: string;
+  previewMockupUrl?: string;
+  orientation: 'landscape' | 'portrait' | 'square';
+  aspectRatio: string; // e.g. "4:3", "16:9", "1:1", "2:3", "3:4"
+  dimensions: {
+    width: number;
+    height: number;
+    unit: 'in' | 'mm' | 'px';
+  };
+  bleedMargin: number; // e.g. 0.125 inches (trim margin)
+  safeMargin: number; // e.g. 0.25 inches (content safe area)
+  status: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  theme: TemplateTheme;
+  canvasConfig: {
+    backgroundColor: string;
+    backgroundImageUrl?: string;
+    bgGradient?: string;
+    bgPattern?: string;
+  };
+  layers: TemplateLayer[];
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+};
+
+export type CustomizedArtworkData = {
+  templateId: string;
+  templateName: string;
+  previewUrl: string;
+  fields: Record<TemplateFieldKey | string, string>;
+  selectedSize?: ProductSizeOption;
+  selectedMaterial?: ProductMaterialOption;
+  selectedFinish?: ProductFinishOption;
+  customizedAt: string;
 };
 
 export type Address = {
@@ -95,14 +233,35 @@ export type PortalUser = {
 };
 
 export type OrderStatus =
+  | 'DRAFT'
   | 'PENDING_APPROVAL'
+  | 'CHANGES_REQUESTED'
   | 'APPROVED'
-  | 'REJECTED'
+  | 'PAID'
+  | 'ORDER_PLACED'
+  | 'IN_PRODUCTION'
   | 'RECEIVED'
   | 'PROCESSING'
   | 'DISPATCHED'
   | 'DELIVERED'
+  | 'REJECTED'
   | 'CANCELLED';
+
+export type PaymentStatus = 'UNPAID' | 'PAYMENT_PENDING' | 'PAID' | 'REFUNDED';
+
+export type CorporatePaymentMethod =
+  | 'CORPORATE_INVOICE'
+  | 'PURCHASING_CARD'
+  | 'CORPORATE_ACH'
+  | 'PREAPPROVED_CREDIT';
+
+export type OrderStatusHistory = {
+  status: OrderStatus;
+  timestamp: string;
+  actorName: string;
+  actorRole: string;
+  comment?: string;
+};
 
 export type OrderLineItem = {
   id: string;
@@ -117,6 +276,12 @@ export type OrderLineItem = {
   packSize?: string;
   uom?: string;
   customizations?: Record<string, string>;
+  templateId?: string;
+  templateName?: string;
+  selectedSize?: string;
+  selectedMaterial?: string;
+  selectedFinish?: string;
+  customizedArtworkUrl?: string;
 };
 
 export type Order = {
@@ -134,6 +299,11 @@ export type Order = {
   campaignCode?: string;
   projectCode?: string;
   status: OrderStatus;
+  paymentStatus?: PaymentStatus;
+  paymentMethod?: CorporatePaymentMethod;
+  paymentReference?: string;
+  paidBy?: string;
+  paidAt?: string;
   totalAmount: number;
   itemCount: number;
   requiresApproval?: boolean;
@@ -141,6 +311,7 @@ export type Order = {
   approvedBy?: string;
   approvedAt?: string;
   rejectedReason?: string;
+  changesRequestedNotes?: string;
   createdAt: string;
   updatedAt: string;
   dispatchedAt?: string;
@@ -148,6 +319,15 @@ export type Order = {
   deliveryNotes?: string;
   carrier?: string;
   trackingNumber?: string;
+  requestedDeliveryDate?: string;
+  deliveryAddress?: Address;
+  recipientContact?: {
+    name: string;
+    phone?: string;
+    email?: string;
+  };
+  customizedArtwork?: CustomizedArtworkData;
+  statusHistory?: OrderStatusHistory[];
   lineItems: OrderLineItem[];
 };
 

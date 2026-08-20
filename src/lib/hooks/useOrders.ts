@@ -184,11 +184,38 @@ export function useOrderMutations() {
     }
   };
 
+  const requestChanges = async (id: string, approverName: string, notes: string) => {
+    setIsPending(true);
+    try {
+      const { requestChanges: requestChangesService } = await import('@/lib/services/orders.service');
+      return await requestChangesService(id, approverName, notes);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const payOrder = async (
+    id: string,
+    paymentMethod: Order['paymentMethod'] = 'CORPORATE_INVOICE',
+    paymentRef?: string,
+    paidBy: string = 'Elena Rostova (Head Office)'
+  ) => {
+    setIsPending(true);
+    try {
+      const { payOrder: payOrderService } = await import('@/lib/services/orders.service');
+      return await payOrderService(id, paymentMethod, paymentRef, paidBy);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return {
     createOrder,
     updateOrderStatus,
     updateOrderDetails,
     approveOrder,
+    requestChanges,
+    payOrder,
     rejectOrder,
     isPending,
   };

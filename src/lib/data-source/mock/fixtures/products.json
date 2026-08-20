@@ -1,37 +1,190 @@
 [
   {
     "id": "prod-001",
-    "sku": "POS-WND-BANNER-01",
-    "name": "Ultra-Clear Window Vinyl Poster",
-    "description": "High-impact UV-resistant storefront vinyl graphic designed for exterior and interior dispensary glass partitions.",
+    "sku": "SGN-YARD-CORO-1824",
+    "name": "Corrugated Yard & Lawn Signs (18\" x 24\")",
+    "description": "Weatherproof 4mm corrugated fluted plastic yard signs. Vibrant full-color UV direct print with standard metal H-wire ground stakes included.",
     "thumbnailUrl": "https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-pos",
-    "categoryName": "Point of Sale",
+    "categoryId": "cat-signs",
+    "categoryName": "Signs & Posters",
     "packSize": "Pack of 5",
     "uom": "PK",
-    "basePrice": 145.00,
+    "basePrice": 65.00,
     "moq": 1,
     "orderMultiple": 1,
     "status": "ACTIVE",
+    "printCategory": "Signs",
+    "templatesCount": 4,
+    "turnaroundDays": 2,
+    "availableSizes": [
+      { "id": "sz-1824", "label": "18\" x 24\" (Standard Yard Sign)", "dimensions": "18\" x 24\"", "widthInches": 24, "heightInches": 18, "priceMultiplier": 1.0, "isPopular": true },
+      { "id": "sz-2436", "label": "24\" x 36\" (Large Property Sign)", "dimensions": "24\" x 36\"", "widthInches": 36, "heightInches": 24, "priceMultiplier": 1.65 },
+      { "id": "sz-1218", "label": "12\" x 18\" (Directional / Arrow Sign)", "dimensions": "12\" x 18\"", "widthInches": 18, "heightInches": 12, "priceMultiplier": 0.75 }
+    ],
+    "materials": [
+      { "id": "mat-coro-4mm", "name": "4mm Fluted Coroplast (Standard)", "description": "Lightweight, waterproof, outdoor-rated for all seasons", "priceAddon": 0, "recommendedFor": "Outdoor lawns & sidewalks" },
+      { "id": "mat-coro-10mm", "name": "10mm Heavy-Duty Coroplast", "description": "Extra rigid commercial grade for high-wind areas", "priceAddon": 18.00 }
+    ],
+    "finishingOptions": [
+      { "id": "fin-single", "name": "Single-Sided Print", "description": "Printed front only with blank white backing", "priceAddon": 0 },
+      { "id": "fin-double", "name": "Double-Sided Print (Recommended)", "description": "Full color identical or mirrored print on both sides", "priceAddon": 12.00 },
+      { "id": "fin-grommets", "name": "4 Corner Brass Grommets", "description": "Added corner eyelets for hanging on fences/walls", "priceAddon": 6.50 }
+    ],
+    "volumeDiscounts": [
+      { "minQty": 5, "discountPercent": 10 },
+      { "minQty": 15, "discountPercent": 18 },
+      { "minQty": 50, "discountPercent": 28 }
+    ],
     "createdAt": "2026-01-10T08:30:00.000Z",
-    "updatedAt": "2026-08-01T14:20:00.000Z"
+    "updatedAt": "2026-08-20T14:20:00.000Z"
   },
   {
     "id": "prod-002",
-    "sku": "POS-FLR-STAND-02",
-    "name": "Illuminated Slim LED Totem Stand",
-    "description": "Freestanding aluminum edge-lit signage frame with snap-lock acrylic front. Designed for fast poster changes.",
+    "sku": "BAN-ROLLUP-3380",
+    "name": "Retractable Pull-Up Banner Stand (33\" x 80\")",
+    "description": "Heavy-duty 13oz anti-curl polyester banner housed inside a sleek silver aluminum cassette base with padded nylon travel bag.",
     "thumbnailUrl": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-pos",
-    "categoryName": "Point of Sale",
+    "categoryId": "cat-banners",
+    "categoryName": "Banners & Displays",
     "packSize": "Single Unit",
     "uom": "EA",
-    "basePrice": 380.00,
+    "basePrice": 149.00,
     "moq": 1,
     "orderMultiple": 1,
     "status": "ACTIVE",
+    "printCategory": "Banners",
+    "templatesCount": 3,
+    "turnaroundDays": 3,
+    "availableSizes": [
+      { "id": "sz-3380", "label": "33\" x 80\" (Standard Expo Rollup)", "dimensions": "33\" x 80\"", "widthInches": 33, "heightInches": 80, "priceMultiplier": 1.0, "isPopular": true },
+      { "id": "sz-3980", "label": "39\" x 80\" (Wide Executive Standee)", "dimensions": "39\" x 80\"", "widthInches": 39, "heightInches": 80, "priceMultiplier": 1.35 },
+      { "id": "sz-4780", "label": "47\" x 80\" (Super-Wide Stage Backdrop)", "dimensions": "47\" x 80\"", "widthInches": 47, "heightInches": 80, "priceMultiplier": 1.70 }
+    ],
+    "materials": [
+      { "id": "mat-vinyl-13oz", "name": "13oz Smooth Stay-Flat Vinyl", "description": "Anti-curl opaque matte finish with zero glare", "priceAddon": 0 },
+      { "id": "mat-fabric-polyester", "name": "260gsm Wrinkle-Resistant Tension Fabric", "description": "Luxury textured fabric with vibrant dye-sublimation print", "priceAddon": 35.00 }
+    ],
+    "finishingOptions": [
+      { "id": "fin-standard-base", "name": "Standard Aluminum Cassette + Padded Bag", "description": "Lightweight twin swivel feet base", "priceAddon": 0 },
+      { "id": "fin-premium-base", "name": "Premium Teardrop Chrome Base + Hard Case", "description": "Weighted wide-stance base with magnetic end caps", "priceAddon": 45.00 }
+    ],
+    "volumeDiscounts": [
+      { "minQty": 3, "discountPercent": 12 },
+      { "minQty": 10, "discountPercent": 20 }
+    ],
     "createdAt": "2026-01-15T09:00:00.000Z",
-    "updatedAt": "2026-07-28T11:00:00.000Z"
+    "updatedAt": "2026-08-20T11:00:00.000Z"
+  },
+  {
+    "id": "prod-007",
+    "sku": "POS-POSTER-2436",
+    "name": "High-Definition Promotional Poster (24\" x 36\")",
+    "description": "Museum-grade 200gsm photo paper with vibrant archival UV inks. Available in high-gloss or glare-free matte finish.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80",
+    "categoryId": "cat-signs",
+    "categoryName": "Signs & Posters",
+    "packSize": "Pack of 10",
+    "uom": "PK",
+    "basePrice": 89.00,
+    "moq": 1,
+    "orderMultiple": 1,
+    "status": "ACTIVE",
+    "printCategory": "Posters",
+    "templatesCount": 5,
+    "turnaroundDays": 2,
+    "availableSizes": [
+      { "id": "sz-1824", "label": "18\" x 24\" (Medium Display)", "dimensions": "18\" x 24\"", "widthInches": 18, "heightInches": 24, "priceMultiplier": 0.8 },
+      { "id": "sz-2436", "label": "24\" x 36\" (Standard Promotional Poster)", "dimensions": "24\" x 36\"", "widthInches": 24, "heightInches": 36, "priceMultiplier": 1.0, "isPopular": true },
+      { "id": "sz-3648", "label": "36\" x 48\" (Mega Event Poster)", "dimensions": "36\" x 48\"", "widthInches": 36, "heightInches": 48, "priceMultiplier": 1.8 }
+    ],
+    "materials": [
+      { "id": "mat-gloss-200", "name": "200gsm High Gloss Photo Stock", "description": "Ultra vibrant colors with reflective glossy sheen", "priceAddon": 0 },
+      { "id": "mat-matte-200", "name": "200gsm Premium Non-Glare Matte Stock", "description": "Velvety smooth texture ideal for bright showroom lighting", "priceAddon": 5.00 },
+      { "id": "mat-foam-core", "name": "5mm Rigid Foam Board Mount", "description": "Rigid self-standing board ready to place on easels", "priceAddon": 25.00 }
+    ],
+    "finishingOptions": [
+      { "id": "fin-none", "name": "Trimmed to Edge (Unmounted)", "description": "Rolled in protective craft mailing tube", "priceAddon": 0 },
+      { "id": "fin-lam-matte", "name": "Double-Sided Matte Lamination", "description": "Water-resistant scratch protection", "priceAddon": 15.00 }
+    ],
+    "volumeDiscounts": [
+      { "minQty": 3, "discountPercent": 10 },
+      { "minQty": 10, "discountPercent": 25 }
+    ],
+    "createdAt": "2026-02-10T10:00:00.000Z",
+    "updatedAt": "2026-08-20T12:00:00.000Z"
+  },
+  {
+    "id": "prod-008",
+    "sku": "CRD-SOFT-TOUCH-500",
+    "name": "Executive Soft-Touch Business Cards (Pack of 500)",
+    "description": "Ultra-thick 18pt cardstock coated with tactile soft-touch velvet lamination. Crisp high-definition digital offset printing.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&auto=format&fit=crop&q=80",
+    "categoryId": "cat-cards",
+    "categoryName": "Business Cards & Stationery",
+    "packSize": "Box of 500",
+    "uom": "BX",
+    "basePrice": 48.00,
+    "moq": 1,
+    "orderMultiple": 1,
+    "status": "ACTIVE",
+    "printCategory": "Business Cards",
+    "templatesCount": 6,
+    "turnaroundDays": 2,
+    "availableSizes": [
+      { "id": "sz-std-card", "label": "3.5\" x 2.0\" (Standard US Format)", "dimensions": "3.5\" x 2.0\"", "widthInches": 3.5, "heightInches": 2.0, "priceMultiplier": 1.0, "isPopular": true },
+      { "id": "sz-square-card", "label": "2.5\" x 2.5\" (Modern Square)", "dimensions": "2.5\" x 2.5\"", "widthInches": 2.5, "heightInches": 2.5, "priceMultiplier": 1.15 }
+    ],
+    "materials": [
+      { "id": "mat-18pt-velvet", "name": "18pt Soft-Touch Velvet Cardstock", "description": "Suede-like luxurious touch sensation", "priceAddon": 0 },
+      { "id": "mat-16pt-matte", "name": "16pt Classic Silk Matte Cardstock", "description": "Clean executive standard finish", "priceAddon": -4.00 }
+    ],
+    "finishingOptions": [
+      { "id": "fin-square-corners", "name": "Standard 90° Square Corners", "description": "Precision guillotine cut", "priceAddon": 0 },
+      { "id": "fin-rounded-corners", "name": "Rounded 1/4\" Die-Cut Corners", "description": "Smooth rounded modern edges", "priceAddon": 8.00 },
+      { "id": "fin-gold-foil", "name": "Raised Gold Foil Accent on Logo", "description": "3D embossed metallic reflection", "priceAddon": 22.00 }
+    ],
+    "volumeDiscounts": [
+      { "minQty": 2, "discountPercent": 15 },
+      { "minQty": 5, "discountPercent": 30 }
+    ],
+    "createdAt": "2026-02-15T11:00:00.000Z",
+    "updatedAt": "2026-08-20T14:00:00.000Z"
+  },
+  {
+    "id": "prod-009",
+    "sku": "FLY-TRI-FOLD-1000",
+    "name": "Gloss Tri-Fold Patient Care Brochure & Flyer",
+    "description": "100lb premium gloss book paper with double-sided aqueous coating. Machine scored and folded into clean 6-panel informational guides.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80",
+    "categoryId": "cat-flyers",
+    "categoryName": "Flyers & Brochures",
+    "packSize": "Pack of 250",
+    "uom": "PK",
+    "basePrice": 95.00,
+    "moq": 1,
+    "orderMultiple": 1,
+    "status": "ACTIVE",
+    "printCategory": "Flyers",
+    "templatesCount": 4,
+    "turnaroundDays": 2,
+    "availableSizes": [
+      { "id": "sz-8511", "label": "8.5\" x 11\" (Letter Tri-Fold)", "dimensions": "8.5\" x 11\"", "widthInches": 11, "heightInches": 8.5, "priceMultiplier": 1.0, "isPopular": true },
+      { "id": "sz-8514", "label": "8.5\" x 14\" (Legal 4-Panel Fold)", "dimensions": "8.5\" x 14\"", "widthInches": 14, "heightInches": 8.5, "priceMultiplier": 1.35 }
+    ],
+    "materials": [
+      { "id": "mat-100lb-gloss", "name": "100lb Gloss Book with Aqueous Seal", "description": "Standard high-definition magazine-feel brochure paper", "priceAddon": 0 },
+      { "id": "mat-100lb-cover", "name": "100lb Heavy Cover Cardstock", "description": "Firm cardstock that stands independently in racks", "priceAddon": 28.00 }
+    ],
+    "finishingOptions": [
+      { "id": "fin-trifold", "name": "Tri-Fold (Letter Fold)", "description": "Standard 3-panel roll fold", "priceAddon": 0 },
+      { "id": "fin-zfold", "name": "Z-Fold (Accordion Fold)", "description": "Zig-zag opening for stepped presentations", "priceAddon": 5.00 }
+    ],
+    "volumeDiscounts": [
+      { "minQty": 4, "discountPercent": 18 },
+      { "minQty": 10, "discountPercent": 35 }
+    ],
+    "createdAt": "2026-03-01T09:00:00.000Z",
+    "updatedAt": "2026-08-20T15:00:00.000Z"
   },
   {
     "id": "prod-003",
@@ -44,8 +197,8 @@
     "packSize": "Pack of 10",
     "uom": "PK",
     "basePrice": 290.00,
-    "moq": 2,
-    "orderMultiple": 2,
+    "moq": 1,
+    "orderMultiple": 1,
     "status": "ACTIVE",
     "createdAt": "2026-02-01T10:15:00.000Z",
     "updatedAt": "2026-08-10T16:45:00.000Z"
@@ -78,95 +231,10 @@
     "packSize": "Roll of 1000",
     "uom": "RL",
     "basePrice": 48.50,
-    "moq": 4,
-    "orderMultiple": 2,
+    "moq": 1,
+    "orderMultiple": 1,
     "status": "ACTIVE",
     "createdAt": "2026-03-01T13:00:00.000Z",
     "updatedAt": "2026-07-20T15:25:00.000Z"
-  },
-  {
-    "id": "prod-006",
-    "sku": "LBL-WARN-HAZ-06",
-    "name": "Hazardous Material Caution Overlays",
-    "description": "High-visibility fluorescent orange caution labels for specialized biologics handling.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-lbl",
-    "categoryName": "Labels & Signage",
-    "packSize": "Pack of 500",
-    "uom": "PK",
-    "basePrice": 62.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "ACTIVE",
-    "createdAt": "2026-03-12T14:10:00.000Z",
-    "updatedAt": "2026-06-15T12:00:00.000Z"
-  },
-  {
-    "id": "prod-007",
-    "sku": "DOC-REG-LOGBOOK-07",
-    "name": "Hardcover Controlled Substance Register",
-    "description": "Archival quality numbered record log with tamper-proof stitch binding for regulatory compliance.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-doc",
-    "categoryName": "Regulatory Documents",
-    "packSize": "Pack of 3",
-    "uom": "PK",
-    "basePrice": 89.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "ACTIVE",
-    "createdAt": "2026-03-20T16:00:00.000Z",
-    "updatedAt": "2026-07-01T10:30:00.000Z"
-  },
-  {
-    "id": "prod-008",
-    "sku": "DOC-CERT-FOLDER-08",
-    "name": "Embossed Dispensing Certificate Portfolios",
-    "description": "Foil-stamped navy presentation folders for certified patient consultation records.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-doc",
-    "categoryName": "Regulatory Documents",
-    "packSize": "Box of 100",
-    "uom": "BX",
-    "basePrice": 175.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "UNAVAILABLE",
-    "createdAt": "2026-04-05T09:45:00.000Z",
-    "updatedAt": "2026-08-05T17:00:00.000Z"
-  },
-  {
-    "id": "prod-009",
-    "sku": "MERCH-LANYARD-09",
-    "name": "Anti-Microbial Staff Breakaway Lanyards",
-    "description": "Silver-ion infused safety lanyard with dual clip and custom badge holder.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-merch",
-    "categoryName": "Merchandise & Uniforms",
-    "packSize": "Pack of 25",
-    "uom": "PK",
-    "basePrice": 95.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "ACTIVE",
-    "createdAt": "2026-04-18T11:20:00.000Z",
-    "updatedAt": "2026-07-15T13:40:00.000Z"
-  },
-  {
-    "id": "prod-010",
-    "sku": "MERCH-SCRUB-SET-10",
-    "name": "Clinical Pharmacist Antimicrobial Lab Coat (Legacy)",
-    "description": "Previous generation cotton-poly blend coat. Replaced by modern Teflon-shielded coat.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-merch",
-    "categoryName": "Merchandise & Uniforms",
-    "packSize": "Single Unit",
-    "uom": "EA",
-    "basePrice": 65.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "SUPERSEDED",
-    "createdAt": "2025-11-10T10:00:00.000Z",
-    "updatedAt": "2026-05-01T08:00:00.000Z"
   }
 ]

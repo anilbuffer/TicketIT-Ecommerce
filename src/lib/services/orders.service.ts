@@ -123,6 +123,70 @@ export async function approveOrder(
   return updated;
 }
 
+export async function requestChanges(
+  id: string,
+  approverName: string,
+  notes: string
+): Promise<Order> {
+  const ds = getDataSource();
+  const updated = await ds.orders.requestChanges(id, approverName, notes);
+
+  try {
+    await ds.audit.log({
+      actorId: 'usr_headoffice_001',
+      actorName: approverName,
+      actorEmail: 'approver@ticketit.io',
+      actorRole: 'HEAD_OFFICE',
+      action: 'ORDER_CHANGES_REQUESTED',
+      entityType: 'ORDER',
+      entityId: updated.id,
+      entityName: updated.orderNumber,
+      details: {
+        totalAmount: updated.totalAmount,
+        siteCode: updated.siteCode,
+        notes,
+      },
+    });
+  } catch (err) {
+    console.error('Audit log failed', err);
+  }
+
+  return updated;
+}
+
+export async function payOrder(
+  id: string,
+  paymentMethod: Order['paymentMethod'] = 'CORPORATE_INVOICE',
+  paymentRef?: string,
+  paidBy: string = 'Elena Rostova (Head Office)'
+): Promise<Order> {
+  const ds = getDataSource();
+  const updated = await ds.orders.payOrder(id, paymentMethod, paymentRef, paidBy);
+
+  try {
+    await ds.audit.log({
+      actorId: 'usr_headoffice_001',
+      actorName: paidBy,
+      actorEmail: 'controller@ticketit.io',
+      actorRole: 'HEAD_OFFICE',
+      action: 'ORDER_PAID',
+      entityType: 'ORDER',
+      entityId: updated.id,
+      entityName: updated.orderNumber,
+      details: {
+        totalAmount: updated.totalAmount,
+        paymentMethod,
+        paymentReference: paymentRef,
+        siteCode: updated.siteCode,
+      },
+    });
+  } catch (err) {
+    console.error('Audit log failed', err);
+  }
+
+  return updated;
+}
+
 export async function rejectOrder(
   id: string,
   approverName: string,
@@ -158,10 +222,11 @@ export async function getPendingApprovals(accountId?: string): Promise<Order[]> 
   const ds = getDataSource();
   const res = await ds.orders.list({
     accountId,
-    status: 'PENDING_APPROVAL',
     pageSize: 100,
   });
-  return res.items;
+  return res.items.filter(
+    (o) => o.status === 'PENDING_APPROVAL' || o.status === 'APPROVED' || o.status === 'CHANGES_REQUESTED'
+  );
 }
 
 export async function getFulfilmentQueue(): Promise<{

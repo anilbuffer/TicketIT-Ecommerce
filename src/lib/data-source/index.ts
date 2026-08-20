@@ -11,6 +11,8 @@ import * as dbAccounts from './production/db-accounts.adapter';
 import * as dbOrders from './production/db-orders.adapter';
 import * as dbPricing from './production/db-pricing.adapter';
 
+import * as mockTemplates from './mock/mock-templates.adapter';
+
 // Flag to switch data source: default is mock
 const isProduction = process.env.NEXT_PUBLIC_DATA_SOURCE === 'production';
 
@@ -18,6 +20,7 @@ export function getDataSource() {
   if (!isProduction) {
     return {
       products: mockProducts,
+      templates: mockTemplates,
       accounts: mockAccounts,
       orders: mockOrders,
       pricing: mockPricing,
@@ -29,6 +32,7 @@ export function getDataSource() {
 
   return {
     products: dbProducts,
+    templates: mockTemplates,
     accounts: dbAccounts,
     orders: dbOrders,
     pricing: dbPricing,

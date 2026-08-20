@@ -1,10 +1,38 @@
 [
   {
+    "id": "cat-signs",
+    "name": "Signs & Posters",
+    "code": "SIGNS",
+    "description": "Yard signs, acrylic office signs, aluminum composite boards, and high-gloss posters",
+    "itemCount": 4
+  },
+  {
+    "id": "cat-banners",
+    "name": "Banners & Displays",
+    "code": "BAN",
+    "description": "Vinyl retractable rollup banners, mesh outdoor banners, step & repeat backdrops",
+    "itemCount": 3
+  },
+  {
+    "id": "cat-cards",
+    "name": "Business Cards & Stationery",
+    "code": "CARD",
+    "description": "Executive soft-touch cards, linen textured cards, foil stamped cards, and envelopes",
+    "itemCount": 2
+  },
+  {
+    "id": "cat-flyers",
+    "name": "Flyers & Brochures",
+    "code": "FLY",
+    "description": "Tri-fold medical brochures, promotional club flyers, and bi-fold product guides",
+    "itemCount": 3
+  },
+  {
     "id": "cat-pos",
     "name": "Point of Sale",
     "code": "POS",
     "description": "Storefront displays, LED stands, retail window graphics, and shelf talkers",
-    "itemCount": 2
+    "itemCount": 3
   },
   {
     "id": "cat-pkg",
@@ -21,17 +49,10 @@
     "itemCount": 2
   },
   {
-    "id": "cat-doc",
-    "name": "Regulatory Documents",
-    "code": "DOC",
-    "description": "Controlled drug registers, compliance audit binders, and certificate folders",
-    "itemCount": 2
-  },
-  {
     "id": "cat-merch",
-    "name": "Merchandise & Uniforms",
+    "name": "Marketing & Branded Merch",
     "code": "MERCH",
-    "description": "Antimicrobial staff coats, branded safety lanyards, and patient care kits",
+    "description": "Branded event tablecloths, promotional kits, staff apparel, and lanyards",
     "itemCount": 2
   }
 ]

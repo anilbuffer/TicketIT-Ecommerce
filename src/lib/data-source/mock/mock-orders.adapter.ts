@@ -147,13 +147,105 @@ export async function approveOrder(
   }
 
   const now = new Date().toISOString();
+  const current = ordersStore[idx];
+  const history = current.statusHistory || [];
+
   const updated: Order = {
-    ...ordersStore[idx],
+    ...current,
     status: 'APPROVED',
+    paymentStatus: 'PAYMENT_PENDING',
     approvedBy: approverName,
     approvedAt: now,
     approvalNotes: notes || 'Approved by Head Office Controller',
     updatedAt: now,
+    statusHistory: [
+      ...history,
+      {
+        status: 'APPROVED',
+        timestamp: now,
+        actorName: approverName,
+        actorRole: 'HEAD_OFFICE',
+        comment: notes || 'Approved for procurement',
+      },
+    ],
+  };
+
+  ordersStore[idx] = updated;
+  return JSON.parse(JSON.stringify(updated));
+}
+
+export async function requestChanges(
+  id: string,
+  approverName: string,
+  notes: string
+): Promise<Order> {
+  await simulateLatency();
+  const idx = ordersStore.findIndex((o) => o.id === id || o.orderNumber === id);
+  if (idx === -1) {
+    throw new Error(`Order with ID "${id}" not found`);
+  }
+
+  const now = new Date().toISOString();
+  const current = ordersStore[idx];
+  const history = current.statusHistory || [];
+
+  const updated: Order = {
+    ...current,
+    status: 'CHANGES_REQUESTED',
+    changesRequestedNotes: notes,
+    updatedAt: now,
+    statusHistory: [
+      ...history,
+      {
+        status: 'CHANGES_REQUESTED',
+        timestamp: now,
+        actorName: approverName,
+        actorRole: 'HEAD_OFFICE',
+        comment: notes,
+      },
+    ],
+  };
+
+  ordersStore[idx] = updated;
+  return JSON.parse(JSON.stringify(updated));
+}
+
+export async function payOrder(
+  id: string,
+  paymentMethod: Order['paymentMethod'] = 'CORPORATE_INVOICE',
+  paymentRef?: string,
+  paidBy: string = 'Elena Rostova (Head Office)'
+): Promise<Order> {
+  await simulateLatency();
+  const idx = ordersStore.findIndex((o) => o.id === id || o.orderNumber === id);
+  if (idx === -1) {
+    throw new Error(`Order with ID "${id}" not found`);
+  }
+
+  const now = new Date().toISOString();
+  const current = ordersStore[idx];
+  const history = current.statusHistory || [];
+  const ref = paymentRef || `CORP-TXN-${Date.now().toString().slice(-6)}`;
+
+  const updated: Order = {
+    ...current,
+    status: 'IN_PRODUCTION',
+    paymentStatus: 'PAID',
+    paymentMethod,
+    paymentReference: ref,
+    paidBy,
+    paidAt: now,
+    updatedAt: now,
+    statusHistory: [
+      ...history,
+      {
+        status: 'PAID',
+        timestamp: now,
+        actorName: paidBy,
+        actorRole: 'HEAD_OFFICE',
+        comment: `Corporate payment settled via ${paymentMethod.replace(/_/g, ' ')} (${ref}). Production started.`,
+      },
+    ],
   };
 
   ordersStore[idx] = updated;
@@ -172,16 +264,30 @@ export async function rejectOrder(
   }
 
   const now = new Date().toISOString();
+  const current = ordersStore[idx];
+  const history = current.statusHistory || [];
+
   const updated: Order = {
-    ...ordersStore[idx],
+    ...current,
     status: 'REJECTED',
     approvedBy: approverName,
     approvedAt: now,
     rejectedReason: reason || 'Budget allocation cap exceeded for this site',
     updatedAt: now,
+    statusHistory: [
+      ...history,
+      {
+        status: 'REJECTED',
+        timestamp: now,
+        actorName: approverName,
+        actorRole: 'HEAD_OFFICE',
+        comment: reason,
+      },
+    ],
   };
 
   ordersStore[idx] = updated;
   return JSON.parse(JSON.stringify(updated));
 }
+
 

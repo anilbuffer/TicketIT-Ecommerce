@@ -37,6 +37,8 @@ import { useAuth } from '../../context/AuthContext';
 import { UserRole, ROLE_DETAILS, DEMO_USERS } from '../../types/auth';
 import { TicketITLogo } from '../ui/TicketITLogo';
 
+
+
 interface NavItem {
   label: string;
   href: string;
@@ -65,6 +67,8 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   // Role-specific navigation items
   const adminNav: NavItem[] = [
     { label: 'Platform HQ Dashboard', href: '/admin/dashboard', icon: <LayoutDashboard size={19} /> },
+    { label: 'Master Templates', href: '/admin/templates', icon: <FileSpreadsheet size={19} />, badge: 'Studio' },
+    { label: 'Template Builder', href: '/admin/templates/builder', icon: <Layers size={19} /> },
     { label: 'Product Catalogue & DAM', href: '/admin/catalogue/products', icon: <Package size={19} /> },
     { label: 'Orders & Fulfilment', href: '/admin/orders/all', icon: <ShoppingCart size={19} />, badge: 'Live' },
     { label: 'Customer Accounts & Sites', href: '/admin/customers/accounts', icon: <Store size={19} /> },
@@ -74,15 +78,17 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   ];
 
   const siteUserNav: NavItem[] = [
-    { label: 'Asset Catalogue', href: '/shop/catalogue', icon: <Package size={19} /> },
+    { label: 'Template Gallery', href: '/shop/templates', icon: <FileSpreadsheet size={19} />, badge: 'VistaPrint' },
+    { label: 'Print Products Catalogue', href: '/shop/catalogue', icon: <Package size={19} /> },
+    { label: 'Purchase Orders & Pipeline', href: '/shop/orders', icon: <ClipboardList size={19} />, badge: 'Live' },
     { label: 'Collateral Cart', href: '/shop/cart', icon: <ShoppingCart size={19} /> },
-    { label: 'My Site Orders', href: '/shop/orders/history', icon: <ClipboardList size={19} />, badge: 'History' },
+    { label: 'Order History', href: '/shop/orders/history', icon: <History size={19} /> },
   ];
-
 
   const headOfficeNav: NavItem[] = [
     { label: 'HQ Dashboard', href: '/head-office/dashboard', icon: <LayoutDashboard size={19} /> },
-    { label: 'Approvals Queue', href: '/head-office/approvals', icon: <CheckCircle2 size={19} />, badge: 'New', badgeColor: '#b45309' },
+    { label: 'PO Approvals & Payments', href: '/head-office/approvals', icon: <CheckCircle2 size={19} />, badge: 'Action', badgeColor: '#059669' },
+    { label: 'Read-Only Catalogue', href: '/head-office/catalogue', icon: <Package size={19} /> },
     { label: 'Cross-Site Orders', href: '/head-office/orders/all', icon: <ShoppingCart size={19} />, badge: 'Live' },
     { label: 'Monthly Billing', href: '/head-office/billing/monthly', icon: <FileSpreadsheet size={19} />, badge: 'Reports' },
     { label: 'Spend Insights', href: '/head-office/reports/spend-by-site', icon: <TrendingUp size={19} /> },
@@ -94,7 +100,6 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
       : role === 'head_office'
       ? headOfficeNav
       : siteUserNav;
-
 
   const handleLogout = () => {
     logout();
@@ -108,24 +113,26 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
-      {/* 1. LEFT SIDEBAR (DESKTOP) */}
-      <aside
-        style={{
-          width: isSidebarCollapsed ? '80px' : '260px',
-          background: '#1e1b38',
-          color: '#ffffff',
-          display: 'flex',
-          flexDirection: 'column',
-          transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-          zIndex: 30,
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          flexShrink: 0,
-        }}
-      >
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
+
+      <div style={{ display: 'flex', flex: 1 }}>
+        {/* 1. LEFT SIDEBAR (DESKTOP) */}
+        <aside
+          style={{
+            width: isSidebarCollapsed ? '80px' : '260px',
+            background: '#1e1b38',
+            color: '#ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+            borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+            zIndex: 30,
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            flexShrink: 0,
+          }}
+        >
         {/* Brand Header */}
         <div
           style={{
@@ -731,5 +738,6 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
         <main style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>{children}</main>
       </div>
     </div>
+  </div>
   );
 }

@@ -26,6 +26,8 @@ import {
   ChevronRight,
   Database,
   UserCheck,
+  LayoutTemplate,
+  Palette,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/auth';
@@ -74,10 +76,21 @@ export function AdminSidebar({
       ],
     },
     {
-      title: 'CATALOGUE & DAM',
+      title: 'CATALOGUE & TEMPLATES',
       items: [
         {
-          title: 'Products',
+          title: 'Design Templates',
+          href: '/admin/templates',
+          icon: LayoutTemplate,
+          badge: 'Master',
+        },
+        {
+          title: 'Template Builder',
+          href: '/admin/templates/builder',
+          icon: Palette,
+        },
+        {
+          title: 'Print Products',
           href: '/admin/catalogue/products',
           icon: Package,
         },

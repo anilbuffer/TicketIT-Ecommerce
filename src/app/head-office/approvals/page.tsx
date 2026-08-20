@@ -11,7 +11,6 @@ import {
   XCircle,
   Clock,
   Building2,
-  FileSpreadsheet,
   Search,
   Filter,
   DollarSign,
@@ -21,11 +20,16 @@ import {
   ChevronRight,
   Package,
   MessageSquare,
+  CreditCard,
+  Check,
+  FileText,
+  Eye,
+  RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { usePendingApprovals, useOrderMutations } from '@/lib/hooks/useOrders';
 import { StatusPill } from '@/components/admin/StatusPill';
-import type { Order } from '@/lib/services/types';
+import type { Order, CorporatePaymentMethod } from '@/lib/services/types';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80';
 
@@ -34,13 +38,15 @@ export default function HeadOfficeApprovalsPage() {
   const accountId = user?.accountId || 'acc-001';
 
   const { orders, isLoading, refetch } = usePendingApprovals(accountId);
-  const { approveOrder, rejectOrder, isPending } = useOrderMutations();
+  const { approveOrder, rejectOrder, requestChanges, payOrder, isPending } = useOrderMutations();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [siteFilter, setSiteFilter] = useState('ALL');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [actionType, setActionType] = useState<'APPROVE' | 'REJECT' | null>(null);
+  const [actionType, setActionType] = useState<'APPROVE' | 'REJECT' | 'CHANGES' | 'PAY' | null>(null);
   const [actionNotes, setActionNotes] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<CorporatePaymentMethod>('CORPORATE_INVOICE');
+  const [paymentRefNumber, setPaymentRefNumber] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const filteredOrders = orders.filter((o) => {
@@ -49,17 +55,22 @@ export default function HeadOfficeApprovalsPage() {
       searchQuery.trim() === '' ||
       o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (o.poReference && o.poReference.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      o.siteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (o.campaignCode && o.campaignCode.toLowerCase().includes(searchQuery.toLowerCase()));
+      o.siteName.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSite && matchesSearch;
   });
 
   const totalPendingValue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
 
-  const handleOpenAction = (order: Order, type: 'APPROVE' | 'REJECT') => {
+  const handleOpenAction = (order: Order, type: 'APPROVE' | 'REJECT' | 'CHANGES' | 'PAY') => {
     setSelectedOrder(order);
     setActionType(type);
-    setActionNotes(type === 'APPROVE' ? 'Approved by Head Office Controller' : '');
+    if (type === 'APPROVE') {
+      setActionNotes('Approved by Head Office Financial Controller for procurement.');
+    } else if (type === 'PAY') {
+      setPaymentRefNumber(`CORP-STMT-${Math.floor(100000 + Math.random() * 900000)}`);
+    } else {
+      setActionNotes('');
+    }
   };
 
   const handleConfirmAction = async (e: React.FormEvent) => {
@@ -67,20 +78,34 @@ export default function HeadOfficeApprovalsPage() {
     if (!selectedOrder || !actionType) return;
 
     try {
-      const approverName = user?.name || 'Head Office Controller';
+      const approverName = user?.name || 'Elena Rostova (Head Office)';
+
       if (actionType === 'APPROVE') {
         await approveOrder(selectedOrder.id, approverName, actionNotes);
         setFeedbackMessage({
           type: 'success',
-          text: `Order ${selectedOrder.orderNumber} successfully approved for fulfillment.`,
+          text: `PO ${selectedOrder.poReference || selectedOrder.orderNumber} approved. Ready for corporate payment.`,
         });
-      } else {
+      } else if (actionType === 'CHANGES') {
+        await requestChanges(selectedOrder.id, approverName, actionNotes || 'Please adjust branch address and quantities.');
+        setFeedbackMessage({
+          type: 'error',
+          text: `Changes requested for PO ${selectedOrder.poReference || selectedOrder.orderNumber}. Feedback sent to site user.`,
+        });
+      } else if (actionType === 'PAY') {
+        await payOrder(selectedOrder.id, selectedPaymentMethod, paymentRefNumber, approverName);
+        setFeedbackMessage({
+          type: 'success',
+          text: `Corporate payment settled for PO ${selectedOrder.poReference || selectedOrder.orderNumber}. Order sent to print production!`,
+        });
+      } else if (actionType === 'REJECT') {
         await rejectOrder(selectedOrder.id, approverName, actionNotes || 'Budget threshold exceeded');
         setFeedbackMessage({
           type: 'error',
-          text: `Order ${selectedOrder.orderNumber} has been rejected. Notification sent to site.`,
+          text: `PO ${selectedOrder.poReference || selectedOrder.orderNumber} rejected. Notification logged.`,
         });
       }
+
       setSelectedOrder(null);
       setActionType(null);
       setActionNotes('');
@@ -116,405 +141,354 @@ export default function HeadOfficeApprovalsPage() {
             }}
           >
             <Building2 size={14} />
-            <span>{user?.organization || 'Apex Healthcare Group'} • Corporate Governance</span>
+            <span>{user?.organization || 'Apex Healthcare Group'} • Head Office Approvals & Financial Control</span>
           </div>
-          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-            Requisition Approval Queue
+
+          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', margin: 0 }}>
+            Purchase Order Approvals & Corporate Payments
           </h1>
-          <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-            Review, authorize, or reject branch marketing collateral orders exceeding threshold limits ($1,000.00).
+
+          <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+            Step 9, 10 & 11: Review customized artwork proofs, approve purchase orders, and authorize corporate payments to initiate production.
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Total Value Pill */}
+        <div
+          style={{
+            padding: '12px 20px',
+            borderRadius: '16px',
+            backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
           <div
             style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '8px 16px',
-              borderRadius: '12px',
-              backgroundColor: '#fff',
-              border: '1px solid rgba(43, 37, 62, 0.1)',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+              justifyContent: 'center',
             }}
           >
-            <DollarSign size={18} color="#2563eb" />
-            <div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
-                Pending Spend
-              </div>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
-                ${totalPendingValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-              </div>
-            </div>
+            <DollarSign size={20} />
+          </div>
+          <div>
+            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', fontWeight: 600 }}>
+              Queue Total ({filteredOrders.length} POs)
+            </span>
+            <span style={{ fontSize: '18px', fontWeight: 900, color: '#1e3a8a' }}>
+              ${totalPendingValue.toFixed(2)}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Feedback Alert */}
-      <AnimatePresence>
-        {feedbackMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            style={{
-              padding: '14px 18px',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              backgroundColor: feedbackMessage.type === 'success' ? '#ECFDF5' : '#FEF2F2',
-              border: `1px solid ${feedbackMessage.type === 'success' ? '#A7F3D0' : '#FECACA'}`,
-              color: feedbackMessage.type === 'success' ? '#065F46' : '#991B1B',
-              fontSize: '14px',
-              fontWeight: 600,
-            }}
+      {feedbackMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            padding: '14px 18px',
+            borderRadius: '12px',
+            backgroundColor: feedbackMessage.type === 'success' ? '#ecfdf5' : '#fef2f2',
+            border: feedbackMessage.type === 'success' ? '1px solid #a7f3d0' : '1px solid #fecaca',
+            color: feedbackMessage.type === 'success' ? '#065f46' : '#991b1b',
+            fontSize: '13px',
+            fontWeight: 700,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>{feedbackMessage.text}</span>
+          <button
+            onClick={() => setFeedbackMessage(null)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 800 }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {feedbackMessage.type === 'success' ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
-              <span>{feedbackMessage.text}</span>
-            </div>
-            <button
-              onClick={() => setFeedbackMessage(null)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontWeight: 700 }}
-            >
-              ✕
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ✕
+          </button>
+        </motion.div>
+      )}
 
-      {/* 2. Filter Bar */}
+      {/* 2. Search & Filter Bar */}
       <div
         style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '16px 20px',
           display: 'flex',
-          gap: '12px',
+          justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
-          backgroundColor: '#fff',
-          padding: '14px 18px',
-          borderRadius: '14px',
-          border: '1px solid rgba(43, 37, 62, 0.08)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
+          gap: '16px',
         }}
       >
-        <div style={{ position: 'relative', flex: '1 1 240px' }}>
-          <Search
-            size={16}
-            color="#94a3b8"
-            style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
-          />
+        <div style={{ position: 'relative', flex: 1, minWidth: '280px', maxWidth: '440px' }}>
+          <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
           <input
             type="text"
-            placeholder="Search order #, PO, branch, campaign code..."
+            placeholder="Search by PO #, Order ID, or Site Name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               width: '100%',
-              padding: '9px 12px 9px 36px',
+              paddingLeft: '38px',
+              paddingRight: '14px',
+              paddingTop: '10px',
+              paddingBottom: '10px',
+              borderRadius: '10px',
+              border: '1.5px solid #e2e8f0',
               fontSize: '13px',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0',
+              backgroundColor: '#f8fafc',
               outline: 'none',
             }}
           />
         </div>
 
-        <select
-          value={siteFilter}
-          onChange={(e) => setSiteFilter(e.target.value)}
-          style={{
-            padding: '9px 14px',
-            fontSize: '13px',
-            borderRadius: '8px',
-            border: '1px solid #e2e8f0',
-            backgroundColor: '#fff',
-            outline: 'none',
-            color: '#334155',
-            fontWeight: 600,
-          }}
-        >
-          <option value="ALL">All Branch Sites</option>
-          <option value="site-101">APX-MID-101 (Midtown)</option>
-          <option value="site-102">APX-BK-102 (Brooklyn)</option>
-          <option value="site-106">APX-QNS-106 (Queens)</option>
-        </select>
+        <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 600 }}>
+          Showing <strong>{filteredOrders.length}</strong> purchase orders awaiting financial review
+        </span>
       </div>
 
-      {/* 3. Approvals List */}
-      {isLoading ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>
-          Loading pending requisitions...
-        </div>
-      ) : filteredOrders.length === 0 ? (
-        <div
-          style={{
-            backgroundColor: '#fff',
-            borderRadius: '16px',
-            padding: '48px 24px',
-            textAlign: 'center',
-            border: '1px dashed #cbd5e1',
-          }}
-        >
-          <CheckCircle2 size={48} color="#10b981" style={{ margin: '0 auto 16px' }} />
-          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
-            All Requisitions Cleared
-          </h3>
-          <p style={{ fontSize: '14px', color: '#64748b', maxWidth: '440px', margin: '0 auto' }}>
-            There are no branch orders currently pending Head Office managerial sign-off. All submitted orders are within standard budget thresholds.
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {filteredOrders.map((order) => (
-            <motion.div
-              key={order.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                backgroundColor: '#fff',
-                borderRadius: '16px',
-                border: '1px solid rgba(43, 37, 62, 0.09)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
-                overflow: 'hidden',
-              }}
-            >
-              {/* Card Header */}
+      {/* 3. PO Queue List */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {isLoading ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: '#94a3b8' }}>Loading Approvals Queue...</div>
+        ) : filteredOrders.length === 0 ? (
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '20px',
+              border: '1px solid #e2e8f0',
+              padding: '48px',
+              textAlign: 'center',
+              maxWidth: '480px',
+              margin: '32px auto',
+            }}
+          >
+            <CheckCircle2 size={40} color="#10b981" style={{ margin: '0 auto 12px auto' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>All Purchase Orders Clear</h3>
+            <p style={{ fontSize: '13px', color: '#64748b', marginTop: '6px' }}>
+              There are currently no purchase orders awaiting approval or payment for your corporate account.
+            </p>
+          </div>
+        ) : (
+          filteredOrders.map((order) => {
+            const firstItem = order.lineItems[0];
+            const isApproved = order.status === 'APPROVED';
+
+            return (
               <div
+                key={order.id}
                 style={{
+                  backgroundColor: '#ffffff',
+                  borderRadius: '20px',
+                  border: isApproved ? '1.5px solid #bfdbfe' : '1px solid #e2e8f0',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                  padding: '24px',
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '12px',
-                  padding: '16px 20px',
-                  backgroundColor: '#f8fafc',
-                  borderBottom: '1px solid #f1f5f9',
+                  flexDirection: 'column',
+                  gap: '16px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {/* Top Row: PO Meta & Status */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        backgroundColor: '#2B253E',
+                        color: '#ffffff',
+                        fontSize: '12px',
+                        fontWeight: 800,
+                      }}
+                    >
+                      {order.poReference || order.orderNumber}
+                    </span>
+                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
+                      {order.siteName} ({order.siteCode})
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>
+                      Requested by <strong>{order.userName}</strong> • {new Date(order.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <StatusPill status={order.status} />
+                </div>
+
+                {/* Middle Row: Artwork Thumbnail, Specifications & Financials */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '80px 1fr 220px',
+                    gap: '20px',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: '14px',
+                    padding: '16px',
+                    border: '1px solid #e2e8f0',
+                    alignItems: 'center',
+                  }}
+                >
+                  {/* Thumbnail */}
                   <div
                     style={{
-                      width: '36px',
-                      height: '36px',
+                      width: '80px',
+                      height: '80px',
                       borderRadius: '10px',
-                      backgroundColor: '#FFFBEB',
-                      border: '1px solid #FDE68A',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#D97706',
+                      backgroundColor: '#e2e8f0',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      flexShrink: 0,
                     }}
                   >
-                    <ShieldAlert size={18} />
+                    <Image
+                      src={firstItem?.thumbnailUrl || FALLBACK_IMAGE}
+                      alt="Customized Artwork Proof"
+                      fill
+                      unoptimized
+                      style={{ objectFit: 'cover' }}
+                    />
                   </div>
+
+                  {/* Spec Info */}
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>
-                        {order.orderNumber}
-                      </span>
-                      <StatusPill status={order.status} size="sm" />
-                      {order.campaignCode && (
-                        <span
-                          style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            padding: '2px 8px',
-                            borderRadius: '6px',
-                            backgroundColor: '#EEF2FF',
-                            color: '#4F46E5',
-                            border: '1px solid #C7D2FE',
-                          }}
-                        >
-                          {order.campaignCode}
-                        </span>
-                      )}
+                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>
+                      {firstItem?.productName}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>
-                      Requested by <strong style={{ color: '#334155' }}>{order.userName}</strong> on{' '}
-                      {new Date(order.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                    <div style={{ fontSize: '12px', color: '#475569', marginTop: '4px' }}>
+                      {order.itemCount} Units • Direct UV High-Definition Offset Printing
                     </div>
+                    {firstItem?.customizations && (
+                      <div style={{ fontSize: '11px', color: '#059669', marginTop: '4px', fontWeight: 600 }}>
+                        ✓ Custom Branch: {firstItem.customizations.businessName || order.siteName}
+                      </div>
+                    )}
+                    {order.deliveryNotes && (
+                      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+                        Delivery Instructions: &quot;{order.deliveryNotes}&quot;
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Financials & Payer Note */}
+                  <div style={{ textAlign: 'right', borderLeft: '1px solid #e2e8f0', paddingLeft: '16px' }}>
+                    <span style={{ fontSize: '11px', color: '#64748b', display: 'block', fontWeight: 600 }}>
+                      Total Amount (Corporate Statement)
+                    </span>
+                    <span style={{ fontSize: '20px', fontWeight: 900, color: '#2B253E' }}>
+                      ${order.totalAmount.toFixed(2)}
+                    </span>
+                    <span style={{ fontSize: '11px', color: '#059669', display: 'block', fontWeight: 700, marginTop: '2px' }}>
+                      {order.paymentStatus === 'PAID' ? '✓ Paid' : 'HO Payment Required'}
+                    </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Total Requisition</div>
-                    <div style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a' }}>
-                      ${order.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
+                {/* Bottom Row: Actions */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
+                  <button
+                    onClick={() => handleOpenAction(order, 'REJECT')}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      backgroundColor: '#fef2f2',
+                      border: '1px solid #fecaca',
+                      color: '#b91c1c',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Reject PO
+                  </button>
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => handleOpenAction(order, 'CHANGES')}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      backgroundColor: '#fff7ed',
+                      border: '1px solid #fed7aa',
+                      color: '#c2410c',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Request Changes
+                  </button>
+
+                  {!isApproved && (
                     <button
                       onClick={() => handleOpenAction(order, 'APPROVE')}
-                      disabled={isPending}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '8px 14px',
-                        borderRadius: '8px',
-                        backgroundColor: '#10b981',
-                        color: '#fff',
-                        border: 'none',
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 6px rgba(16, 185, 129, 0.25)',
-                      }}
-                    >
-                      <CheckCircle2 size={16} />
-                      <span>Approve</span>
-                    </button>
-                    <button
-                      onClick={() => handleOpenAction(order, 'REJECT')}
-                      disabled={isPending}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '8px 14px',
-                        borderRadius: '8px',
-                        backgroundColor: '#fff',
-                        color: '#ef4444',
-                        border: '1px solid #fca5a5',
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <XCircle size={16} />
-                      <span>Reject</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Body - Line Items */}
-              <div style={{ padding: '16px 20px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '10px' }}>
-                  Branch Location: <strong style={{ color: '#0f172a' }}>{order.siteName} ({order.siteCode})</strong> • PO: <strong style={{ color: '#0f172a' }}>{order.poReference || 'N/A'}</strong>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {order.lineItems.map((item) => (
-                    <div
-                      key={item.id}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '8px 12px',
+                        padding: '8px 18px',
                         borderRadius: '10px',
-                        backgroundColor: '#f8fafc',
-                        border: '1px solid #f1f5f9',
+                        backgroundColor: '#2563eb',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div
-                          style={{
-                            width: '40px',
-                            height: '40px',
-                            position: 'relative',
-                            borderRadius: '6px',
-                            overflow: 'hidden',
-                            backgroundColor: '#e2e8f0',
-                          }}
-                        >
-                          <Image
-                            src={item.thumbnailUrl || FALLBACK_IMAGE}
-                            alt={item.productName}
-                            fill
-                            style={{ objectFit: 'cover' }}
-                          />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>
-                            {item.productName}
-                          </div>
-                          <div style={{ fontSize: '11px', color: '#64748b' }}>
-                            SKU: {item.sku} • Qty: {item.qty} ({item.packSize || 'Units'})
-                          </div>
-                          {item.customizations && (
-                            <div style={{ marginTop: '2px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                              {Object.entries(item.customizations).map(([k, v]) => (
-                                <span
-                                  key={k}
-                                  style={{
-                                    fontSize: '10px',
-                                    padding: '1px 6px',
-                                    borderRadius: '4px',
-                                    backgroundColor: '#FDF2F8',
-                                    color: '#BE185D',
-                                    border: '1px solid #FBCFE8',
-                                  }}
-                                >
-                                  {k}: {v}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      Approve PO
+                    </button>
+                  )}
 
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                          ${item.lineTotal.toFixed(2)}
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#64748b' }}>
-                          ${item.unitPrice.toFixed(2)} / unit
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {order.deliveryNotes && (
-                  <div
+                  {/* MAKE PAYMENT (Head Office Pays) */}
+                  <button
+                    onClick={() => handleOpenAction(order, 'PAY')}
                     style={{
-                      marginTop: '12px',
-                      padding: '10px 14px',
-                      borderRadius: '8px',
-                      backgroundColor: '#FFFDF0',
-                      border: '1px solid #FEF08A',
-                      fontSize: '12px',
-                      color: '#854D0E',
                       display: 'flex',
-                      gap: '8px',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 20px',
+                      borderRadius: '10px',
+                      backgroundColor: '#059669',
+                      color: '#ffffff',
+                      border: 'none',
+                      fontSize: '12px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)',
                     }}
                   >
-                    <MessageSquare size={16} />
-                    <span><strong>Branch Delivery Instructions:</strong> {order.deliveryNotes}</span>
-                  </div>
-                )}
+                    <CreditCard size={15} />
+                    Make Payment (${order.totalAmount.toFixed(2)})
+                  </button>
+                </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+            );
+          })
+        )}
+      </div>
 
-      {/* Action Modal (Approve / Reject) */}
+      {/* 4. Action Confirmation / Corporate Payment Modal */}
       <AnimatePresence>
         {selectedOrder && actionType && (
           <div
             style={{
               position: 'fixed',
               inset: 0,
-              zIndex: 9999,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(8px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: 'rgba(15, 23, 42, 0.6)',
-              backdropFilter: 'blur(4px)',
+              zIndex: 1000,
+              padding: '24px',
             }}
           >
             <motion.div
@@ -522,46 +496,112 @@ export default function HeadOfficeApprovalsPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '24px',
+                padding: '32px',
+                maxWidth: '560px',
                 width: '100%',
-                maxWidth: '480px',
-                backgroundColor: '#fff',
-                borderRadius: '16px',
-                padding: '24px',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                margin: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               }}
             >
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '0 0 8px' }}>
-                {actionType === 'APPROVE' ? 'Authorize Requisition' : 'Reject Requisition'}
-              </h3>
-              <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px' }}>
-                Order <strong>{selectedOrder.orderNumber}</strong> (${selectedOrder.totalAmount.toFixed(2)}) for{' '}
-                <strong>{selectedOrder.siteName}</strong>.
-              </p>
-
               <form onSubmit={handleConfirmAction} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    {actionType === 'APPROVE' ? 'Approval Audit Notes (Optional)' : 'Rejection Reason (Required)'}
-                  </label>
-                  <textarea
-                    rows={3}
-                    required={actionType === 'REJECT'}
-                    placeholder={actionType === 'APPROVE' ? 'e.g. Approved within Q3 promotional allocation budget' : 'e.g. Exceeds branch monthly budget cap. Please re-submit with reduced quantities.'}
-                    value={actionNotes}
-                    onChange={(e) => setActionNotes(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '13px',
-                      outline: 'none',
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                    {actionType === 'PAY' && 'Step 11: Head Office Corporate Payment'}
+                    {actionType === 'APPROVE' && 'Step 10: Approve Purchase Order'}
+                    {actionType === 'CHANGES' && 'Request Changes from Site User'}
+                    {actionType === 'REJECT' && 'Decline Purchase Order'}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedOrder(null);
+                      setActionType(null);
                     }}
-                  />
+                    style={{ background: 'none', border: 'none', fontSize: '16px', color: '#64748b', cursor: 'pointer' }}
+                  >
+                    ✕
+                  </button>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '13px' }}>
+                  <div style={{ fontWeight: 800, color: '#0f172a' }}>
+                    PO #{selectedOrder.poReference || selectedOrder.orderNumber}
+                  </div>
+                  <div style={{ color: '#475569', marginTop: '2px' }}>
+                    Branch: {selectedOrder.siteName} • Total: <strong>${selectedOrder.totalAmount.toFixed(2)}</strong>
+                  </div>
+                </div>
+
+                {actionType === 'PAY' ? (
+                  /* Corporate Payment Form */
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', display: 'block', marginBottom: '6px' }}>
+                        Select Corporate Payment Method
+                      </label>
+                      <select
+                        value={selectedPaymentMethod}
+                        onChange={(e) => setSelectedPaymentMethod(e.target.value as CorporatePaymentMethod)}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: '10px',
+                          border: '1.5px solid #cbd5e1',
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          color: '#0f172a',
+                        }}
+                      >
+                        <option value="CORPORATE_INVOICE">Corporate Net-30 Account Invoice</option>
+                        <option value="PURCHASING_CARD">Corporate Purchasing Card (P-Card •••• 9021)</option>
+                        <option value="CORPORATE_ACH">Direct Corporate ACH / BACS Transfer</option>
+                        <option value="PREAPPROVED_CREDIT">Pre-Approved Commercial Credit Facility</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', display: 'block', marginBottom: '4px' }}>
+                        Payment Reference / Authorization Code
+                      </label>
+                      <input
+                        type="text"
+                        value={paymentRefNumber}
+                        onChange={(e) => setPaymentRefNumber(e.target.value)}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1.5px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                      />
+                    </div>
+
+                    <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', fontSize: '12px', color: '#047857' }}>
+                      💳 Authorizing this payment will immediately settle PO #{selectedOrder.poReference} and transition the order to <strong>&quot;Paid → In Production&quot;</strong>.
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', display: 'block', marginBottom: '6px' }}>
+                      Approval / Feedback Notes
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={actionNotes}
+                      onChange={(e) => setActionNotes(e.target.value)}
+                      placeholder="Add comments or instructions..."
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                        border: '1.5px solid #cbd5e1',
+                        fontSize: '13px',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '8px' }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -569,33 +609,40 @@ export default function HeadOfficeApprovalsPage() {
                       setActionType(null);
                     }}
                     style={{
-                      padding: '9px 16px',
-                      borderRadius: '8px',
+                      padding: '10px 18px',
+                      borderRadius: '10px',
                       backgroundColor: '#f1f5f9',
-                      color: '#475569',
                       border: 'none',
-                      fontSize: '13px',
+                      color: '#475569',
                       fontWeight: 700,
                       cursor: 'pointer',
                     }}
                   >
                     Cancel
                   </button>
+
                   <button
                     type="submit"
                     disabled={isPending}
                     style={{
-                      padding: '9px 18px',
-                      borderRadius: '8px',
-                      backgroundColor: actionType === 'APPROVE' ? '#10b981' : '#ef4444',
-                      color: '#fff',
+                      padding: '10px 22px',
+                      borderRadius: '10px',
+                      backgroundColor: actionType === 'PAY' ? '#059669' : actionType === 'REJECT' ? '#dc2626' : '#2563eb',
+                      color: '#ffffff',
                       border: 'none',
-                      fontSize: '13px',
-                      fontWeight: 700,
+                      fontWeight: 800,
                       cursor: 'pointer',
                     }}
                   >
-                    {isPending ? 'Processing...' : actionType === 'APPROVE' ? 'Confirm Approval' : 'Confirm Rejection'}
+                    {isPending
+                      ? 'Processing...'
+                      : actionType === 'PAY'
+                      ? 'Confirm & Settle Payment'
+                      : actionType === 'APPROVE'
+                      ? 'Confirm Approval'
+                      : actionType === 'CHANGES'
+                      ? 'Send Feedback'
+                      : 'Confirm Rejection'}
                   </button>
                 </div>
               </form>

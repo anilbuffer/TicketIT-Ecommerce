@@ -352,10 +352,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                     fontSize: '12px',
                     fontWeight: 700,
                     cursor: isValidQty ? 'pointer' : 'not-allowed',
-                    backgroundColor: isAdded ? '#059669' : isValidQty ? '#f73582' : '#cbd5e1',
+                    backgroundColor: isAdded ? '#059669' : isValidQty ? '#2B253E' : '#cbd5e1',
                     color: '#ffffff',
                     border: 'none',
-                    boxShadow: isValidQty && !isAdded ? '0 2px 6px rgba(247, 53, 130, 0.25)' : 'none',
+                    boxShadow: isValidQty && !isAdded ? '0 2px 6px rgba(43, 37, 62, 0.25)' : 'none',
                     transition: 'all 0.15s ease',
                   }}
                 >
@@ -365,11 +365,33 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                     </span>
                   ) : (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <ShoppingCart size={13} /> Add to Cart
+                      <ShoppingCart size={13} /> Add
                     </span>
                   )}
                 </button>
               </div>
+
+              {/* Template customization CTA */}
+              <Link
+                href="/shop/templates"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  backgroundColor: '#fdf2f8',
+                  border: '1px solid #fbcfe8',
+                  color: '#be185d',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>Browse Design Templates ({product.templatesCount || 4}) →</span>
+              </Link>
 
               {/* Order rules mini pill */}
               {(product.moq > 1 || product.orderMultiple > 1) && (

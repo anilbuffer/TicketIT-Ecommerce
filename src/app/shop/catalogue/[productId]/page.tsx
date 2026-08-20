@@ -652,15 +652,15 @@ export default function ProductDetailPage() {
                     onClick={handleAddToCart}
                     disabled={!isValidQty}
                     style={{
-                      padding: '14px 28px',
+                      padding: '14px 24px',
                       borderRadius: '14px',
                       fontSize: '13px',
                       fontWeight: 800,
                       cursor: isValidQty ? 'pointer' : 'not-allowed',
-                      backgroundColor: isAdded ? '#059669' : isValidQty ? '#f73582' : '#cbd5e1',
+                      backgroundColor: isAdded ? '#059669' : isValidQty ? '#2B253E' : '#cbd5e1',
                       color: '#ffffff',
                       border: 'none',
-                      boxShadow: isValidQty && !isAdded ? '0 4px 12px rgba(247, 53, 130, 0.3)' : 'none',
+                      boxShadow: isValidQty && !isAdded ? '0 4px 12px rgba(43, 37, 62, 0.3)' : 'none',
                       transition: 'all 0.15s ease',
                       display: 'flex',
                       alignItems: 'center',
@@ -673,10 +673,30 @@ export default function ProductDetailPage() {
                       </>
                     ) : (
                       <>
-                        <ShoppingCart size={16} /> Add to Collateral Order
+                        <ShoppingCart size={16} /> Add to Cart
                       </>
                     )}
                   </button>
+
+                  <Link
+                    href="/shop/templates"
+                    style={{
+                      padding: '14px 24px',
+                      borderRadius: '14px',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      backgroundColor: '#f73582',
+                      color: '#ffffff',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 14px rgba(247, 53, 130, 0.35)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Sparkles size={16} />
+                    <span>Choose Template & Customize →</span>
+                  </Link>
                 </div>
 
                 {addError && (
