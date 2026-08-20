@@ -114,6 +114,46 @@ export async function approveOrder(
   }) as any;
 }
 
+export async function requestChanges(
+  id: string,
+  approverName: string,
+  notes: string
+): Promise<Order> {
+  const now = new Date().toISOString();
+  return prisma.order.update({
+    where: { id },
+    data: {
+      status: 'CHANGES_REQUESTED',
+      changesRequestedNotes: notes,
+      updatedAt: now,
+    } as any,
+    include: { lineItems: true },
+  }) as any;
+}
+
+export async function payOrder(
+  id: string,
+  paymentMethod: Order['paymentMethod'] = 'CORPORATE_INVOICE',
+  paymentRef?: string,
+  paidBy: string = 'Elena Rostova (Head Office)'
+): Promise<Order> {
+  const now = new Date().toISOString();
+  const ref = paymentRef || `CORP-TXN-${Date.now().toString().slice(-6)}`;
+  return prisma.order.update({
+    where: { id },
+    data: {
+      status: 'IN_PRODUCTION',
+      paymentStatus: 'PAID',
+      paymentMethod,
+      paymentReference: ref,
+      paidBy,
+      paidAt: now,
+      updatedAt: now,
+    } as any,
+    include: { lineItems: true },
+  }) as any;
+}
+
 export async function rejectOrder(
   id: string,
   approverName: string,
@@ -132,4 +172,5 @@ export async function rejectOrder(
     include: { lineItems: true },
   }) as any;
 }
+
 
