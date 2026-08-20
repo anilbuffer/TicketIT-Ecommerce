@@ -18,6 +18,10 @@ import {
   ShieldAlert,
   Tag,
   AlertTriangle,
+  Download,
+  FileDown,
+  FileText,
+  Sparkles,
 } from 'lucide-react';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80';
@@ -345,13 +349,15 @@ export default function ProductDetailPage() {
                 border: '1px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px',
+                gap: '10px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                 <div>
-                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block' }}>Unit Contract Price:</span>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    Unit Contract Price: <span style={{ fontSize: '10px', fontWeight: 700, color: '#059669', backgroundColor: '#ecfdf5', padding: '1px 6px', borderRadius: '4px' }}>Excl. GST</span>
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '2px' }}>
                     <span style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>
                       ${unitPrice.toFixed(2)}
                     </span>
@@ -366,11 +372,14 @@ export default function ProductDetailPage() {
 
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block' }}>
-                    Extended Total ({qty} {product.uom}):
+                    Extended Subtotal ({qty} {product.uom}):
                   </span>
                   <span style={{ fontSize: '24px', fontWeight: 900, color: '#f73582' }}>
                     ${lineTotal.toFixed(2)}
                   </span>
+                  <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+                    + GST (10%): ${(lineTotal * 0.1).toFixed(2)} = <strong style={{ color: '#0f172a' }}>${(lineTotal * 1.1).toFixed(2)}</strong> incl. GST
+                  </div>
                 </div>
               </div>
 
@@ -380,6 +389,93 @@ export default function ProductDetailPage() {
                   <span>Rate Card Tier: <strong>{product.rateCardName}</strong></span>
                 </div>
               )}
+            </div>
+
+            {/* Optional Downloadable Artwork / Reference File */}
+            <div
+              style={{
+                padding: '14px 16px',
+                borderRadius: '14px',
+                backgroundColor: '#ffffff',
+                border: '1px dashed #cbd5e1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    backgroundColor: '#eff6ff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#2563eb',
+                    flexShrink: 0,
+                  }}
+                >
+                  <FileDown size={18} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+                    Download Approved Artwork & Reference Spec
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>
+                    Print-ready vector guidelines, dimensions, and brand compliance file (.PDF)
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const blob = new Blob([
+                    `--- TICKETIT ASSET SPECIFICATION & ARTWORK REFERENCE ---\n` +
+                    `SKU: ${product.sku}\n` +
+                    `Asset Name: ${product.name}\n` +
+                    `Category: ${product.categoryName || 'Marketing Asset'}\n` +
+                    `Pack Size: ${product.packSize || '1 Unit'}\n` +
+                    `Unit of Measure: ${product.uom || 'EA'}\n` +
+                    `Unit Price (ex. GST): $${unitPrice.toFixed(2)}\n` +
+                    `MOQ: ${moq}\n` +
+                    `Order Multiples: ${multiple}\n` +
+                    `Status: ${product.status}\n` +
+                    `Description: ${product.description}\n` +
+                    `Reference URL: ${product.thumbnailUrl}\n` +
+                    `Generated On: ${new Date().toISOString()}\n`
+                  ], { type: 'text/plain;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${product.sku}_Artwork_Reference_Spec.txt`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #cbd5e1',
+                  color: '#334155',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Download size={13} />
+                <span>Download Spec</span>
+              </button>
             </div>
           </div>
 

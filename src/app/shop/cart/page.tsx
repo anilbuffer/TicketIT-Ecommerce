@@ -433,7 +433,7 @@ export default function CartPage() {
             {/* Price Calculations */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
-                <span>Items Subtotal:</span>
+                <span>Subtotal (Excl. GST):</span>
                 <strong style={{ color: '#0f172a' }}>${subtotal.toFixed(2)}</strong>
               </div>
 
@@ -443,8 +443,8 @@ export default function CartPage() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
-                <span>Applicable Taxes:</span>
-                <span style={{ color: '#64748b' }}>Consolidated on HQ Invoice</span>
+                <span>Estimated GST (10%):</span>
+                <strong style={{ color: '#475569' }}>${(subtotal * 0.1).toFixed(2)}</strong>
               </div>
 
               <div
@@ -460,11 +460,11 @@ export default function CartPage() {
                   <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', display: 'block' }}>
                     Total Order Value
                   </span>
-                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>On-Account Settlement</span>
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>Incl. GST (On-Account)</span>
                 </div>
 
                 <span style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a' }}>
-                  ${subtotal.toFixed(2)}
+                  ${(subtotal * 1.1).toFixed(2)}
                 </span>
               </div>
             </div>

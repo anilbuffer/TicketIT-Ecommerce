@@ -333,8 +333,8 @@ export default function CheckoutReviewPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
-              <span>Total Order Value:</span>
-              <strong style={{ color: '#0f172a', fontSize: '16px' }}>${subtotal.toFixed(2)}</strong>
+              <span>Subtotal (Excl. GST):</span>
+              <strong style={{ color: '#0f172a' }}>${subtotal.toFixed(2)}</strong>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
@@ -343,6 +343,31 @@ export default function CheckoutReviewPage() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+              <span>Estimated GST (10%):</span>
+              <strong style={{ color: '#475569' }}>${(subtotal * 0.1).toFixed(2)}</strong>
+            </div>
+
+            <div
+              style={{
+                paddingTop: '10px',
+                borderTop: '1px solid #f1f5f9',
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div>
+                <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', display: 'block' }}>
+                  Total Order Value
+                </span>
+                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Incl. GST (On-Account)</span>
+              </div>
+              <span style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>
+                ${(subtotal * 1.1).toFixed(2)}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569', paddingTop: '6px' }}>
               <span>Settlement Terms:</span>
               <strong style={{ color: '#059669' }}>Net 30 Monthly Invoice</strong>
             </div>

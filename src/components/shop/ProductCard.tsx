@@ -295,8 +295,8 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Price Row */}
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <div>
-              <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>
-                Price / {product.uom || 'unit'}
+              <span style={{ fontSize: '11px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                Price / {product.uom || 'unit'} <span style={{ fontSize: '9px', fontWeight: 600, color: '#64748b' }}>(excl. GST)</span>
               </span>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                 <span style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>
@@ -316,7 +316,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                   Total ({qty} {product.uom})
                 </span>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: '#f73582' }}>
-                  ${lineTotal.toFixed(2)}
+                  ${lineTotal.toFixed(2)} <span style={{ fontSize: '9px', fontWeight: 500, color: '#94a3b8' }}>ex. GST</span>
                 </span>
               </div>
             )}

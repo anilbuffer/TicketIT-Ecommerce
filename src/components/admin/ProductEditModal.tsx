@@ -396,23 +396,42 @@ export function ProductEditModal({
               </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
-                Image Asset URL
-              </label>
-              <input
-                type="url"
-                value={formData.thumbnailUrl}
-                onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                placeholder="https://images.unsplash.com/..."
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  border: '1px solid #CBD5E1',
-                  fontSize: '0.85rem',
-                }}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
+                  Thumbnail Image URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.thumbnailUrl}
+                  onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                  placeholder="https://images.unsplash.com/..."
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid #CBD5E1',
+                    fontSize: '0.85rem',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
+                  Artwork / Reference Spec URL
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://cdn.ticketit.com/assets/spec-01.pdf"
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid #CBD5E1',
+                    fontSize: '0.85rem',
+                  }}
+                />
+              </div>
             </div>
 
             {/* Footer Buttons */}
