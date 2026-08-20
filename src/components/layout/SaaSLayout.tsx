@@ -78,7 +78,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   ];
 
   const siteUserNav: NavItem[] = [
-    { label: 'Template Gallery', href: '/shop/templates', icon: <FileSpreadsheet size={19} />, badge: 'VistaPrint' },
+    { label: 'Template Gallery', href: '/shop/templates', icon: <FileSpreadsheet size={19} /> },
     { label: 'Print Products Catalogue', href: '/shop/catalogue', icon: <Package size={19} /> },
     { label: 'Purchase Orders & Pipeline', href: '/shop/orders', icon: <ClipboardList size={19} />, badge: 'Live' },
     { label: 'Collateral Cart', href: '/shop/cart', icon: <ShoppingCart size={19} /> },
