@@ -4,53 +4,116 @@ import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Shield,
-  Truck,
   Lock,
   Eye,
   EyeOff,
+  Check,
   CheckCircle2,
-  ArrowRight,
   ShieldCheck,
-  Zap,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole, DEMO_USERS, ROLE_DETAILS } from '../../types/auth';
 
-// Custom Pill / Capsule SVG Icon for Pharmacy
-function PillIcon({ size = 24, color = '#d97706' }: { size?: number; color?: string }) {
+// Custom SVG Icons matching the reference designs
+
+// 1. Super Admin Shield Icon
+function SuperAdminShieldIcon({ size = 30 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ display: 'block' }}
-    >
-      <rect
-        x="3"
-        y="10.5"
-        width="18"
-        height="9"
-        rx="4.5"
-        transform="rotate(-45 3 10.5)"
-        stroke={color}
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Outer shield container */}
+      <path
+        d="M16 3L6 7.5V14.5C6 21.2 10.3 27.4 16 29C21.7 27.4 26 21.2 26 14.5V7.5L16 3Z"
+        fill="#f8fafc"
+        stroke="#cbd5e1"
+        strokeWidth="1.5"
+      />
+      {/* Inner red shield badge */}
+      <path
+        d="M16 6L8.5 9.5V14.5C8.5 19.8 11.7 24.7 16 26C20.3 24.7 23.5 19.8 23.5 14.5V9.5L16 6Z"
+        fill="#e11d48"
+      />
+      {/* Shield emblem / reflection */}
+      <path
+        d="M16 6V26C19.8 24.7 22.8 20.3 23.3 15.5H16V6Z"
+        fill="#be123c"
+      />
+      <path
+        d="M12.5 14.5L15 17L19.5 12"
+        stroke="#ffffff"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+// 2. Pharmacy Angled Capsule Pill Icon
+function PharmacyPillIcon({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g transform="rotate(-45 16 16)">
+        {/* Top half: Red */}
+        <path
+          d="M10 16H22V10C22 6.68629 19.3137 4 16 4C12.6863 4 10 6.68629 10 10V16Z"
+          fill="#e11d48"
+        />
+        {/* Bottom half: Yellow/Amber */}
+        <path
+          d="M10 16H22V22C22 25.3137 19.3137 28 16 28C12.6863 28 10 25.3137 10 22V16Z"
+          fill="#f59e0b"
+        />
+        {/* Capsule outline */}
+        <rect
+          x="10"
+          y="4"
+          width="12"
+          height="24"
+          rx="6"
+          stroke="#0f172a"
+          strokeWidth="1.5"
+        />
+        {/* Center divider line */}
+        <line x1="10" y1="16" x2="22" y2="16" stroke="#0f172a" strokeWidth="1.5" />
+        {/* Capsule shine */}
+        <path
+          d="M12.5 8C12.5 6.5 13.5 5.5 15 5.5"
+          stroke="#ffffff"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
+// 3. Driver Delivery Truck Icon
+function DriverTruckIcon({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Truck Cargo Box */}
+      <rect x="4" y="9" width="15" height="12" rx="2" fill="#ea580c" stroke="#0f172a" strokeWidth="1.5" />
+      {/* Truck Cabin */}
       <path
-        d="M8.5 8.5L15.5 15.5"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
+        d="M19 13H24.5L27 16.5V21H19V13Z"
+        fill="#ef4444"
+        stroke="#0f172a"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
       />
+      {/* Cabin Window */}
       <path
-        d="M6 11L13 18"
-        fill={color}
-        fillOpacity="0.25"
+        d="M20.5 14.5H23.8L25.5 17H20.5V14.5Z"
+        fill="#93c5fd"
       />
+      {/* Wheels */}
+      <circle cx="9" cy="22" r="3" fill="#0f172a" stroke="#f8fafc" strokeWidth="1.5" />
+      <circle cx="9" cy="22" r="1" fill="#f8fafc" />
+      <circle cx="23" cy="22" r="3" fill="#0f172a" stroke="#f8fafc" strokeWidth="1.5" />
+      <circle cx="23" cy="22" r="1" fill="#f8fafc" />
+      {/* Cargo lines */}
+      <line x1="7" y1="13" x2="15" y2="13" stroke="#fed7aa" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="7" y1="16" x2="13" y2="16" stroke="#fed7aa" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }
@@ -80,35 +143,6 @@ function LoginForm() {
     setErrorMessage(null);
   };
 
-  // Direct 1-Click Fast Login directly into portal
-  const handleDirectAccess = async (roleKey: UserRole) => {
-    setSelectedRole(roleKey);
-    const demo = DEMO_USERS[roleKey];
-    if (!demo) return;
-    
-    setEmail(demo.email);
-    setPassword(demo.defaultPassword);
-    setIsSubmitting(true);
-    setErrorMessage(null);
-
-    try {
-      const res = await login(demo.email, demo.defaultPassword, roleKey);
-      if (res.success) {
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        } else {
-          router.push(ROLE_DETAILS[roleKey].defaultRedirect);
-        }
-      } else {
-        setErrorMessage(res.error || 'Authentication error.');
-        setIsSubmitting(false);
-      }
-    } catch {
-      setErrorMessage('Failed to authenticate. Please try again.');
-      setIsSubmitting(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRole && !email.trim()) {
@@ -128,7 +162,7 @@ function LoginForm() {
         } else if (selectedRole) {
           router.push(ROLE_DETAILS[selectedRole].defaultRedirect);
         } else {
-          router.push('/portal/admin');
+          router.push('/admin/dashboard');
         }
       } else {
         setErrorMessage(res.error || 'Invalid credentials.');
@@ -140,39 +174,80 @@ function LoginForm() {
     }
   };
 
-  const rolesConfig: {
+  const portalCards: {
     key: UserRole;
     icon: React.ReactNode;
     title: string;
     sub: string;
-    color: string;
-    iconBg: string;
+    badgeColor: string;
+    borderColor: string;
   }[] = [
     {
       key: 'admin',
-      icon: <Shield size={24} color="#e11d48" />,
+      icon: <SuperAdminShieldIcon size={32} />,
       title: 'Super Admin',
       sub: 'Platform HQ',
-      color: '#e11d48',
-      iconBg: '#ffe4e6',
+      badgeColor: '#059669',
+      borderColor: '#059669',
     },
     {
       key: 'site_user',
-      icon: <PillIcon size={24} color="#d97706" />,
+      icon: <PharmacyPillIcon size={32} />,
       title: 'Pharmacy',
       sub: 'Dispensing Hub',
-      color: '#d97706',
-      iconBg: '#fef3c7',
+      badgeColor: '#3b82f6',
+      borderColor: '#0f172a',
     },
     {
       key: 'head_office',
-      icon: <Truck size={24} color="#e11d48" />,
+      icon: <DriverTruckIcon size={32} />,
       title: 'Driver',
       sub: 'Courier Portal',
-      color: '#059669',
-      iconBg: '#fee2e2',
+      badgeColor: '#f59e0b',
+      borderColor: '#0f172a',
     },
   ];
+
+  // Dynamic Button Properties
+  const getButtonProps = () => {
+    if (!selectedRole) {
+      return {
+        text: 'Select a Portal First',
+        bgColor: '#cbd5e1',
+        textColor: '#94a3b8',
+        shadow: 'none',
+        disabled: true,
+      };
+    }
+    if (selectedRole === 'admin') {
+      return {
+        text: 'Enter Super Admin Portal',
+        bgColor: '#059669',
+        textColor: '#ffffff',
+        shadow: '0 8px 20px rgba(5, 150, 105, 0.28)',
+        disabled: false,
+      };
+    }
+    if (selectedRole === 'site_user') {
+      return {
+        text: 'Enter Pharmacy Portal',
+        bgColor: '#3b82f6',
+        textColor: '#ffffff',
+        shadow: '0 8px 20px rgba(59, 130, 246, 0.28)',
+        disabled: false,
+      };
+    }
+    // Head office / Driver
+    return {
+      text: 'Enter Driver Portal',
+      bgColor: '#f59e0b',
+      textColor: '#ffffff',
+      shadow: '0 8px 20px rgba(245, 158, 11, 0.28)',
+      disabled: false,
+    };
+  };
+
+  const btnProps = getButtonProps();
 
   return (
     <div
@@ -182,65 +257,34 @@ function LoginForm() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem 1rem',
-        position: 'relative',
-        backgroundColor: '#edf3f8',
+        padding: '2.5rem 1rem',
+        backgroundColor: '#eef2f6',
         backgroundImage: `
-          radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.45) 0px, transparent 50%),
-          radial-gradient(at 100% 0%, rgba(204, 251, 241, 0.45) 0px, transparent 50%),
-          radial-gradient(at 50% 100%, rgba(224, 231, 255, 0.4) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(254, 240, 138, 0.25) 0px, transparent 50%)
+          radial-gradient(at 10% 15%, rgba(204, 251, 241, 0.55) 0px, transparent 50%),
+          radial-gradient(at 90% 15%, rgba(224, 231, 255, 0.55) 0px, transparent 50%),
+          radial-gradient(at 50% 90%, rgba(254, 243, 199, 0.45) 0px, transparent 50%)
         `,
-        overflow: 'hidden',
+        fontFamily: 'inherit',
       }}
     >
-      {/* Subtle Ambient Glow Orbs */}
-      <div
-        style={{
-          position: 'absolute',
-          width: '500px',
-          height: '500px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(255,255,255,0) 70%)',
-          top: '-10%',
-          left: '-5%',
-          filter: 'blur(40px)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          width: '450px',
-          height: '450px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(255,255,255,0) 70%)',
-          bottom: '-10%',
-          right: '-5%',
-          filter: 'blur(40px)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Centered Mockup Card */}
+      {/* Central Login Card */}
       <motion.div
-        initial={{ opacity: 0, y: 18, scale: 0.98 }}
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         style={{
           width: '100%',
-          maxWidth: '510px',
+          maxWidth: '490px',
           background: '#ffffff',
           borderRadius: '26px',
-          boxShadow: '0 20px 50px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)',
-          border: '1px solid rgba(226, 232, 240, 0.8)',
-          padding: '2.5rem 2.25rem',
+          boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)',
+          border: '1px solid rgba(226, 232, 240, 0.9)',
+          padding: '2.25rem 2rem',
           position: 'relative',
-          zIndex: 10,
         }}
       >
         {/* Brand Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.6rem' }}>
           <div
             style={{
               width: '44px',
@@ -287,7 +331,7 @@ function LoginForm() {
         </div>
 
         {/* Heading & Subtitle */}
-        <div style={{ marginBottom: '1.6rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
           <h1
             style={{
               fontSize: '1.75rem',
@@ -302,7 +346,7 @@ function LoginForm() {
           </h1>
           <p
             style={{
-              fontSize: '0.88rem',
+              fontSize: '0.86rem',
               color: '#64748b',
               lineHeight: 1.45,
               margin: 0,
@@ -313,7 +357,7 @@ function LoginForm() {
         </div>
 
         {/* Form Container */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
           {/* Section: PORTAL ACCESS */}
           <div>
             <div
@@ -321,7 +365,7 @@ function LoginForm() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '0.7rem',
+                marginBottom: '0.65rem',
               }}
             >
               <span
@@ -364,48 +408,70 @@ function LoginForm() {
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '0.75rem',
+                gap: '0.7rem',
               }}
             >
-              {rolesConfig.map((item) => {
+              {portalCards.map((item) => {
                 const isSelected = selectedRole === item.key;
                 return (
-                  <motion.button
+                  <button
                     key={item.key}
                     type="button"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
                     onClick={() => handleSelectRole(item.key)}
-                    onDoubleClick={() => handleDirectAccess(item.key)}
-                    title="Click to select & auto-fill, or double click for instant 1-click access"
                     style={{
-                      background: isSelected ? '#ffffff' : '#f8fafc',
+                      background: isSelected ? (item.key === 'admin' ? '#f0fdf9' : item.key === 'head_office' ? '#fefce8' : '#eff6ff') : '#f8fafc',
                       borderRadius: '16px',
-                      padding: '1.1rem 0.6rem',
+                      padding: '1.15rem 0.5rem',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       textAlign: 'center',
-                      border: isSelected ? '2px solid #0f172a' : '1.5px solid #e2e8f0',
+                      border: isSelected
+                        ? `2px solid ${item.borderColor}`
+                        : '1.5px solid #e2e8f0',
                       boxShadow: isSelected
-                        ? '0 6px 16px -2px rgba(15, 23, 42, 0.12)'
+                        ? '0 6px 16px -2px rgba(15, 23, 42, 0.1)'
                         : 'none',
                       cursor: 'pointer',
                       position: 'relative',
                       transition: 'all 0.15s ease',
                     }}
                   >
+                    {/* Selected Checkmark Badge in Top Right */}
+                    {isSelected && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '6px',
+                          right: '6px',
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '50%',
+                          backgroundColor: item.badgeColor,
+                          color: '#ffffff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.15)',
+                        }}
+                      >
+                        <Check size={11} strokeWidth={3.5} />
+                      </div>
+                    )}
+
                     {/* Icon container */}
                     <div
                       style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '12px',
-                        background: item.iconBg,
+                        width: '46px',
+                        height: '46px',
+                        borderRadius: '14px',
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginBottom: '0.65rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
                       }}
                     >
                       {item.icon}
@@ -435,7 +501,7 @@ function LoginForm() {
                     >
                       {item.sub}
                     </div>
-                  </motion.button>
+                  </button>
                 );
               })}
             </div>
@@ -464,7 +530,7 @@ function LoginForm() {
                 width: '100%',
                 padding: '0.82rem 1rem',
                 borderRadius: '12px',
-                border: '1.5px solid #e2e8f0',
+                border: selectedRole ? '1.5px solid #059669' : '1.5px solid #e2e8f0',
                 background: selectedRole ? '#ffffff' : '#f8fafc',
                 color: '#0f172a',
                 fontSize: '0.9rem',
@@ -499,12 +565,13 @@ function LoginForm() {
                   width: '100%',
                   padding: '0.82rem 2.75rem 0.82rem 1rem',
                   borderRadius: '12px',
-                  border: '1.5px solid #e2e8f0',
+                  border: selectedRole ? '1.5px solid #059669' : '1.5px solid #e2e8f0',
                   background: selectedRole ? '#ffffff' : '#f8fafc',
                   color: '#0f172a',
                   fontSize: '0.9rem',
                   fontWeight: 600,
                   outline: 'none',
+                  letterSpacing: password ? '0.15em' : 'normal',
                   transition: 'border-color 0.15s ease, background 0.15s ease',
                 }}
               />
@@ -530,6 +597,35 @@ function LoginForm() {
             </div>
           </div>
 
+          {/* Auto-filled Demo Credentials Green Callout */}
+          <AnimatePresence>
+            {selectedRole && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  background: '#ecfdf5',
+                  border: '1px solid #a7f3d0',
+                  borderRadius: '10px',
+                  padding: '0.65rem 0.85rem',
+                  color: '#065f46',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                }}
+              >
+                <CheckCircle2 size={15} color="#059669" />
+                <span>
+                  Demo credentials auto-filled for {ROLE_DETAILS[selectedRole].title} portal
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Error Message */}
           {errorMessage && (
             <div
@@ -552,24 +648,22 @@ function LoginForm() {
             type="submit"
             whileHover={selectedRole ? { scale: 1.01 } : {}}
             whileTap={selectedRole ? { scale: 0.98 } : {}}
-            disabled={!selectedRole || isSubmitting}
+            disabled={btnProps.disabled || isSubmitting}
             style={{
               width: '100%',
               padding: '0.95rem 1.25rem',
               borderRadius: '12px',
-              background: !selectedRole
-                ? '#cbd5e1'
-                : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-              color: !selectedRole ? '#64748b' : '#ffffff',
+              background: btnProps.bgColor,
+              color: btnProps.textColor,
               fontSize: '0.92rem',
               fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
-              cursor: !selectedRole || isSubmitting ? 'not-allowed' : 'pointer',
+              cursor: btnProps.disabled || isSubmitting ? 'not-allowed' : 'pointer',
               border: 'none',
-              boxShadow: selectedRole ? '0 8px 20px rgba(5, 150, 105, 0.25)' : 'none',
+              boxShadow: btnProps.shadow,
               transition: 'all 0.2s ease',
               marginTop: '0.2rem',
             }}
@@ -587,52 +681,15 @@ function LoginForm() {
                     borderTopColor: '#ffffff',
                   }}
                 />
-                <span>Entering Portal...</span>
-              </>
-            ) : !selectedRole ? (
-              <>
-                <Lock size={16} />
-                <span>Select a Portal First</span>
+                <span>Authenticating...</span>
               </>
             ) : (
               <>
-                <span>Sign In to {ROLE_DETAILS[selectedRole].title} Portal</span>
-                <ArrowRight size={16} />
+                <Lock size={16} />
+                <span>{btnProps.text}</span>
               </>
             )}
           </motion.button>
-
-          {/* Fast 1-Click Direct Entry Shortcut Links */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              marginTop: '0.2rem',
-            }}
-          >
-            <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>Direct Demo Access:</span>
-            {rolesConfig.map((r) => (
-              <button
-                key={r.key}
-                type="button"
-                onClick={() => handleDirectAccess(r.key)}
-                style={{
-                  fontSize: '0.72rem',
-                  color: '#059669',
-                  fontWeight: 700,
-                  background: '#ecfdf5',
-                  border: '1px solid #a7f3d0',
-                  borderRadius: '6px',
-                  padding: '0.15rem 0.45rem',
-                  cursor: 'pointer',
-                }}
-              >
-                {r.title}
-              </button>
-            ))}
-          </div>
         </form>
 
         {/* Footer info & HIPAA badge */}
@@ -648,7 +705,7 @@ function LoginForm() {
             gap: '0.75rem',
           }}
         >
-          <div style={{ fontSize: '0.73rem', color: '#94a3b8', fontWeight: 500 }}>
+          <div style={{ fontSize: '0.73rem', color: '#64748b', fontWeight: 500 }}>
             © 2024 Rahhawan LLC. All rights reserved.
           </div>
 
@@ -685,12 +742,12 @@ export default function LoginPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#edf3f8',
+            backgroundColor: '#eef2f6',
             color: '#64748b',
             fontWeight: 600,
           }}
         >
-          Loading Portal...
+          Loading Rahhawan Portal...
         </div>
       }
     >

@@ -12,6 +12,7 @@ interface AuthContextType {
   loginAsRole: (role: UserRole) => void;
   logout: () => void;
   switchRole: (role: UserRole) => void;
+  switchUserRole: (role: UserRole) => void;
   hasPermission: (permission: Permission) => boolean;
   canAccessRole: (allowedRoles: UserRole[]) => boolean;
 }
@@ -136,6 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginAsRole,
         logout,
         switchRole,
+        switchUserRole: switchRole,
         hasPermission,
         canAccessRole,
       }}

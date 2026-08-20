@@ -1,0 +1,151 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ProductStatus {
+  ACTIVE
+  UNAVAILABLE
+  SUPERSEDED
+}
+
+enum OrderStatus {
+  RECEIVED
+  PROCESSING
+  DISPATCHED
+  DELIVERED
+}
+
+enum Role {
+  ADMIN
+  HEAD_OFFICE
+  SITE_USER
+}
+
+model Product {
+  id            String         @id @default(uuid())
+  sku           String         @unique
+  name          String
+  description   String
+  thumbnailUrl  String
+  categoryId    String
+  packSize      String
+  uom           String
+  basePrice     Decimal
+  moq           Int
+  orderMultiple Int
+  status        ProductStatus
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lineItems     OrderLineItem[]
+  rateCardItems RateCardItem[]
+}
+
+model Account {
+  id          String     @id @default(uuid())
+  name        String
+  accountCode String     @unique
+  status      String     @default("ACTIVE")
+  contactEmail String
+  contactPhone String?
+  sites       Site[]
+  rateCards   RateCard[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Site {
+  id             String   @id @default(uuid())
+  accountId      String
+  account        Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name           String
+  code           String   @unique
+  billToAddress  Json
+  shipToAddress  Json
+  users          User[]
+  orders         Order[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  name             String
+  role             Role     @default(SITE_USER)
+  avatar           String?
+  siteId           String?
+  site             Site?    @relation(fields: [siteId], references: [id])
+  department       String?
+  monthlyBudgetCap Decimal?
+  poPrefix         String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Order {
+  id           String          @id @default(uuid())
+  orderNumber  String          @unique
+  accountId    String
+  siteId       String
+  site         Site            @relation(fields: [siteId], references: [id])
+  userId       String
+  poReference  String?
+  status       OrderStatus     @default(RECEIVED)
+  totalAmount  Decimal         @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  lineItems    OrderLineItem[]
+}
+
+model OrderLineItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  sku       String
+  qty       Int
+  unitPrice Decimal
+  lineTotal Decimal
+}
+
+model RateCard {
+  id          String         @id @default(uuid())
+  accountId   String
+  account     Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name        String
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  discountPct Decimal        @default(0)
+  items       RateCardItem[]
+  createdAt   DateTime       @default(now())
+}
+
+model RateCardItem {
+  id         String   @id @default(uuid())
+  rateCardId String
+  rateCard   RateCard @relation(fields: [rateCardId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  fixedPrice Decimal?
+  discountPct Decimal?
+}
+
+model AuditLogEntry {
+  id          String   @id @default(uuid())
+  actorId     String
+  actorName   String
+  actorRole   String
+  action      String
+  entityType  String
+  entityId    String
+  ipAddress   String?
+  details     Json?
+  timestamp   DateTime @default(now())
+}

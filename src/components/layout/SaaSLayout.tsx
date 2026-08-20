@@ -87,10 +87,13 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
 
   // Role-specific navigation items
   const adminNav: NavItem[] = [
-    { label: 'Platform HQ & Analytics', href: '/portal/admin', icon: <LayoutDashboard size={19} /> },
-    { label: 'Product & Medication DAM', href: '/portal/admin#catalogue', icon: <Package size={19} />, badge: '58 Items' },
-    { label: 'Dispensing Hub Registry', href: '/portal/admin#sites', icon: <Store size={19} />, badge: '34 Hubs' },
-    { label: 'Security & Audit Logs', href: '/portal/admin#audit', icon: <History size={19} /> },
+    { label: 'Platform HQ Dashboard', href: '/admin/dashboard', icon: <LayoutDashboard size={19} /> },
+    { label: 'Product Catalogue & DAM', href: '/admin/catalogue/products', icon: <Package size={19} /> },
+    { label: 'Orders & Fulfilment', href: '/admin/orders/all', icon: <Truck size={19} />, badge: 'Live' },
+    { label: 'Customer Accounts & Sites', href: '/admin/customers/accounts', icon: <Store size={19} /> },
+    { label: 'Rate Cards & Pricing', href: '/admin/pricing/rate-cards', icon: <Layers size={19} /> },
+    { label: 'Monthly Billing Reports', href: '/admin/reports/monthly-billing', icon: <FileText size={19} /> },
+    { label: 'Security & Audit Logs', href: '/admin/reports/audit-log', icon: <History size={19} /> },
   ];
 
   const pharmacyNav: NavItem[] = [

@@ -26,6 +26,11 @@ export const RoleSwitcherWidget: React.FC = () => {
 
   const rolesList: { role: UserRole; icon: React.ReactNode; path: string }[] = [
     {
+      role: 'admin',
+      icon: <Shield size={18} />,
+      path: '/admin/dashboard',
+    },
+    {
       role: 'site_user',
       icon: <Store size={18} />,
       path: '/portal/site-user',
@@ -34,11 +39,6 @@ export const RoleSwitcherWidget: React.FC = () => {
       role: 'head_office',
       icon: <Building2 size={18} />,
       path: '/portal/head-office',
-    },
-    {
-      role: 'admin',
-      icon: <Shield size={18} />,
-      path: '/portal/admin',
     },
   ];
 

@@ -9,7 +9,8 @@ export type Permission =
   | 'export_billing_reports'
   | 'manage_catalogue'
   | 'manage_sites'
-  | 'view_audit_trail';
+  | 'view_audit_trail'
+  | 'update_order_status';
 
 export interface User {
   id: string;
@@ -45,52 +46,60 @@ export const ROLE_DETAILS: Record<
     defaultRedirect: string;
     themeColor: string;
     badgeText: string;
+    buttonColor: string;
+    buttonText: string;
   }
 > = {
   admin: {
     title: 'Super Admin',
     subtitle: 'Platform HQ',
-    description: 'Central platform administration, inventory catalog control, hub management, and HIPAA compliance audit logs.',
-    defaultRedirect: '/portal/admin',
-    themeColor: '#ef4444',
+    description: 'Central platform administration, carrying the full operational workload to see and action every order in full detail and update statuses.',
+    defaultRedirect: '/admin/dashboard',
+    themeColor: '#059669',
+    buttonColor: '#059669',
+    buttonText: 'Enter Super Admin Portal',
     badgeText: 'Super Admin • Platform HQ',
   },
   site_user: {
     title: 'Pharmacy',
     subtitle: 'Dispensing Hub',
-    description: 'Dispensing management, inventory ordering, medication PO verification, and real-time courier request tracking.',
+    description: 'Dispensing management with a read-only status view strictly limited to their own branch orders and purchase order submission.',
     defaultRedirect: '/portal/site-user',
-    themeColor: '#f59e0b',
+    themeColor: '#2563eb',
+    buttonColor: '#3b82f6',
+    buttonText: 'Enter Pharmacy Portal',
     badgeText: 'Pharmacy • Dispensing Hub',
   },
   head_office: {
     title: 'Driver',
     subtitle: 'Courier Portal',
-    description: 'Active courier delivery routes, digital proof of delivery, dispatch logs, and consolidated transport billing.',
+    description: 'Inheriting a read-only status view across all 34 sites, dispatch logs, and consolidated monthly billing reports.',
     defaultRedirect: '/portal/head-office',
-    themeColor: '#10b981',
+    themeColor: '#f59e0b',
+    buttonColor: '#f59e0b',
+    buttonText: 'Enter Driver Portal',
     badgeText: 'Driver • Courier Portal',
   },
 };
 
 export const DEMO_USERS: Record<UserRole, DemoUserCredential> = {
   admin: {
-    email: 'admin@rahhawan.io',
+    email: 'sarah.jenkins@rahhawan.com',
     role: 'admin',
     roleTitle: 'Super Admin',
     roleSubtitle: 'Platform HQ',
     defaultPassword: 'password123',
     user: {
       id: 'usr_admin_999',
-      name: 'Dr. Sarah Sterling',
-      email: 'admin@rahhawan.io',
+      name: 'Sarah Jenkins',
+      email: 'sarah.jenkins@rahhawan.com',
       role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       title: 'Chief Operations & Platform Officer',
       organization: 'Rahhawan Platform HQ',
       siteCode: 'RAHHAWAN-HQ-GLOBAL',
       siteName: 'Platform Central Operations (HQ)',
-      department: 'System Architecture & HIPAA Compliance',
+      department: 'Central Fulfillment & Operations HQ',
       permissions: [
         'browse_dam',
         'order_collateral',
@@ -101,52 +110,52 @@ export const DEMO_USERS: Record<UserRole, DemoUserCredential> = {
         'manage_catalogue',
         'manage_sites',
         'view_audit_trail',
+        'update_order_status',
       ],
     },
   },
   site_user: {
-    email: 'pharmacy@rahhawan.io',
+    email: 'dr.chen@northgate-infusion.com',
     role: 'site_user',
     roleTitle: 'Pharmacy',
     roleSubtitle: 'Dispensing Hub',
     defaultPassword: 'password123',
     user: {
       id: 'usr_site_104',
-      name: 'Marcus Vance, PharmD',
-      email: 'pharmacy@rahhawan.io',
+      name: 'Dr. Chen, PharmD',
+      email: 'dr.chen@northgate-infusion.com',
       role: 'site_user',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-      title: 'Head Pharmacist & Dispensing Manager',
-      organization: 'Metro Central Pharmacy #104',
+      avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+      title: 'Head Pharmacist & Dispensing Lead',
+      organization: 'Northgate Infusion Center #104',
       siteCode: 'PHARM-NYC-104',
-      siteName: 'Downtown Dispensing Hub #104',
-      department: 'Pharmacy Operations & Logistics',
+      siteName: 'Northgate Infusion Suite #104',
+      department: 'Pharmacy Dispensing & Local Orders',
       poPrefix: 'RX-APX104',
       monthlyBudgetCap: 15000,
       permissions: ['browse_dam', 'order_collateral', 'view_site_orders'],
     },
   },
   head_office: {
-    email: 'driver@rahhawan.io',
+    email: 'marcus.vance@rahhawan.com',
     role: 'head_office',
     roleTitle: 'Driver',
     roleSubtitle: 'Courier Portal',
     defaultPassword: 'password123',
     user: {
       id: 'usr_driver_001',
-      name: 'Elena Rostova',
-      email: 'driver@rahhawan.io',
+      name: 'Marcus Vance',
+      email: 'marcus.vance@rahhawan.com',
       role: 'head_office',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
-      title: 'Lead Dispatch & Logistics Driver',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      title: 'Regional Fleet Dispatch & Multi-Site Logistics Lead',
       organization: 'Rahhawan Courier Fleet',
       siteCode: 'FLEET-DISPATCH-EAST',
       siteName: 'Courier Fleet Hub (Regional East)',
-      department: 'Cold-Chain Delivery & Fleet Routing',
+      department: 'Multi-Site Oversight & Consolidated Billing',
       poPrefix: 'PO-FLEET-EXP',
       permissions: [
         'browse_dam',
-        'order_collateral',
         'view_site_orders',
         'view_all_sites',
         'view_consolidated_billing',
@@ -155,3 +164,4 @@ export const DEMO_USERS: Record<UserRole, DemoUserCredential> = {
     },
   },
 };
+

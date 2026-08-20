@@ -1,0 +1,37 @@
+[
+  {
+    "id": "cat-pos",
+    "name": "Point of Sale",
+    "code": "POS",
+    "description": "Storefront displays, LED stands, retail window graphics, and shelf talkers",
+    "itemCount": 2
+  },
+  {
+    "id": "cat-pkg",
+    "name": "Specialized Packaging",
+    "code": "PKG",
+    "description": "Cold-chain thermal totes, tamper-evident security bags, and dispensing vials",
+    "itemCount": 2
+  },
+  {
+    "id": "cat-lbl",
+    "name": "Labels & Signage",
+    "code": "LBL",
+    "description": "Direct thermal labels, hazardous material alerts, and directional clinic signage",
+    "itemCount": 2
+  },
+  {
+    "id": "cat-doc",
+    "name": "Regulatory Documents",
+    "code": "DOC",
+    "description": "Controlled drug registers, compliance audit binders, and certificate folders",
+    "itemCount": 2
+  },
+  {
+    "id": "cat-merch",
+    "name": "Merchandise & Uniforms",
+    "code": "MERCH",
+    "description": "Antimicrobial staff coats, branded safety lanyards, and patient care kits",
+    "itemCount": 2
+  }
+]
