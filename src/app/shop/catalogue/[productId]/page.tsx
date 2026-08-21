@@ -9,7 +9,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { getProductWithPricing } from '@/lib/services/products.service';
 import type { EffectiveProduct } from '@/lib/services/types';
-import { QuantitySelector } from '@/components/shop/QuantitySelector';
 import {
   ArrowLeft,
   ShoppingCart,
@@ -402,13 +401,13 @@ export default function ProductDetailPage() {
 
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block' }}>
-                    Extended Subtotal ({qty} {product.uom}):
+                    Total Incl. GST ({product.uom}):
                   </span>
                   <span style={{ fontSize: '24px', fontWeight: 900, color: '#f73582' }}>
-                    ${lineTotal.toFixed(2)}
+                    ${(unitPrice * 1.1).toFixed(2)}
                   </span>
                   <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
-                    + GST (10%): ${(lineTotal * 0.1).toFixed(2)} = <strong style={{ color: '#0f172a' }}>${(lineTotal * 1.1).toFixed(2)}</strong> incl. GST
+                    + GST (10%): ${(unitPrice * 0.1).toFixed(2)} Included • <strong style={{ color: '#059669' }}>Up to 25% Vol. Tier</strong>
                   </div>
                 </div>
               </div>
@@ -631,39 +630,24 @@ export default function ProductDetailPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {isAvailable ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
-                  <div style={{ flex: 1, minWidth: '180px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
-                      Select Quantity ({product.uom}):
-                    </label>
-                    <QuantitySelector
-                      product={product}
-                      value={qty}
-                      onChange={(newQty, valid) => {
-                        setQty(newQty);
-                        setIsValidQty(valid);
-                      }}
-                      size="lg"
-                    />
-                  </div>
-
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '14px' }}>
                   <button
                     type="button"
                     onClick={handleAddToCart}
-                    disabled={!isValidQty}
                     style={{
-                      padding: '14px 24px',
+                      padding: '14px 20px',
                       borderRadius: '14px',
                       fontSize: '13px',
                       fontWeight: 800,
-                      cursor: isValidQty ? 'pointer' : 'not-allowed',
-                      backgroundColor: isAdded ? '#059669' : isValidQty ? '#f73582' : '#cbd5e1',
-                      color: '#ffffff',
-                      border: 'none',
-                      boxShadow: isValidQty && !isAdded ? '0 4px 12px rgba(247, 53, 130, 0.35)' : 'none',
+                      cursor: 'pointer',
+                      backgroundColor: isAdded ? '#059669' : '#ffffff',
+                      color: isAdded ? '#ffffff' : '#0f172a',
+                      border: isAdded ? '1px solid #059669' : '1.5px solid #cbd5e1',
+                      boxShadow: isAdded ? '0 4px 12px rgba(5, 150, 105, 0.25)' : '0 1px 3px rgba(0,0,0,0.04)',
                       transition: 'all 0.15s ease',
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '8px',
                     }}
                   >
@@ -681,7 +665,7 @@ export default function ProductDetailPage() {
                   <Link
                     href="/shop/templates"
                     style={{
-                      padding: '14px 24px',
+                      padding: '14px 20px',
                       borderRadius: '14px',
                       fontSize: '13px',
                       fontWeight: 800,
@@ -691,7 +675,9 @@ export default function ProductDetailPage() {
                       boxShadow: '0 4px 14px rgba(247, 53, 130, 0.35)',
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '8px',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     <Sparkles size={16} />
