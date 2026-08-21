@@ -137,7 +137,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', backgroundColor: '#f1f5f9', fontFamily: "'Inter', -apple-system, sans-serif" }}>
       {/* TOP HEADER */}
-      <div style={{ height: '56px', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', flexShrink: 0, zIndex: 50, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', gap: '16px' }}>
+      <div style={{ height: '56px', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', flexShrink: 0, zIndex: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', gap: '16px' }}>
         {/* Left: Back & Template Info */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
           <Link

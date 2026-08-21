@@ -36,7 +36,7 @@ export default function AdminLayout({
               display: 'flex',
               flexDirection: 'column',
               minWidth: 0,
-              overflowX: 'hidden',
+              overflowX: 'clip',
             }}
           >
             {isReadOnly && (

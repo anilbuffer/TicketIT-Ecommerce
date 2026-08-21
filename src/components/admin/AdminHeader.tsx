@@ -44,7 +44,7 @@ export function AdminHeader({
         padding: '0 28px',
         position: 'sticky',
         top: 0,
-        zIndex: 30,
+        zIndex: 35,
         boxShadow: '0 2px 8px rgba(43, 37, 62, 0.03)',
       }}
     >

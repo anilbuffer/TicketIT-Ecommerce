@@ -494,7 +494,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
       </aside>
 
       {/* 2. MAIN APPLICATION CONTENT AREA */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'clip' }}>
         {/* Top SaaS Header Bar */}
         <header
           style={{
@@ -507,7 +507,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
             padding: '0 1.5rem',
             position: 'sticky',
             top: 0,
-            zIndex: 20,
+            zIndex: 35,
             boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
           }}
         >
@@ -735,7 +735,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
         </header>
 
         {/* Main Content Body */}
-        <main style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>{children}</main>
+        <main style={{ flex: 1, padding: '1.5rem' }}>{children}</main>
       </div>
     </div>
   </div>
