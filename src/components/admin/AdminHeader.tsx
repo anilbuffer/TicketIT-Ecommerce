@@ -5,18 +5,15 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Search,
   Bell,
-  Plus,
   LogOut,
   ChevronDown,
-  Sparkles,
-  ShieldCheck,
-  Package,
-  ShoppingCart,
-  ExternalLink,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useSidebar } from '@/context/SidebarContext';
 
 export function AdminHeader({
   title,
@@ -27,52 +24,118 @@ export function AdminHeader({
   subtitle?: string;
   actionButton?: React.ReactNode;
 }) {
-  const { user, logout, role } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
+  const sidebar = useSidebar();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const handleSidebarToggle = () => {
+    if (sidebar.isMobile) {
+      sidebar.toggleMobileDrawer();
+    } else {
+      sidebar.toggleMiniSidebar();
+    }
+  };
 
   return (
     <header
       style={{
-        height: '72px',
+        minHeight: '70px',
         backgroundColor: '#FFFFFF',
         borderBottom: '1px solid rgba(43, 37, 62, 0.08)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 28px',
+        padding: '0.75rem 1.25rem',
         position: 'sticky',
         top: 0,
         zIndex: 35,
         boxShadow: '0 2px 8px rgba(43, 37, 62, 0.03)',
+        gap: '12px',
+        flexWrap: 'wrap',
       }}
     >
-      {/* Title & Subtitle */}
-      <div>
-        <h1
+      {/* Left: Sidebar Toggle + Title & Subtitle */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
+        {/* Responsive Toggle Button */}
+        <button
+          type="button"
+          onClick={handleSidebarToggle}
+          aria-label="Toggle Sidebar Navigation"
+          title={
+            sidebar.isMobile
+              ? 'Open Navigation Menu'
+              : sidebar.isMiniSidebar
+              ? 'Expand Sidebar'
+              : 'Collapse to Mini Sidebar'
+          }
           style={{
-            fontSize: '1.25rem',
-            fontWeight: 800,
+            width: '38px',
+            height: '38px',
+            borderRadius: '10px',
+            backgroundColor: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             color: '#2B253E',
-            letterSpacing: '-0.02em',
-            margin: 0,
-            lineHeight: 1.2,
+            cursor: 'pointer',
+            flexShrink: 0,
+            transition: 'all 150ms ease',
           }}
         >
-          {title}
-        </h1>
-        {subtitle && (
-          <p style={{ fontSize: '0.78rem', color: '#64748B', margin: 0, marginTop: '2px' }}>
-            {subtitle}
-          </p>
-        )}
+          {sidebar.isMobile ? (
+            <Menu size={19} />
+          ) : sidebar.isMiniSidebar ? (
+            <PanelLeftOpen size={18} />
+          ) : (
+            <PanelLeftClose size={18} />
+          )}
+        </button>
+
+        <div style={{ minWidth: 0 }}>
+          <h1
+            style={{
+              fontSize: '1.15rem',
+              fontWeight: 800,
+              color: '#2B253E',
+              letterSpacing: '-0.02em',
+              margin: 0,
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {title}
+          </h1>
+          {subtitle && (
+            <p
+              style={{
+                fontSize: '0.74rem',
+                color: '#64748B',
+                margin: 0,
+                marginTop: '2px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {subtitle}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {/* Optional Action Button */}
-        {actionButton}
+        {actionButton && (
+          <div className="admin-header-action-btn" style={{ display: 'flex', alignItems: 'center' }}>
+            {actionButton}
+          </div>
+        )}
 
         {/* Notification Bell */}
         <div style={{ position: 'relative' }}>
@@ -90,6 +153,7 @@ export function AdminHeader({
               justifyContent: 'center',
               color: '#475569',
               position: 'relative',
+              cursor: 'pointer',
               transition: 'all 150ms ease',
             }}
           >
@@ -114,24 +178,24 @@ export function AdminHeader({
                 position: 'absolute',
                 top: '46px',
                 right: 0,
-                width: '300px',
+                width: '290px',
                 backgroundColor: '#FFFFFF',
                 borderRadius: '12px',
                 boxShadow: '0 10px 25px rgba(43, 37, 62, 0.15)',
                 border: '1px solid #E2E8F0',
-                padding: '16px',
+                padding: '14px',
                 zIndex: 50,
               }}
             >
               <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#2B253E', marginBottom: '8px' }}>
-                Recent Operational Alerts
+                Recent Alerts
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#64748B', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ fontSize: '0.76rem', color: '#64748B', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ padding: '8px', backgroundColor: '#FFF0F6', borderRadius: '6px', color: '#B01654' }}>
-                  <strong>New Collateral Order:</strong> ORD-2026-8819 ($630.00) from Downtown Flagship.
+                  <strong>New Collateral Order:</strong> ORD-2026-8819 ($630.00)
                 </div>
                 <div style={{ padding: '8px', backgroundColor: '#EAF8EF', borderRadius: '6px', color: '#228B53' }}>
-                  <strong>Fulfilment Dispatched:</strong> Carrier assigned & tracking updated.
+                  <strong>Fulfilment Dispatched:</strong> Carrier assigned & tracking live.
                 </div>
               </div>
             </div>
@@ -146,8 +210,8 @@ export function AdminHeader({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              padding: '6px 12px 6px 6px',
+              gap: '8px',
+              padding: '5px 10px 5px 5px',
               borderRadius: '9999px',
               backgroundColor: '#F8FAFC',
               border: '1px solid #E2E8F0',
@@ -156,8 +220,8 @@ export function AdminHeader({
           >
             <div
               style={{
-                width: '32px',
-                height: '32px',
+                width: '30px',
+                height: '30px',
                 borderRadius: '50%',
                 backgroundColor: '#2B253E',
                 color: '#FFFFFF',
@@ -165,16 +229,16 @@ export function AdminHeader({
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 700,
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
               }}
             >
               {user?.name ? user.name[0] : 'A'}
             </div>
-            <div style={{ textAlign: 'left', lineHeight: 1.1 }}>
-              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2B253E' }}>
+            <div className="admin-header-user-info" style={{ textAlign: 'left', lineHeight: 1.1 }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#2B253E' }}>
                 {user?.name || 'Administrator'}
               </div>
-              <div style={{ fontSize: '0.68rem', color: '#F73582', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.66rem', color: '#F73582', fontWeight: 600 }}>
                 Operations HQ Admin
               </div>
             </div>
@@ -200,16 +264,17 @@ export function AdminHeader({
               }}
             >
               <div style={{ padding: '8px 12px', borderBottom: '1px solid #F1F5F9' }}>
-                <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Signed in as</div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2B253E', wordBreak: 'break-all' }}>
+                <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Signed in as</div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#2B253E', wordBreak: 'break-all' }}>
                   {user?.email || 'sarah.jenkins@ticketit.com'}
                 </div>
               </div>
               <Link
                 href="/admin/settings"
+                onClick={() => setShowProfileMenu(false)}
                 style={{
                   padding: '8px 12px',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   color: '#475569',
                   borderRadius: '6px',
                   textDecoration: 'none',
@@ -228,12 +293,13 @@ export function AdminHeader({
                   alignItems: 'center',
                   gap: '8px',
                   padding: '8px 12px',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   color: '#EF4444',
                   borderRadius: '6px',
                   fontWeight: 600,
                   width: '100%',
                   textAlign: 'left',
+                  cursor: 'pointer',
                 }}
               >
                 <LogOut size={14} />
@@ -243,6 +309,14 @@ export function AdminHeader({
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .admin-header-user-info {
+            display: none;
+          }
+        }
+      `}</style>
     </header>
   );
 }

@@ -1,20 +1,17 @@
+// src/components/layout/SaaSLayout.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
-  Truck,
   LayoutDashboard,
   Package,
   Store,
   FileText,
   History,
-  Settings,
-  Bell,
-  Search,
   LogOut,
   ChevronDown,
   ChevronRight,
@@ -25,19 +22,18 @@ import {
   ShieldCheck,
   RefreshCw,
   Layers,
-  MapPin,
   ClipboardList,
   Building2,
   FileSpreadsheet,
   ShoppingCart,
   TrendingUp,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
-import { UserRole, ROLE_DETAILS, DEMO_USERS } from '../../types/auth';
+import { UserRole, ROLE_DETAILS } from '../../types/auth';
 import { TicketITLogo } from '../ui/TicketITLogo';
-
-
 
 interface NavItem {
   label: string;
@@ -53,16 +49,58 @@ interface SaaSLayoutProps {
   onSectionChange?: (section: string) => void;
 }
 
-export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLayoutProps) {
+export function SaaSLayout({ children }: SaaSLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, role, logout, switchRole } = useAuth();
 
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMiniSidebar, setIsMiniSidebar] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
+  const [windowWidth, setWindowWidth] = useState(1200);
+
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
   const currentRoleDetails = role ? ROLE_DETAILS[role] : ROLE_DETAILS.admin;
+
+  // Responsive breakpoint tracking
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setWindowWidth(width);
+      if (width < 768) {
+        // Mobile
+      } else if (width >= 768 && width < 1024) {
+        setIsMiniSidebar(true);
+        setIsMobileDrawerOpen(false);
+      } else {
+        setIsMobileDrawerOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setIsMobileDrawerOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (isMobile && isMobileDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobile, isMobileDrawerOpen]);
 
   // Role-specific navigation items
   const adminNav: NavItem[] = [
@@ -109,6 +147,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
   const handleSwitchPersona = (newRole: UserRole) => {
     switchRole(newRole);
     setIsRoleDropdownOpen(false);
+    setIsMobileDrawerOpen(false);
     router.push(ROLE_DETAILS[newRole].defaultRedirect);
   };
 
@@ -116,138 +155,209 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
     pathname?.includes('/templates/') &&
     (pathname?.includes('/edit') || pathname?.includes('/builder') || pathname?.includes('/customize'));
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
+  const isMini = isMiniSidebar || isStudioRoute;
 
-      <div style={{ display: 'flex', flex: 1 }}>
-        {/* 1. LEFT SIDEBAR (DESKTOP) */}
-        <aside
+  const handleToggleSidebar = () => {
+    if (isMobile) {
+      setIsMobileDrawerOpen((prev) => !prev);
+    } else {
+      setIsMiniSidebar((prev) => !prev);
+    }
+  };
+
+  // Reusable Sidebar Content for both Desktop aside and Mobile Drawer
+  const renderSidebarContent = (isDrawer = false) => {
+    const isCollapsed = !isDrawer && isMini;
+
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          width: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Brand Header */}
+        <div
           style={{
-            width: isSidebarCollapsed || isStudioRoute ? '72px' : '260px',
-            background: '#1e1b38',
-            color: '#ffffff',
+            padding: isCollapsed ? '1.25rem 0.5rem' : '1.25rem 1.25rem',
             display: 'flex',
-            flexDirection: 'column',
-            transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-            borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-            zIndex: 30,
-            position: 'sticky',
-            top: 0,
-            height: '100vh',
+            alignItems: 'center',
+            justifyContent: isCollapsed ? 'center' : 'space-between',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            minHeight: '70px',
             flexShrink: 0,
+            gap: '8px',
           }}
         >
-          {/* Brand Header */}
-          <div
+          <Link
+            href="/login"
+            onClick={() => isDrawer && setIsMobileDrawerOpen(false)}
             style={{
-              padding: isSidebarCollapsed || isStudioRoute ? '1.25rem 0.5rem' : '1.25rem 1.25rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: isSidebarCollapsed || isStudioRoute ? 'center' : 'space-between',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              textDecoration: 'none',
+              minWidth: 0,
             }}
           >
-            <Link
-              href="/login"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                textDecoration: 'none',
-              }}
-            >
-              {isSidebarCollapsed || isStudioRoute ? (
-                <div
-                  style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
-                    background: '#f73582',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 900,
-                    fontSize: '1.2rem',
-                    color: '#ffffff',
-                    boxShadow: '0 4px 10px rgba(247, 53, 130, 0.35)',
-                  }}
-                >
-                  IT
-                </div>
-              ) : (
-                <TicketITLogo size="sm" showTagline={true} theme="dark" />
-              )}
-            </Link>
-          </div>
-
-          {/* Current Active Role Badge */}
-          {!(isSidebarCollapsed || isStudioRoute) && (
-            <div
-              style={{
-                margin: '1rem 1rem 0.5rem 1rem',
-                padding: '0.75rem 0.85rem',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <div
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    background: currentRoleDetails.themeColor,
-                    boxShadow: `0 0 10px ${currentRoleDetails.themeColor}`,
-                  }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f8fafc' }}>
-                    {currentRoleDetails.title}
-                  </div>
-                  <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
-                    {currentRoleDetails.subtitle}
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                title="Switch role"
+            {isCollapsed ? (
+              <div
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: 'none',
-                  color: '#cbd5e1',
-                  padding: '4px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  background: '#f73582',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: '1.15rem',
+                  color: '#ffffff',
+                  boxShadow: '0 4px 10px rgba(247, 53, 130, 0.35)',
                 }}
               >
-                <RefreshCw size={13} />
-              </button>
-            </div>
-          )}
+                IT
+              </div>
+            ) : (
+              <TicketITLogo size="sm" showTagline={true} theme="dark" />
+            )}
+          </Link>
 
-          {/* Navigation List */}
-          <nav style={{ flex: 1, padding: '0.75rem 0.6rem', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              {activeNavList.map((item) => {
-                const isItemCollapsed = isSidebarCollapsed || isStudioRoute;
-                const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href) && item.href !== '/site-user' && item.href !== '/head-office');
-                return (
+          {isDrawer ? (
+            <button
+              type="button"
+              onClick={() => setIsMobileDrawerOpen(false)}
+              aria-label="Close drawer"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                color: '#CBD5E1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                border: 'none',
+              }}
+            >
+              <X size={18} />
+            </button>
+          ) : (
+            !isCollapsed && (
+              <button
+                type="button"
+                onClick={() => setIsMiniSidebar(true)}
+                title="Collapse to Mini Sidebar"
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#94A3B8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <PanelLeftClose size={15} />
+              </button>
+            )
+          )}
+        </div>
+
+        {/* Current Active Role Badge */}
+        {!isCollapsed && (
+          <div
+            style={{
+              margin: '0.85rem 0.85rem 0.35rem 0.85rem',
+              padding: '0.7rem 0.85rem',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  background: currentRoleDetails.themeColor,
+                  boxShadow: `0 0 10px ${currentRoleDetails.themeColor}`,
+                }}
+              />
+              <div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f8fafc' }}>
+                  {currentRoleDetails.title}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                  {currentRoleDetails.subtitle}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+              title="Switch role"
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                color: '#cbd5e1',
+                padding: '4px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <RefreshCw size={13} />
+            </button>
+          </div>
+        )}
+
+        {/* Navigation List */}
+        <nav
+          style={{
+            flex: 1,
+            padding: isCollapsed ? '0.75rem 0.45rem' : '0.75rem 0.6rem',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            {activeNavList.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== '/admin' &&
+                  pathname.startsWith(item.href) &&
+                  item.href !== '/site-user' &&
+                  item.href !== '/head-office');
+
+              return (
+                <div
+                  key={item.label}
+                  style={{ position: 'relative' }}
+                  onMouseEnter={() => setHoveredNav(item.label)}
+                  onMouseLeave={() => setHoveredNav(null)}
+                >
                   <Link
-                    key={item.label}
                     href={item.href}
+                    onClick={() => isDrawer && setIsMobileDrawerOpen(false)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: isItemCollapsed ? 'center' : 'space-between',
+                      justifyContent: isCollapsed ? 'center' : 'space-between',
                       gap: '0.75rem',
-                      padding: isItemCollapsed ? '0.7rem' : '0.65rem 0.85rem',
+                      padding: isCollapsed ? '0.75rem 0' : '0.65rem 0.85rem',
                       borderRadius: '10px',
                       color: isActive ? '#ffffff' : '#94a3b8',
                       background: isActive ? 'rgba(247, 53, 130, 0.2)' : 'transparent',
@@ -257,21 +367,34 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                       fontSize: '0.82rem',
                       transition: 'all 0.15s ease',
                     }}
-                    title={isItemCollapsed ? item.label : undefined}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <span style={{ color: isActive ? '#f73582' : '#94a3b8' }}>{item.icon}</span>
-                      {!isItemCollapsed && <span>{item.label}</span>}
+                      <span style={{ color: isActive ? '#f73582' : '#94a3b8', flexShrink: 0 }}>
+                        {item.icon}
+                      </span>
+                      {!isCollapsed && (
+                        <span
+                          style={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {item.label}
+                        </span>
+                      )}
                     </div>
 
-                    {!isItemCollapsed && item.badge && (
+                    {!isCollapsed && item.badge && (
                       <span
                         style={{
                           fontSize: '0.65rem',
                           padding: '0.15rem 0.45rem',
                           borderRadius: '6px',
-                          background: 'rgba(247, 53, 130, 0.2)',
-                          color: '#f73582',
+                          background: item.badgeColor
+                            ? `${item.badgeColor}33`
+                            : 'rgba(247, 53, 130, 0.2)',
+                          color: item.badgeColor || '#f73582',
                           fontWeight: 700,
                         }}
                       >
@@ -279,115 +402,88 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                       </span>
                     )}
                   </Link>
-                );
-              })}
-            </div>
-          </nav>
 
-          {/* Role switcher inside sidebar if opened */}
-          <div style={{ padding: '0 0.75rem 0.5rem 0.75rem' }}>
-            {isRoleDropdownOpen && (
-              <div
+                  {/* Floating Mini Tooltip */}
+                  {isCollapsed && hoveredNav === item.label && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '100%',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        marginLeft: '12px',
+                        backgroundColor: '#1E1B38',
+                        color: '#FFFFFF',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        zIndex: 100,
+                        pointerEvents: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <span>{item.label}</span>
+                      {item.badge && (
+                        <span
+                          style={{
+                            fontSize: '0.62rem',
+                            padding: '1px 5px',
+                            borderRadius: '9999px',
+                            backgroundColor: item.badgeColor || '#F73582',
+                            color: '#FFFFFF',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Sidebar Footer: System Status & User Profile */}
+        <div
+          style={{
+            padding: isCollapsed ? '0.75rem 0.4rem' : '0.85rem 1rem',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'rgba(0, 0, 0, 0.2)',
+            flexShrink: 0,
+          }}
+        >
+          {isCollapsed ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setIsMiniSidebar(false)}
+                title="Expand Sidebar"
                 style={{
-                  background: 'rgba(0, 0, 0, 0.35)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '12px',
-                  padding: '0.5rem',
-                  marginBottom: '0.5rem',
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#CBD5E1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
                 }}
               >
-                <div
-                  style={{
-                    fontSize: '0.68rem',
-                    fontWeight: 800,
-                    color: '#94a3b8',
-                    padding: '0.2rem 0.5rem 0.4rem 0.5rem',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Switch Role Persona
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                  <button
-                    onClick={() => handleSwitchPersona('admin')}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.6rem',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '8px',
-                      background: role === 'admin' ? 'rgba(5, 150, 105, 0.2)' : 'transparent',
-                      border: role === 'admin' ? '1px solid rgba(5, 150, 105, 0.4)' : 'none',
-                      color: role === 'admin' ? '#34d399' : '#94a3b8',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      width: '100%',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <Shield size={16} color="#059669" />
-                    <span>Admin HQ</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleSwitchPersona('head_office')}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.6rem',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '8px',
-                      background: role === 'head_office' ? 'rgba(37, 99, 235, 0.2)' : 'transparent',
-                      border: role === 'head_office' ? '1px solid rgba(37, 99, 235, 0.4)' : 'none',
-                      color: role === 'head_office' ? '#60a5fa' : '#94a3b8',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      width: '100%',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <Building2 size={16} color="#2563eb" />
-                    <span>Head Office</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleSwitchPersona('site_user')}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.6rem',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '8px',
-                      background: role === 'site_user' ? 'rgba(247, 53, 130, 0.2)' : 'transparent',
-                      border: role === 'site_user' ? '1px solid rgba(247, 53, 130, 0.4)' : 'none',
-                      color: role === 'site_user' ? '#f472b6' : '#94a3b8',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      width: '100%',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <Store size={16} color="#f73582" />
-                    <span>Site User (Branch)</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar Footer: System Status & User Profile */}
-          <div
-            style={{
-              padding: isSidebarCollapsed || isStudioRoute ? '0.75rem 0.5rem' : '0.85rem 1rem',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-              background: 'rgba(0, 0, 0, 0.2)',
-            }}
-          >
-            {!(isSidebarCollapsed || isStudioRoute) && (
+                <PanelLeftOpen size={16} />
+              </button>
+            </div>
+          ) : (
+            <>
               <div
                 style={{
                   display: 'flex',
@@ -405,16 +501,14 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                 <ShieldCheck size={14} />
                 <span>SOC 2 Type II Certified</span>
               </div>
-            )}
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: isSidebarCollapsed || isStudioRoute ? 'center' : 'space-between',
-              }}
-            >
-              {!(isSidebarCollapsed || isStudioRoute) ? (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 0 }}>
                   <div
                     style={{
@@ -459,69 +553,133 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div
+
+                <button
+                  onClick={handleLogout}
+                  title="Logout"
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    background: currentRoleDetails.themeColor,
-                    color: '#ffffff',
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    padding: '6px',
+                    borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
                   }}
-                  title={user?.name || 'User'}
                 >
-                  {user?.name ? user.name.charAt(0) : 'U'}
-                </div>
-              )}
+                  <LogOut size={16} />
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
 
-              <button
-                onClick={handleLogout}
-                title="Logout"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  padding: '6px',
-                  borderRadius: '6px',
-                  display: isSidebarCollapsed || isStudioRoute ? 'none' : 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
-          </div>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
+      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
+        {/* 1. DESKTOP/TABLET SIDEBAR (VISIBLE ON SCREENS >= 768px) */}
+        <aside
+          className="saas-desktop-sidebar"
+          style={{
+            width: isMini ? '72px' : '260px',
+            background: '#1e1b38',
+            color: '#ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            transition: 'width 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+            borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+            zIndex: 30,
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            flexShrink: 0,
+            userSelect: 'none',
+          }}
+        >
+          {renderSidebarContent(false)}
         </aside>
 
-        {/* 2. MAIN APPLICATION CONTENT AREA */}
+        {/* 2. MOBILE SLIDE-OVER DRAWER (VISIBLE ON SCREENS < 768px) */}
+        <AnimatePresence>
+          {isMobileDrawerOpen && (
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 1200,
+                display: 'flex',
+              }}
+            >
+              {/* Frosted Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setIsMobileDrawerOpen(false)}
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  backgroundColor: 'rgba(15, 23, 42, 0.65)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                }}
+              />
+
+              {/* Drawer Content */}
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+                style={{
+                  position: 'relative',
+                  width: '85vw',
+                  maxWidth: '300px',
+                  height: '100%',
+                  backgroundColor: '#1e1b38',
+                  color: '#ffffff',
+                  boxShadow: '10px 0 35px rgba(0, 0, 0, 0.4)',
+                  zIndex: 1201,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {renderSidebarContent(true)}
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* 3. MAIN APPLICATION CONTENT AREA */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'clip' }}>
           {/* Top SaaS Header Bar */}
           <header
             style={{
-              height: '56px',
+              minHeight: '56px',
               background: '#ffffff',
               borderBottom: '1px solid #e2e8f0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '0 1.25rem',
+              padding: '0.5rem 1.25rem',
               position: 'sticky',
               top: 0,
               zIndex: 35,
               boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+              gap: '10px',
+              flexWrap: 'wrap',
             }}
           >
             {/* Left: Breadcrumbs / Title */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, flex: 1 }}>
               <button
-                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                title="Toggle Sidebar"
+                onClick={handleToggleSidebar}
+                title={isMobile ? 'Open Menu' : isMini ? 'Expand Sidebar' : 'Collapse to Mini'}
                 style={{
                   background: '#f1f5f9',
                   border: '1px solid #e2e8f0',
@@ -531,12 +689,29 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                   color: '#475569',
                   display: 'flex',
                   alignItems: 'center',
+                  flexShrink: 0,
                 }}
               >
-                <Menu size={18} />
+                {isMobile ? (
+                  <Menu size={18} />
+                ) : isMini ? (
+                  <PanelLeftOpen size={18} />
+                ) : (
+                  <PanelLeftClose size={18} />
+                )}
               </button>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontSize: '0.85rem',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 <span style={{ color: '#64748b', fontWeight: 600 }}>TicketIT</span>
                 <ChevronRight size={14} color="#94a3b8" />
                 <span
@@ -554,9 +729,10 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
             </div>
 
             {/* Right: Quick Search + Persona Switcher + Status */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              {/* Delivery Network Status Pill */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
+              {/* Delivery Network Status Pill (Hidden on very small screens) */}
               <div
+                className="saas-header-status-pill"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -578,7 +754,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                     background: '#10b981',
                   }}
                 />
-                <span>Asset Delivery Active</span>
+                <span>Active</span>
               </div>
 
               {/* Persona Switcher Quick Dropdown */}
@@ -600,7 +776,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                   }}
                 >
                   <RefreshCw size={13} color="#64748b" />
-                  <span>Switch Role</span>
+                  <span className="saas-role-btn-text">Role</span>
                   <ChevronDown size={14} color="#94a3b8" />
                 </button>
 
@@ -742,7 +918,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                 }}
               >
                 <LogOut size={14} />
-                <span>Exit</span>
+                <span className="saas-exit-btn-text">Exit</span>
               </button>
             </div>
           </header>
@@ -751,7 +927,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           <main
             style={{
               flex: 1,
-              padding: isStudioRoute ? 0 : '28px',
+              padding: isStudioRoute ? 0 : '24px',
               display: 'flex',
               flexDirection: 'column',
               minHeight: 0,
@@ -763,6 +939,21 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           </main>
         </div>
       </div>
+
+      <style jsx global>{`
+        @media (max-width: 767px) {
+          .saas-desktop-sidebar {
+            display: none !important;
+          }
+          .saas-header-status-pill {
+            display: none !important;
+          }
+          .saas-role-btn-text,
+          .saas-exit-btn-text {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
