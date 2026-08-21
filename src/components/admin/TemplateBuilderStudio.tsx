@@ -1,7 +1,7 @@
 // src/components/admin/TemplateBuilderStudio.tsx
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -32,6 +32,23 @@ import {
   Maximize2,
   FileCheck,
   Settings2,
+  ExternalLink,
+  Move,
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  EyeOff,
+  Palette,
+  Grid,
+  Scissors,
+  CheckCircle2,
+  Download,
+  X,
+  Plus,
+  Minus,
+  Pencil,
+  Sparkle,
+  ShieldCheck,
 } from 'lucide-react';
 import type {
   PrintTemplate,
@@ -55,10 +72,38 @@ const FIELD_KEY_OPTIONS: { key: TemplateFieldKey; label: string; defaultPlacehol
 ];
 
 const PRESET_PRODUCTS = [
+  { id: 'prod-011', name: 'Full-Colour Printed Product Catalogue (A4, Saddle-Stitched)', category: 'Catalogue', width: 8.27, height: 11.69, unit: 'in' as const, ratio: '3:4', orient: 'portrait' as const },
   { id: 'prod-001', name: 'Corrugated Yard & Lawn Signs (18" x 24")', category: 'Signs', width: 24, height: 18, unit: 'in' as const, ratio: '4:3', orient: 'landscape' as const },
   { id: 'prod-002', name: 'Retractable Pull-Up Banner Stand (33" x 80")', category: 'Banners', width: 33, height: 80, unit: 'in' as const, ratio: '1:2', orient: 'portrait' as const },
   { id: 'prod-009', name: 'Gloss Tri-Fold Patient Care Brochure & Flyer', category: 'Flyers', width: 11, height: 8.5, unit: 'in' as const, ratio: '16:9', orient: 'landscape' as const },
   { id: 'prod-008', name: 'Executive Soft-Touch Business Cards (Pack of 500)', category: 'Business Cards', width: 3.5, height: 2.0, unit: 'in' as const, ratio: '16:9', orient: 'landscape' as const },
+];
+
+const FONT_OPTIONS = [
+  'Inter',
+  'Plus Jakarta Sans',
+  'Outfit',
+  'Montserrat',
+  'Playfair Display',
+  'Roboto Mono',
+  'Bebas Neue',
+];
+
+const COLOR_SWATCHES = [
+  '#ffffff', '#f8fafc', '#94a3b8', '#334155', '#0f172a', '#000000',
+  '#f73582', '#ec4899', '#f43f5e', '#e11d48',
+  '#3b82f6', '#0284c7', '#06b6d4', '#0d9488',
+  '#10b981', '#059669', '#84cc16', '#eab308',
+  '#f59e0b', '#f97316', '#8b5cf6', '#7c3aed',
+];
+
+const GRADIENT_PRESETS = [
+  { label: 'Deep Slate', value: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0284c7 100%)' },
+  { label: 'Royal Blue', value: 'linear-gradient(160deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%)' },
+  { label: 'Clean Light', value: 'linear-gradient(160deg, #f8fafc 0%, #ffffff 100%)' },
+  { label: 'Electric Sunset', value: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #f73582 100%)' },
+  { label: 'Dark Emerald', value: 'linear-gradient(135deg, #064e3b 0%, #047857 60%, #10b981 100%)' },
+  { label: 'Pure Obsidian', value: 'linear-gradient(180deg, #18181b 0%, #09090b 100%)' },
 ];
 
 interface TemplateBuilderStudioProps {
@@ -78,113 +123,91 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       category: PRESET_PRODUCTS[0].category,
       name: 'New Custom Master Template',
       description: 'Master template configured with locked brand guidelines and customizable location fields.',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=600&auto=format&fit=crop&q=80',
-      orientation: 'landscape',
-      aspectRatio: '4:3',
-      dimensions: { width: 24, height: 18, unit: 'in' },
+      thumbnailUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80',
+      orientation: 'portrait',
+      aspectRatio: '3:4',
+      dimensions: { width: 8.27, height: 11.69, unit: 'in' },
       bleedMargin: 0.125,
-      safeMargin: 0.25,
+      safeMargin: 0.375,
       status: 'DRAFT',
-      theme: 'healthcare',
+      theme: 'retail',
       canvasConfig: {
-        backgroundColor: '#0f172a',
-        bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0284c7 100%)',
+        backgroundColor: '#ffffff',
+        bgGradient: 'linear-gradient(160deg, #f8fafc 0%, #ffffff 100%)',
       },
       layers: [
         {
-          id: 'layer-title-1',
-          type: 'text',
-          name: 'Main Business Title',
-          isEditableBySiteUser: true,
-          fieldKey: 'businessName',
-          label: 'Business / Branch Name',
-          x: 8,
-          y: 18,
-          width: 80,
-          height: 18,
-          content: 'Apex Midtown Health & Wellness',
-          style: {
-            fontSize: 24,
-            fontWeight: 800,
-            color: '#ffffff',
-            textAlign: 'left',
-          },
-          zIndex: 2,
-          isRequired: true,
-        },
-        {
-          id: 'layer-tagline-1',
-          type: 'text',
-          name: 'Subhead Tagline',
-          isEditableBySiteUser: true,
-          fieldKey: 'tagline',
-          label: 'Promotional Tagline',
-          x: 8,
-          y: 38,
-          width: 75,
-          height: 12,
-          content: 'Walk-Ins Welcome • Full Prescription Services',
-          style: {
-            fontSize: 14,
-            fontWeight: 600,
-            color: '#38bdf8',
-          },
-          zIndex: 2,
-        },
-        {
-          id: 'layer-footer-ribbon',
+          id: 'cat001-cover-bg',
           type: 'shape',
-          name: 'Brand Security Base (Locked)',
+          name: 'Cover Background',
           isEditableBySiteUser: false,
-          label: 'Brand Footer Ribbon',
+          label: 'Cover Colour Band',
           x: 0,
-          y: 75,
+          y: 0,
           width: 100,
-          height: 25,
+          height: 50,
           content: '',
-          style: {
-            backgroundColor: 'rgba(255, 255, 255, 0.07)',
-            borderColor: 'rgba(255, 255, 255, 0.12)',
-            borderWidth: 1,
-          },
+          style: { backgroundColor: '#1e40af' },
           zIndex: 1,
         },
         {
-          id: 'layer-phone-1',
+          id: 'cat001-brand',
           type: 'text',
-          name: 'Direct Phone',
+          name: 'Brand Name',
           isEditableBySiteUser: true,
-          fieldKey: 'phone',
-          label: 'Phone Contact',
+          fieldKey: 'businessName',
+          label: 'Company / Brand Name',
           x: 8,
-          y: 82,
-          width: 45,
-          height: 10,
-          content: '📞 +1 (212) 555-0199',
-          style: {
-            fontSize: 14,
-            fontWeight: 700,
-            color: '#ffffff',
-          },
+          y: 12,
+          width: 62,
+          height: 14,
+          content: 'APEX RETAIL COLLECTIONS',
+          style: { fontSize: 24, fontWeight: 900, color: '#ffffff' },
           zIndex: 3,
+          isRequired: true,
         },
         {
-          id: 'layer-qr-1',
-          type: 'qrcode',
-          name: 'Website QR Code',
+          id: 'cat001-season',
+          type: 'badge',
+          name: 'Season Tag',
+          isEditableBySiteUser: false,
+          label: 'Season / Edition Badge',
+          x: 8,
+          y: 28,
+          width: 40,
+          height: 7,
+          content: 'SPRING / SUMMER 2026',
+          style: { fontSize: 11, fontWeight: 700, color: '#bfdbfe', letterSpacing: 2 },
+          zIndex: 2,
+        },
+        {
+          id: 'cat001-logo',
+          type: 'logo',
+          name: 'Brand Logo',
+          isEditableBySiteUser: false,
+          fieldKey: 'logo',
+          label: 'Corporate Logo',
+          x: 74,
+          y: 10,
+          width: 18,
+          height: 18,
+          content: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=200&auto=format&fit=crop&q=80',
+          style: { borderRadius: 8 },
+          zIndex: 4,
+        },
+        {
+          id: 'cat001-contact',
+          type: 'text',
+          name: 'Contact Info',
           isEditableBySiteUser: true,
-          fieldKey: 'website',
-          label: 'Website QR Code',
-          x: 78,
-          y: 77,
-          width: 14,
-          height: 20,
-          content: 'https://apexhealth.org',
-          style: {
-            backgroundColor: '#ffffff',
-            borderRadius: 6,
-            padding: 3,
-          },
+          fieldKey: 'phone',
+          label: 'Branch Phone & Website',
+          x: 8,
+          y: 90,
+          width: 84,
+          height: 8,
+          content: '📞 +1 (212) 555-0199  |  www.apexretail.com',
+          style: { fontSize: 10, fontWeight: 500, color: '#64748b', textAlign: 'center' },
           zIndex: 3,
         },
       ],
@@ -194,13 +217,22 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
     }
   );
 
-  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(template.layers[0]?.id || null);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(template.layers[1]?.id || template.layers[0]?.id || null);
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [showBleedGuides, setShowBleedGuides] = useState<boolean>(true);
   const [showSafeGuides, setShowSafeGuides] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'layers' | 'add' | 'canvas' | 'rules'>('layers');
+  const [showGrid, setShowGrid] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'layers' | 'add' | 'setup' | 'governance'>('layers');
+  const [layerFilter, setLayerFilter] = useState<'all' | 'editable' | 'locked'>('all');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
+  const [hiddenLayers, setHiddenLayers] = useState<Record<string, boolean>>({});
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+
+  // Dragging state
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+  const [isDraggingLayer, setIsDraggingLayer] = useState(false);
+  const dragStartRef = useRef<{ startX: number; startY: number; initialLayerX: number; initialLayerY: number } | null>(null);
 
   const selectedLayer = template.layers.find((l) => l.id === selectedLayerId) || null;
 
@@ -226,28 +258,32 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
     let newLayer: TemplateLayer = {
       id: newId,
       type,
-      name: `${type.toUpperCase()} Element`,
+      name: `New ${type.charAt(0).toUpperCase() + type.slice(1)} Element`,
       isEditableBySiteUser: type === 'text' || type === 'logo' || type === 'qrcode',
       fieldKey: type === 'text' ? 'tagline' : type === 'logo' ? 'logo' : type === 'qrcode' ? 'website' : undefined,
-      label: `New ${type.toUpperCase()}`,
-      x: 20,
+      label: `Custom ${type.toUpperCase()}`,
+      x: 15,
       y: 25,
-      width: type === 'qrcode' ? 16 : type === 'logo' ? 20 : 60,
-      height: type === 'qrcode' ? 20 : type === 'logo' ? 20 : 12,
+      width: type === 'qrcode' ? 18 : type === 'logo' ? 20 : type === 'shape' ? 70 : 65,
+      height: type === 'qrcode' ? 18 : type === 'logo' ? 20 : type === 'shape' ? 20 : 10,
       content:
         type === 'text'
-          ? 'Enter your custom text here'
+          ? 'Enter your customizable message here'
           : type === 'logo'
           ? 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=200&auto=format&fit=crop&q=80'
           : type === 'qrcode'
-          ? 'https://apexhealth.org'
+          ? 'https://apexretail.com'
+          : type === 'badge'
+          ? 'LIMITED EDITION'
           : '',
       style: {
-        fontSize: 16,
-        fontWeight: 600,
+        fontSize: type === 'text' ? 16 : type === 'badge' ? 11 : 14,
+        fontWeight: type === 'badge' ? 800 : 600,
         color: '#ffffff',
-        backgroundColor: type === 'shape' ? '#0284c7' : type === 'qrcode' ? '#ffffff' : undefined,
-        borderRadius: type === 'shape' || type === 'qrcode' ? 8 : 0,
+        backgroundColor: type === 'shape' ? '#0284c7' : type === 'badge' ? '#f73582' : type === 'qrcode' ? '#ffffff' : undefined,
+        borderRadius: type === 'shape' || type === 'qrcode' ? 8 : type === 'badge' ? 20 : 0,
+        letterSpacing: type === 'badge' ? 1.5 : 0,
+        textAlign: 'left',
       },
       zIndex: template.layers.length + 1,
     };
@@ -257,6 +293,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       layers: [...prev.layers, newLayer],
     }));
     setSelectedLayerId(newId);
+    setActiveTab('layers');
   };
 
   const handleDeleteLayer = (id: string) => {
@@ -279,6 +316,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       name: `${orig.name} (Copy)`,
       x: Math.min(orig.x + 4, 80),
       y: Math.min(orig.y + 4, 80),
+      zIndex: template.layers.length + 1,
     };
     setTemplate((prev) => ({
       ...prev,
@@ -286,6 +324,72 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
     }));
     setSelectedLayerId(newId);
   };
+
+  const handleMoveLayerZ = (id: string, direction: 'up' | 'down') => {
+    setTemplate((prev) => {
+      const idx = prev.layers.findIndex((l) => l.id === id);
+      if (idx < 0) return prev;
+      const targetIdx = direction === 'up' ? idx + 1 : idx - 1;
+      if (targetIdx < 0 || targetIdx >= prev.layers.length) return prev;
+
+      const newLayers = [...prev.layers];
+      const temp = newLayers[idx];
+      newLayers[idx] = newLayers[targetIdx];
+      newLayers[targetIdx] = temp;
+
+      return {
+        ...prev,
+        layers: newLayers.map((l, i) => ({ ...l, zIndex: i + 1 })),
+      };
+    });
+  };
+
+  const toggleLayerVisibility = (id: string) => {
+    setHiddenLayers((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Drag on Canvas Handling
+  const handleMouseDownLayer = (e: React.MouseEvent, layer: TemplateLayer) => {
+    e.stopPropagation();
+    setSelectedLayerId(layer.id);
+    setIsDraggingLayer(true);
+    dragStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initialLayerX: layer.x,
+      initialLayerY: layer.y,
+    };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingLayer || !dragStartRef.current || !selectedLayerId || !canvasRef.current) return;
+      const rect = canvasRef.current.getBoundingClientRect();
+      const deltaX = ((e.clientX - dragStartRef.current.startX) / rect.width) * 100 * (100 / zoomLevel);
+      const deltaY = ((e.clientY - dragStartRef.current.startY) / rect.height) * 100 * (100 / zoomLevel);
+
+      const newX = Math.max(0, Math.min(100 - (selectedLayer?.width || 10), Math.round(dragStartRef.current.initialLayerX + deltaX)));
+      const newY = Math.max(0, Math.min(100 - (selectedLayer?.height || 10), Math.round(dragStartRef.current.initialLayerY + deltaY)));
+
+      handleUpdateLayer(selectedLayerId, { x: newX, y: newY });
+    };
+
+    const handleMouseUp = () => {
+      if (isDraggingLayer) {
+        setIsDraggingLayer(false);
+        dragStartRef.current = null;
+      }
+    };
+
+    if (isDraggingLayer) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDraggingLayer, selectedLayerId, zoomLevel, selectedLayer]);
 
   const handleSave = async (publish: boolean = false) => {
     const status = publish ? 'PUBLISHED' : template.status;
@@ -303,7 +407,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       }, 1200);
     } else {
       await updateTemplate(template.id, payload);
-      setSaveSuccess(`Template "${template.name}" updated successfully!`);
+      setSaveSuccess(publish ? `Template published to Storefront!` : `Template "${template.name}" draft saved!`);
       setTimeout(() => setSaveSuccess(null), 3000);
     }
   };
@@ -323,123 +427,198 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
     }
   };
 
+  const filteredLayers = template.layers.filter((l) => {
+    if (layerFilter === 'editable') return l.isEditableBySiteUser;
+    if (layerFilter === 'locked') return !l.isEditableBySiteUser;
+    return true;
+  });
+
   const editableLayersCount = template.layers.filter((l) => l.isEditableBySiteUser).length;
   const lockedLayersCount = template.layers.length - editableLayersCount;
 
+  // Calculate canvas dimensions
+  const baseWidth = template.orientation === 'portrait' ? 380 : template.orientation === 'square' ? 440 : 540;
+  const [aw, ah] = template.aspectRatio.split(':').map(Number);
+  const baseHeight = Math.round((baseWidth * (ah || 1)) / (aw || 1));
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 100px)', backgroundColor: '#0f172a', color: '#ffffff' }}>
-      {/* 1. Studio Top Header */}
-      <div
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', backgroundColor: '#090d16', color: '#f8fafc', overflow: 'hidden', fontFamily: "'Inter', sans-serif" }}>
+      
+      {/* 1. TOP STUDIO HEADER BAR */}
+      <header
         style={{
+          height: '56px',
+          backgroundColor: '#111827',
+          borderBottom: '1px solid #1f2937',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '12px 24px',
-          backgroundColor: '#1e293b',
-          borderBottom: '1px solid #334155',
-          gap: '16px',
-          flexWrap: 'wrap',
-          zIndex: 20,
+          padding: '0 16px',
+          flexShrink: 0,
+          zIndex: 30,
+          gap: '12px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Left: Back & Template Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
           <Link
             href="/admin/templates"
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              color: '#cbd5e1',
+              width: '34px',
+              height: '34px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              color: '#94a3b8',
               textDecoration: 'none',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              transition: 'all 0.15s ease',
             }}
+            title="Back to Templates"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} />
           </Link>
 
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input
-                type="text"
-                value={template.name}
-                onChange={(e) => setTemplate({ ...template, name: e.target.value })}
-                style={{
-                  fontSize: '16px',
-                  fontWeight: 800,
-                  color: '#ffffff',
-                  backgroundColor: 'transparent',
-                  border: '1px solid transparent',
-                  borderRadius: '6px',
-                  padding: '2px 6px',
-                  outline: 'none',
-                  transition: 'border 0.2s',
-                }}
-                onFocus={(e) => (e.target.style.borderColor = '#0284c7')}
-                onBlur={(e) => (e.target.style.borderColor = 'transparent')}
-              />
-              <span
+              {isEditingTitle ? (
+                <input
+                  type="text"
+                  autoFocus
+                  value={template.name}
+                  onChange={(e) => setTemplate({ ...template, name: e.target.value })}
+                  onBlur={() => setIsEditingTitle(false)}
+                  onKeyDown={(e) => e.key === 'Enter' && setIsEditingTitle(false)}
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    backgroundColor: '#1e293b',
+                    border: '1px solid #38bdf8',
+                    borderRadius: '6px',
+                    padding: '2px 8px',
+                    outline: 'none',
+                  }}
+                />
+              ) : (
+                <div
+                  onClick={() => setIsEditingTitle(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                    padding: '2px 6px',
+                    borderRadius: '6px',
+                    transition: 'background 0.15s',
+                  }}
+                  title="Click to rename template"
+                >
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#f8fafc', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '280px' }}>
+                    {template.name}
+                  </span>
+                  <Pencil size={12} color="#64748b" />
+                </div>
+              )}
+
+              {/* Status Pill Dropdown */}
+              <select
+                value={template.status}
+                onChange={(e) => setTemplate({ ...template, status: e.target.value as any })}
                 style={{
                   padding: '2px 8px',
-                  borderRadius: '9999px',
+                  borderRadius: '12px',
                   fontSize: '10px',
-                  fontWeight: 700,
-                  backgroundColor: template.status === 'PUBLISHED' ? '#059669' : '#d97706',
-                  color: '#ffffff',
-                  textTransform: 'uppercase',
+                  fontWeight: 800,
+                  backgroundColor: template.status === 'PUBLISHED' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                  color: template.status === 'PUBLISHED' ? '#34d399' : '#fbbf24',
+                  border: template.status === 'PUBLISHED' ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
+                  cursor: 'pointer',
+                  outline: 'none',
                 }}
               >
-                {template.status}
-              </span>
+                <option value="DRAFT">DRAFT</option>
+                <option value="PUBLISHED">PUBLISHED</option>
+                <option value="ARCHIVED">ARCHIVED</option>
+              </select>
             </div>
-            <p style={{ fontSize: '11px', color: '#94a3b8', margin: '2px 0 0 6px' }}>
-              Product: <strong>{template.productName}</strong> ({template.dimensions.width}&quot; × {template.dimensions.height}&quot; {template.dimensions.unit})
-            </p>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#94a3b8', margin: '2px 0 0 6px' }}>
+              <span>{template.productName}</span>
+              <span>•</span>
+              <span style={{ color: '#38bdf8' }}>{template.dimensions.width}&quot; × {template.dimensions.height}&quot; {template.dimensions.unit}</span>
+              <span>•</span>
+              <span style={{ color: '#64748b' }}>300 DPI CMYK</span>
+            </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Center: Live Action Feedback */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {saveSuccess && (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
                 color: '#34d399',
-                fontSize: '12px',
-                fontWeight: 600,
-                border: '1px solid rgba(16, 185, 129, 0.4)',
+                fontSize: '11px',
+                fontWeight: 700,
+                border: '1px solid rgba(16, 185, 129, 0.3)',
               }}
             >
-              <Check size={14} />
+              <Check size={13} />
               {saveSuccess}
             </div>
           )}
+        </div>
+
+        {/* Right: Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <Link
+            href={`/shop/templates/customize/${template.id}`}
+            target="_blank"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              color: '#cbd5e1',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              fontSize: '12px',
+              fontWeight: 600,
+              textDecoration: 'none',
+            }}
+            title="Test how branch site-users experience this customizable template"
+          >
+            <ExternalLink size={13} />
+            Test Customizer
+          </Link>
 
           <button
             onClick={() => setIsPreviewModalOpen(true)}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '8px 14px',
-              borderRadius: '10px',
+              gap: '5px',
+              padding: '6px 12px',
+              borderRadius: '8px',
               backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              color: '#e2e8f0',
+              color: '#f1f5f9',
               border: '1px solid rgba(255, 255, 255, 0.15)',
-              fontSize: '13px',
+              fontSize: '12px',
               fontWeight: 600,
               cursor: 'pointer',
             }}
           >
-            <Eye size={15} />
+            <Eye size={13} />
             Proof Preview
           </button>
 
@@ -449,18 +628,18 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '8px 14px',
-              borderRadius: '10px',
-              backgroundColor: '#334155',
+              gap: '5px',
+              padding: '6px 14px',
+              borderRadius: '8px',
+              backgroundColor: '#374151',
               color: '#ffffff',
-              border: 'none',
-              fontSize: '13px',
+              border: '1px solid #4b5563',
+              fontSize: '12px',
               fontWeight: 700,
               cursor: 'pointer',
             }}
           >
-            <Save size={15} />
+            <Save size={13} />
             Save Draft
           </button>
 
@@ -471,274 +650,378 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '8px 16px',
-              borderRadius: '10px',
-              backgroundColor: '#0284c7',
+              padding: '6px 16px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
               color: '#ffffff',
               border: 'none',
-              fontSize: '13px',
-              fontWeight: 700,
+              fontSize: '12px',
+              fontWeight: 800,
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
             }}
           >
-            <Sparkles size={15} />
+            <Sparkles size={13} />
             Publish Template
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* 2. Main Studio Workspace (3-Column Layout) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr 340px', flex: 1, overflow: 'hidden' }}>
-        {/* LEFT COLUMN: Tool Palette & Layer Stack */}
-        <div
-          style={{
-            backgroundColor: '#1e293b',
-            borderRight: '1px solid #334155',
-            display: 'flex',
-            flexDirection: 'column',
-            overflowY: 'auto',
-          }}
-        >
-          {/* Tabs */}
-          <div style={{ display: 'flex', borderBottom: '1px solid #334155' }}>
+      {/* 2. MAIN 3-COLUMN STUDIO LAYOUT */}
+      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr 340px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        
+        {/* COLUMN 1: LEFT TOOLBAR & LAYER STACK */}
+        <div style={{ backgroundColor: '#111827', borderRight: '1px solid #1f2937', display: 'flex', flexDirection: 'column', minHeight: 0, zIndex: 20 }}>
+          
+          {/* Segmented Top Tabs */}
+          <div style={{ display: 'flex', padding: '8px', backgroundColor: '#0f172a', borderBottom: '1px solid #1e293b', gap: '4px' }}>
             <button
               onClick={() => setActiveTab('layers')}
               style={{
                 flex: 1,
-                padding: '12px 6px',
-                fontSize: '12px',
-                fontWeight: 700,
-                color: activeTab === 'layers' ? '#38bdf8' : '#94a3b8',
-                backgroundColor: activeTab === 'layers' ? '#0f172a' : 'transparent',
+                padding: '6px 8px',
+                borderRadius: '6px',
                 border: 'none',
-                borderBottom: activeTab === 'layers' ? '2px solid #38bdf8' : 'none',
+                fontSize: '11px',
+                fontWeight: 700,
                 cursor: 'pointer',
+                backgroundColor: activeTab === 'layers' ? '#1e293b' : 'transparent',
+                color: activeTab === 'layers' ? '#38bdf8' : '#94a3b8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
               }}
             >
-              Layers ({template.layers.length})
+              <Layers size={13} /> Layers ({template.layers.length})
             </button>
             <button
               onClick={() => setActiveTab('add')}
               style={{
                 flex: 1,
-                padding: '12px 6px',
-                fontSize: '12px',
-                fontWeight: 700,
-                color: activeTab === 'add' ? '#38bdf8' : '#94a3b8',
-                backgroundColor: activeTab === 'add' ? '#0f172a' : 'transparent',
+                padding: '6px 8px',
+                borderRadius: '6px',
                 border: 'none',
-                borderBottom: activeTab === 'add' ? '2px solid #38bdf8' : 'none',
+                fontSize: '11px',
+                fontWeight: 700,
                 cursor: 'pointer',
+                backgroundColor: activeTab === 'add' ? '#1e293b' : 'transparent',
+                color: activeTab === 'add' ? '#f472b6' : '#94a3b8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
               }}
             >
-              + Add Element
+              <Plus size={13} /> Add Elements
             </button>
             <button
-              onClick={() => setActiveTab('canvas')}
+              onClick={() => setActiveTab('setup')}
               style={{
                 flex: 1,
-                padding: '12px 6px',
-                fontSize: '12px',
-                fontWeight: 700,
-                color: activeTab === 'canvas' ? '#38bdf8' : '#94a3b8',
-                backgroundColor: activeTab === 'canvas' ? '#0f172a' : 'transparent',
+                padding: '6px 8px',
+                borderRadius: '6px',
                 border: 'none',
-                borderBottom: activeTab === 'canvas' ? '2px solid #38bdf8' : 'none',
+                fontSize: '11px',
+                fontWeight: 700,
                 cursor: 'pointer',
+                backgroundColor: activeTab === 'setup' ? '#1e293b' : 'transparent',
+                color: activeTab === 'setup' ? '#34d399' : '#94a3b8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
               }}
             >
-              Setup
+              <Settings2 size={13} /> Setup
             </button>
           </div>
 
-          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+          {/* TAB CONTENT */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            
+            {/* TAB 1: LAYERS STACK */}
             {activeTab === 'layers' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                    Visual Layer Stack
-                  </span>
-                  <span style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 600 }}>
-                    {editableLayersCount} Editable • {lockedLayersCount} Locked
+              <>
+                {/* Layer Filters & Stats */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 2px' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {(['all', 'editable', 'locked'] as const).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setLayerFilter(f)}
+                        style={{
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          backgroundColor: layerFilter === f ? '#334155' : '#1e293b',
+                          color: layerFilter === f ? '#ffffff' : '#94a3b8',
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                  <span style={{ fontSize: '10px', color: '#64748b' }}>
+                    {editableLayersCount} editable • {lockedLayersCount} locked
                   </span>
                 </div>
 
-                {template.layers.map((layer, idx) => {
-                  const isSelected = selectedLayerId === layer.id;
-                  return (
-                    <div
-                      key={layer.id}
-                      onClick={() => setSelectedLayerId(layer.id)}
-                      style={{
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        backgroundColor: isSelected ? '#0284c7' : 'rgba(255, 255, 255, 0.04)',
-                        border: isSelected ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
-                        {layer.type === 'text' && <Type size={15} color={isSelected ? '#ffffff' : '#38bdf8'} />}
-                        {layer.type === 'logo' && <ImageIcon size={15} color={isSelected ? '#ffffff' : '#f472b6'} />}
-                        {layer.type === 'qrcode' && <QrCode size={15} color={isSelected ? '#ffffff' : '#34d399'} />}
-                        {layer.type === 'shape' && <Square size={15} color={isSelected ? '#ffffff' : '#fbbf24'} />}
+                {/* Layer List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {filteredLayers.map((layer, idx) => {
+                    const isSelected = selectedLayerId === layer.id;
+                    const isHidden = hiddenLayers[layer.id];
 
-                        <div style={{ textAlign: 'left', overflow: 'hidden' }}>
-                          <div style={{ fontSize: '12px', fontWeight: 700, color: '#ffffff', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                            {layer.name}
+                    return (
+                      <div
+                        key={layer.id}
+                        onClick={() => setSelectedLayerId(layer.id)}
+                        style={{
+                          padding: '10px 12px',
+                          borderRadius: '8px',
+                          backgroundColor: isSelected ? 'rgba(56, 189, 248, 0.12)' : '#1e293b',
+                          border: isSelected ? '1.5px solid #38bdf8' : '1px solid #334155',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          opacity: isHidden ? 0.4 : 1,
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                          {/* Layer Type Icon */}
+                          <div
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '6px',
+                              backgroundColor: layer.isEditableBySiteUser ? 'rgba(16, 185, 129, 0.15)' : 'rgba(148, 163, 184, 0.1)',
+                              color: layer.isEditableBySiteUser ? '#34d399' : '#94a3b8',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {layer.type === 'text' && <Type size={14} />}
+                            {layer.type === 'logo' && <ImageIcon size={14} />}
+                            {layer.type === 'qrcode' && <QrCode size={14} />}
+                            {layer.type === 'shape' && <Square size={14} />}
+                            {layer.type === 'badge' && <Sparkles size={14} />}
                           </div>
-                          <div style={{ fontSize: '10px', color: isSelected ? '#e0f2fe' : '#94a3b8' }}>
-                            {layer.isEditableBySiteUser ? (
-                              <span style={{ color: isSelected ? '#bae6fd' : '#4ade80', fontWeight: 600 }}>
-                                🔓 Editable ({layer.fieldKey || 'Custom'})
-                              </span>
-                            ) : (
-                              <span style={{ color: isSelected ? '#fecdd3' : '#f87171', fontWeight: 600 }}>
-                                🔒 Locked by Admin
-                              </span>
-                            )}
+
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                              {layer.name}
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                              {layer.isEditableBySiteUser ? (
+                                <span style={{ fontSize: '9px', fontWeight: 700, color: '#34d399', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                  <Unlock size={9} /> Editable by Branch
+                                </span>
+                              ) : (
+                                <span style={{ fontSize: '9px', fontWeight: 600, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                  <Lock size={9} /> Locked Corporate
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDuplicateLayer(layer.id);
-                          }}
-                          title="Duplicate Layer"
-                          style={{ background: 'none', border: 'none', color: isSelected ? '#ffffff' : '#94a3b8', cursor: 'pointer', padding: '2px' }}
-                        >
-                          <Copy size={13} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteLayer(layer.id);
-                          }}
-                          title="Delete Layer"
-                          style={{ background: 'none', border: 'none', color: isSelected ? '#ffffff' : '#f87171', cursor: 'pointer', padding: '2px' }}
-                        >
-                          <Trash2 size={13} />
-                        </button>
+                        {/* Quick Layer Controls */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleLayerVisibility(layer.id);
+                            }}
+                            title={isHidden ? 'Show Layer' : 'Hide Layer'}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: isHidden ? '#ef4444' : '#64748b',
+                              cursor: 'pointer',
+                              padding: '4px',
+                            }}
+                          >
+                            {isHidden ? <EyeOff size={13} /> : <Eye size={13} />}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDuplicateLayer(layer.id);
+                            }}
+                            title="Duplicate Layer"
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#64748b',
+                              cursor: 'pointer',
+                              padding: '4px',
+                            }}
+                          >
+                            <Copy size={13} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteLayer(layer.id);
+                            }}
+                            title="Delete Layer"
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              padding: '4px',
+                            }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              </>
             )}
 
+            {/* TAB 2: ADD ELEMENTS */}
             {activeTab === 'add' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                  Insert New Component
-                </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                  Click to add pre-configured building blocks to your canvas:
+                </div>
 
-                <button
-                  onClick={() => handleAddLayer('text')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                    border: '1px solid rgba(56, 189, 248, 0.3)',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <Type size={18} color="#38bdf8" />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700 }}>Add Text Block</div>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Headline, body, or contact field</div>
-                  </div>
-                </button>
+                {/* Element Cards Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button
+                    onClick={() => handleAddLayer('text')}
+                    style={{
+                      padding: '14px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <Type size={20} color="#38bdf8" />
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Text Block</span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8', textAlign: 'center' }}>Customizable header or body text</span>
+                  </button>
 
-                <button
-                  onClick={() => handleAddLayer('logo')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(244, 114, 182, 0.1)',
-                    border: '1px solid rgba(244, 114, 182, 0.3)',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <ImageIcon size={18} color="#f472b6" />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700 }}>Logo / Image Placeholder</div>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Allow branch logo upload</div>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => handleAddLayer('qrcode')}
+                    style={{
+                      padding: '14px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <QrCode size={20} color="#34d399" />
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Dynamic QR</span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8', textAlign: 'center' }}>Website / Booking scanner</span>
+                  </button>
 
-                <button
-                  onClick={() => handleAddLayer('qrcode')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(52, 211, 153, 0.1)',
-                    border: '1px solid rgba(52, 211, 153, 0.3)',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <QrCode size={18} color="#34d399" />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700 }}>Dynamic QR Code</div>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Scannable link for websites</div>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => handleAddLayer('logo')}
+                    style={{
+                      padding: '14px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <ImageIcon size={20} color="#f472b6" />
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Brand Logo</span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8', textAlign: 'center' }}>Official high-res image slot</span>
+                  </button>
 
-                <button
-                  onClick={() => handleAddLayer('shape')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(251, 191, 36, 0.1)',
-                    border: '1px solid rgba(251, 191, 36, 0.3)',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <Square size={18} color="#fbbf24" />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700 }}>Brand Shape / Frame</div>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Background card or accent bar</div>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => handleAddLayer('badge')}
+                    style={{
+                      padding: '14px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <Sparkles size={20} color="#fbbf24" />
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Promo Badge</span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8', textAlign: 'center' }}>Season / Limited offer pill</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleAddLayer('shape')}
+                    style={{
+                      padding: '14px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      gridColumn: 'span 2',
+                    }}
+                  >
+                    <Square size={20} color="#a78bfa" />
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Shape / Decorative Band</span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8' }}>Footer ribbon, color band, or card container</span>
+                  </button>
+                </div>
               </div>
             )}
 
-            {activeTab === 'canvas' && (
+            {/* TAB 3: SETUP & DIMENSIONS */}
+            {activeTab === 'setup' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                  Product & Dimensions Setup
-                </span>
-
+                {/* Product Preset */}
                 <div>
-                  <label style={{ fontSize: '11px', color: '#cbd5e1', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
-                    Target Print Product
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '6px' }}>
+                    Print Product Preset
                   </label>
                   <select
                     value={template.productId}
@@ -746,83 +1029,105 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                     style={{
                       width: '100%',
                       padding: '8px 10px',
-                      borderRadius: '8px',
-                      backgroundColor: '#0f172a',
-                      color: '#ffffff',
+                      borderRadius: '6px',
+                      backgroundColor: '#1e293b',
                       border: '1px solid #334155',
+                      color: '#ffffff',
                       fontSize: '12px',
                       outline: 'none',
                     }}
                   >
-                    {PRESET_PRODUCTS.map((prod) => (
-                      <option key={prod.id} value={prod.id}>
-                        {prod.name}
+                    {PRESET_PRODUCTS.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div>
-                  <label style={{ fontSize: '11px', color: '#cbd5e1', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
-                    Design Theme
-                  </label>
-                  <select
-                    value={template.theme}
-                    onChange={(e) => setTemplate({ ...template, theme: e.target.value as TemplateTheme })}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      backgroundColor: '#0f172a',
-                      color: '#ffffff',
-                      border: '1px solid #334155',
-                      fontSize: '12px',
-                      outline: 'none',
-                    }}
-                  >
-                    <option value="healthcare">Healthcare & Clinical</option>
-                    <option value="corporate">Corporate & Enterprise</option>
-                    <option value="modern">Modern Vibrant</option>
-                    <option value="promotional">Retail & Promotional</option>
-                    <option value="minimalist">Minimalist Luxury</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '11px', color: '#cbd5e1', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
-                    Canvas Background Color
-                  </label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                {/* Dimensions */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#94a3b8' }}>Width ({template.dimensions.unit})</label>
                     <input
-                      type="color"
-                      value={template.canvasConfig.backgroundColor}
+                      type="number"
+                      step="0.1"
+                      value={template.dimensions.width}
                       onChange={(e) =>
                         setTemplate({
                           ...template,
-                          canvasConfig: { ...template.canvasConfig, backgroundColor: e.target.value },
-                        })
-                      }
-                      style={{ width: '36px', height: '36px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
-                    />
-                    <input
-                      type="text"
-                      value={template.canvasConfig.backgroundColor}
-                      onChange={(e) =>
-                        setTemplate({
-                          ...template,
-                          canvasConfig: { ...template.canvasConfig, backgroundColor: e.target.value },
+                          dimensions: { ...template.dimensions, width: parseFloat(e.target.value) || 0 },
                         })
                       }
                       style={{
-                        flex: 1,
-                        padding: '8px 10px',
-                        borderRadius: '8px',
-                        backgroundColor: '#0f172a',
-                        color: '#ffffff',
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        backgroundColor: '#1e293b',
                         border: '1px solid #334155',
+                        color: '#ffffff',
                         fontSize: '12px',
+                        marginTop: '4px',
                       }}
                     />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#94a3b8' }}>Height ({template.dimensions.unit})</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={template.dimensions.height}
+                      onChange={(e) =>
+                        setTemplate({
+                          ...template,
+                          dimensions: { ...template.dimensions, height: parseFloat(e.target.value) || 0 },
+                        })
+                      }
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        backgroundColor: '#1e293b',
+                        border: '1px solid #334155',
+                        color: '#ffffff',
+                        fontSize: '12px',
+                        marginTop: '4px',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Background Gradient Presets */}
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '6px' }}>
+                    Canvas Background Style
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                    {GRADIENT_PRESETS.map((g) => (
+                      <button
+                        key={g.label}
+                        onClick={() =>
+                          setTemplate({
+                            ...template,
+                            canvasConfig: { ...template.canvasConfig, bgGradient: g.value },
+                          })
+                        }
+                        style={{
+                          padding: '8px',
+                          borderRadius: '6px',
+                          border: template.canvasConfig.bgGradient === g.value ? '2px solid #38bdf8' : '1px solid #334155',
+                          background: g.value,
+                          color: '#ffffff',
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                        }}
+                      >
+                        {g.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -830,567 +1135,739 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
           </div>
         </div>
 
-        {/* CENTER COLUMN: Interactive WYSIWYG Print Canvas */}
-        <div
-          style={{
-            backgroundColor: '#090d16',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            overflow: 'auto',
-            padding: '40px',
-          }}
-        >
-          {/* Canvas Controls Floating Bar */}
+        {/* COLUMN 2: CENTER CANVA/FIGMA STAGE */}
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative', overflow: 'hidden', backgroundColor: '#090d16' }}>
+          
+          {/* Floating Canvas Toolbar */}
           <div
             style={{
-              position: 'absolute',
-              top: '16px',
+              height: '42px',
+              backgroundColor: '#111827',
+              borderBottom: '1px solid #1f2937',
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              backgroundColor: 'rgba(30, 41, 59, 0.9)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid #334155',
+              justifyContent: 'space-between',
+              padding: '0 16px',
+              flexShrink: 0,
               zIndex: 10,
             }}
           >
-            <button
-              onClick={() => setZoomLevel((z) => Math.max(z - 15, 50))}
-              style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer' }}
-            >
-              <ZoomOut size={16} />
-            </button>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#38bdf8' }}>{zoomLevel}%</span>
-            <button
-              onClick={() => setZoomLevel((z) => Math.min(z + 15, 150))}
-              style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer' }}
-            >
-              <ZoomIn size={16} />
-            </button>
-            <div style={{ width: '1px', height: '14px', backgroundColor: '#475569' }} />
-            <label style={{ fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={showBleedGuides}
-                onChange={(e) => setShowBleedGuides(e.target.checked)}
-              />
-              <span style={{ color: '#f87171' }}>Bleed Guide</span>
-            </label>
-            <label style={{ fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={showSafeGuides}
-                onChange={(e) => setShowSafeGuides(e.target.checked)}
-              />
-              <span style={{ color: '#4ade80' }}>Safe Area</span>
-            </label>
+            {/* Guide Toggles */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Guides:</span>
+              <button
+                onClick={() => setShowBleedGuides(!showBleedGuides)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  backgroundColor: showBleedGuides ? 'rgba(249, 115, 22, 0.2)' : 'transparent',
+                  color: showBleedGuides ? '#fb923c' : '#94a3b8',
+                  border: showBleedGuides ? '1px solid rgba(249, 115, 22, 0.4)' : '1px solid #374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <Scissors size={12} />
+                Bleed Trim ({template.bleedMargin}&quot;)
+              </button>
+
+              <button
+                onClick={() => setShowSafeGuides(!showSafeGuides)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  backgroundColor: showSafeGuides ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                  color: showSafeGuides ? '#38bdf8' : '#94a3b8',
+                  border: showSafeGuides ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid #374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <ShieldCheck size={12} />
+                Safe Print Margin ({template.safeMargin}&quot;)
+              </button>
+
+              <button
+                onClick={() => setShowGrid(!showGrid)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  backgroundColor: showGrid ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
+                  color: showGrid ? '#c084fc' : '#94a3b8',
+                  border: showGrid ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid #374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <Grid size={12} />
+                Grid
+              </button>
+            </div>
+
+            {/* Zoom Controls */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <button
+                onClick={() => setZoomLevel((z) => Math.max(z - 10, 40))}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '4px',
+                  backgroundColor: '#1e293b',
+                  border: '1px solid #334155',
+                  color: '#f8fafc',
+                  cursor: 'pointer',
+                }}
+              >
+                <Minus size={12} />
+              </button>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', minWidth: '42px', textAlign: 'center' }}>
+                {zoomLevel}%
+              </span>
+              <button
+                onClick={() => setZoomLevel((z) => Math.min(z + 10, 200))}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '4px',
+                  backgroundColor: '#1e293b',
+                  border: '1px solid #334155',
+                  color: '#f8fafc',
+                  cursor: 'pointer',
+                }}
+              >
+                <Plus size={12} />
+              </button>
+              <button
+                onClick={() => setZoomLevel(100)}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  backgroundColor: '#1e293b',
+                  border: '1px solid #334155',
+                  color: '#94a3b8',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Fit 100%
+              </button>
+            </div>
           </div>
 
-          {/* Actual Scaled Print Canvas */}
+          {/* Scrollable Stage Area with Radial Grid */}
           <div
             style={{
+              flex: 1,
+              overflow: 'auto',
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              padding: '40px 24px',
+              backgroundColor: '#090d16',
+              backgroundImage: showGrid
+                ? 'linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)'
+                : 'radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px)',
+              backgroundSize: showGrid ? '20px 20px' : '24px 24px',
               position: 'relative',
-              width: template.orientation === 'portrait' ? '420px' : '580px',
-              aspectRatio: template.aspectRatio.replace(':', ' / '),
-              transform: `scale(${zoomLevel / 100})`,
-              transformOrigin: 'center center',
-              transition: 'transform 0.15s ease',
-              borderRadius: '6px',
-              backgroundColor: template.canvasConfig.backgroundColor,
-              backgroundImage: template.canvasConfig.bgGradient || 'none',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-              overflow: 'hidden',
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setSelectedLayerId(null);
             }}
           >
-            {/* Bleed Margin Overlay */}
-            {showBleedGuides && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              
+              {/* Canvas Frame */}
               <div
+                ref={canvasRef}
                 style={{
-                  position: 'absolute',
-                  inset: '4px',
-                  border: '1.5px dashed rgba(248, 113, 113, 0.6)',
-                  pointerEvents: 'none',
-                  zIndex: 20,
+                  position: 'relative',
+                  width: `${baseWidth}px`,
+                  height: `${baseHeight}px`,
+                  transform: `scale(${zoomLevel / 100})`,
+                  transformOrigin: 'top center',
+                  transition: isDraggingLayer ? 'none' : 'transform 0.15s ease',
+                  backgroundColor: template.canvasConfig.backgroundColor,
+                  backgroundImage: template.canvasConfig.bgGradient || 'none',
+                  boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
+                  borderRadius: '2px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  userSelect: 'none',
+                }}
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) setSelectedLayerId(null);
                 }}
               >
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '2px',
-                    left: '4px',
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    color: '#f87171',
-                    backgroundColor: 'rgba(15, 23, 42, 0.8)',
-                    padding: '1px 4px',
-                    borderRadius: '3px',
-                  }}
-                >
-                  BLEED (0.125&quot;)
-                </span>
-              </div>
-            )}
+                {/* Bleed Guide Overlay */}
+                {showBleedGuides && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: '0',
+                      border: '2px dashed rgba(249, 115, 22, 0.8)',
+                      pointerEvents: 'none',
+                      zIndex: 50,
+                    }}
+                  >
+                    <div style={{ position: 'absolute', top: 2, left: 2, fontSize: '8px', fontWeight: 800, color: '#ea580c', backgroundColor: 'rgba(0,0,0,0.7)', padding: '1px 4px', borderRadius: '2px' }}>
+                      BLEED TRIM ({template.bleedMargin}&quot;)
+                    </div>
+                  </div>
+                )}
 
-            {/* Safe Margin Overlay */}
-            {showSafeGuides && (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: '16px',
-                  border: '1.5px dashed rgba(74, 222, 128, 0.6)',
-                  pointerEvents: 'none',
-                  zIndex: 20,
-                }}
-              >
-                <span
-                  style={{
-                    position: 'absolute',
-                    bottom: '2px',
-                    right: '4px',
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    color: '#4ade80',
-                    backgroundColor: 'rgba(15, 23, 42, 0.8)',
-                    padding: '1px 4px',
-                    borderRadius: '3px',
-                  }}
-                >
-                  SAFE AREA
-                </span>
-              </div>
-            )}
+                {/* Safe Area Guide Overlay */}
+                {showSafeGuides && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: '16px',
+                      border: '1.5px dashed rgba(56, 189, 248, 0.8)',
+                      pointerEvents: 'none',
+                      zIndex: 50,
+                    }}
+                  >
+                    <div style={{ position: 'absolute', bottom: 2, right: 2, fontSize: '8px', fontWeight: 800, color: '#0284c7', backgroundColor: 'rgba(0,0,0,0.7)', padding: '1px 4px', borderRadius: '2px' }}>
+                      SAFE PRINT AREA
+                    </div>
+                  </div>
+                )}
 
-            {/* Rendered Layers */}
-            {template.layers.map((layer) => {
-              const isSelected = selectedLayerId === layer.id;
-              return (
-                <div
-                  key={layer.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedLayerId(layer.id);
-                  }}
-                  style={{
-                    position: 'absolute',
-                    left: `${layer.x}%`,
-                    top: `${layer.y}%`,
-                    width: `${layer.width}%`,
-                    height: `${layer.height}%`,
-                    zIndex: layer.zIndex || 1,
-                    cursor: 'pointer',
-                    outline: isSelected
-                      ? '2px solid #38bdf8'
-                      : layer.isEditableBySiteUser
-                      ? '1px dashed rgba(74, 222, 128, 0.4)'
-                      : 'none',
-                    boxShadow: isSelected ? '0 0 12px rgba(56, 189, 248, 0.5)' : 'none',
-                    backgroundColor: layer.style.backgroundColor || 'transparent',
-                    borderColor: layer.style.borderColor || 'transparent',
-                    borderWidth: layer.style.borderWidth ? `${layer.style.borderWidth}px` : 0,
-                    borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : 0,
-                    opacity: layer.style.opacity ?? 1,
-                    overflow: 'hidden',
-                    display: 'flex',
-                    alignItems: layer.type === 'text' ? 'flex-start' : 'center',
-                    justifyContent: layer.type === 'qrcode' ? 'center' : 'flex-start',
-                    padding: layer.style.padding ? `${layer.style.padding}px` : '4px',
-                    userSelect: 'none',
-                  }}
-                >
-                  {/* Lock / Editable Tag on Selected Layer */}
-                  {isSelected && (
+                {/* Render Template Layers */}
+                {template.layers.map((layer) => {
+                  if (hiddenLayers[layer.id]) return null;
+                  const isSelected = selectedLayerId === layer.id;
+
+                  return (
                     <div
+                      key={layer.id}
+                      onMouseDown={(e) => handleMouseDownLayer(e, layer)}
                       style={{
                         position: 'absolute',
-                        top: '-18px',
-                        left: '0',
-                        fontSize: '9px',
-                        fontWeight: 800,
-                        backgroundColor: layer.isEditableBySiteUser ? '#059669' : '#e11d48',
-                        color: '#ffffff',
-                        padding: '1px 6px',
-                        borderRadius: '3px',
+                        left: `${layer.x}%`,
+                        top: `${layer.y}%`,
+                        width: `${layer.width}%`,
+                        height: `${layer.height}%`,
+                        zIndex: (layer.zIndex || 1) + (isSelected ? 20 : 0),
+                        backgroundColor: layer.style.backgroundColor || 'transparent',
+                        borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : 0,
+                        opacity: layer.style.opacity ?? 1,
+                        cursor: 'grab',
+                        outline: isSelected ? '2px solid #38bdf8' : 'none',
+                        outlineOffset: '2px',
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: '3px',
-                        whiteSpace: 'nowrap',
+                        alignItems: layer.type === 'text' ? 'flex-start' : 'center',
+                        justifyContent: layer.type === 'qrcode' ? 'center' : 'flex-start',
+                        padding: layer.style.padding ? `${layer.style.padding}px` : '4px',
+                        overflow: 'hidden',
                       }}
                     >
-                      {layer.isEditableBySiteUser ? <Unlock size={10} /> : <Lock size={10} />}
-                      {layer.isEditableBySiteUser ? `EDITABLE: ${layer.fieldKey}` : 'LOCKED BY ADMIN'}
-                    </div>
-                  )}
+                      {/* Active Layer Label Tag */}
+                      {isSelected && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '-20px',
+                            left: '0',
+                            backgroundColor: '#0284c7',
+                            color: '#ffffff',
+                            fontSize: '9px',
+                            fontWeight: 800,
+                            padding: '1px 5px',
+                            borderRadius: '3px',
+                            zIndex: 60,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <Move size={8} /> {layer.name} ({layer.x}%, {layer.y}%)
+                        </div>
+                      )}
 
-                  {layer.type === 'text' && (
-                    <div
-                      style={{
-                        fontSize: `${layer.style.fontSize || 14}px`,
-                        fontWeight: layer.style.fontWeight || 600,
-                        color: layer.style.color || '#ffffff',
-                        textAlign: layer.style.textAlign || 'left',
-                        letterSpacing: layer.style.letterSpacing ? `${layer.style.letterSpacing}px` : 'normal',
-                        lineHeight: layer.style.lineHeight || 1.3,
-                        textTransform: layer.style.textTransform || 'none',
-                        width: '100%',
-                        whiteSpace: 'pre-wrap',
-                      }}
-                    >
-                      {layer.content}
-                    </div>
-                  )}
+                      {/* Text Render */}
+                      {layer.type === 'text' && (
+                        <div
+                          style={{
+                            fontSize: `${layer.style.fontSize || 14}px`,
+                            fontWeight: layer.style.fontWeight || 600,
+                            color: layer.style.color || '#ffffff',
+                            textAlign: layer.style.textAlign || 'left',
+                            lineHeight: layer.style.lineHeight || 1.3,
+                            letterSpacing: layer.style.letterSpacing ? `${layer.style.letterSpacing}px` : 'normal',
+                            textTransform: layer.style.textTransform || 'none',
+                            fontFamily: layer.style.fontFamily || 'inherit',
+                            width: '100%',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          {layer.content}
+                        </div>
+                      )}
 
-                  {layer.type === 'logo' && (
-                    <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 'inherit' }}>
-                      <Image
-                        src={layer.content || 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=200&auto=format&fit=crop&q=80'}
-                        alt="Logo Layer"
-                        fill
-                        unoptimized
-                        style={{ objectFit: 'contain', borderRadius: 'inherit' }}
-                      />
-                    </div>
-                  )}
+                      {/* Logo / Image Render */}
+                      {(layer.type === 'logo' || layer.type === 'image') && layer.content && (
+                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                          <Image src={layer.content} alt={layer.name} fill unoptimized style={{ objectFit: 'contain' }} />
+                        </div>
+                      )}
 
-                  {layer.type === 'qrcode' && (
-                    <div
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: '#ffffff',
-                        borderRadius: 'inherit',
-                        padding: '4px',
-                      }}
-                    >
-                      <QrCode size={36} color="#0f172a" />
-                      <span style={{ fontSize: '7px', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
-                        SCAN ME
-                      </span>
-                    </div>
-                  )}
+                      {/* QR Code Render */}
+                      {layer.type === 'qrcode' && (
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: '#ffffff',
+                            borderRadius: 'inherit',
+                            padding: '2px',
+                          }}
+                        >
+                          <QrCode size={26} color="#0f172a" />
+                          <span style={{ fontSize: '6px', fontWeight: 800, color: '#0f172a' }}>SCAN ME</span>
+                        </div>
+                      )}
 
-                  {layer.type === 'badge' && (
-                    <div
-                      style={{
-                        fontSize: `${layer.style.fontSize || 11}px`,
-                        fontWeight: layer.style.fontWeight || 800,
-                        color: layer.style.color || '#ffffff',
-                        letterSpacing: layer.style.letterSpacing || 1,
-                        textTransform: layer.style.textTransform || 'uppercase',
-                      }}
-                    >
-                      {layer.content}
+                      {/* Badge Render */}
+                      {layer.type === 'badge' && (
+                        <div
+                          style={{
+                            fontSize: `${layer.style.fontSize || 11}px`,
+                            fontWeight: layer.style.fontWeight || 800,
+                            color: layer.style.color || '#ffffff',
+                            letterSpacing: `${layer.style.letterSpacing || 1}px`,
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {layer.content}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+
+              {/* Physical Dimension Ruler Annotation */}
+              <div style={{ width: `${baseWidth}px`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <div style={{ flex: 1, height: '1px', backgroundColor: '#334155' }} />
+                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>
+                  {template.dimensions.width} &times; {template.dimensions.height} {template.dimensions.unit} (Scale 1:1 Ready for Print)
+                </span>
+                <div style={{ flex: 1, height: '1px', backgroundColor: '#334155' }} />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Layer Rules & Styling Inspector */}
-        <div
-          style={{
-            backgroundColor: '#1e293b',
-            borderLeft: '1px solid #334155',
-            display: 'flex',
-            flexDirection: 'column',
-            overflowY: 'auto',
-            padding: '16px',
-            gap: '16px',
-          }}
-        >
-          {selectedLayer ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ borderBottom: '1px solid #334155', paddingBottom: '12px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                  Layer Properties
-                </span>
-                <input
-                  type="text"
-                  value={selectedLayer.name}
-                  onChange={(e) => handleUpdateLayer(selectedLayer.id, { name: e.target.value })}
-                  style={{
-                    width: '100%',
-                    marginTop: '6px',
-                    padding: '8px 10px',
-                    borderRadius: '8px',
-                    backgroundColor: '#0f172a',
-                    color: '#ffffff',
-                    border: '1px solid #334155',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                  }}
-                />
-              </div>
+        {/* COLUMN 3: RIGHT PROPERTIES INSPECTOR */}
+        <div style={{ backgroundColor: '#111827', borderLeft: '1px solid #1f2937', display: 'flex', flexDirection: 'column', minHeight: 0, zIndex: 20 }}>
+          
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid #1f2937', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {selectedLayer ? 'Layer Properties' : 'Canvas Overview'}
+            </span>
+            {selectedLayer && (
+              <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', backgroundColor: '#1e293b', color: '#38bdf8' }}>
+                {selectedLayer.type.toUpperCase()}
+              </span>
+            )}
+          </div>
 
-              {/* ─── ADMIN RULES CONFIGURATOR ─── */}
-              <div
-                style={{
-                  padding: '14px',
-                  borderRadius: '12px',
-                  backgroundColor: selectedLayer.isEditableBySiteUser
-                    ? 'rgba(16, 185, 129, 0.1)'
-                    : 'rgba(239, 68, 68, 0.1)',
-                  border: selectedLayer.isEditableBySiteUser
-                    ? '1px solid rgba(16, 185, 129, 0.3)'
-                    : '1px solid rgba(239, 68, 68, 0.3)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    {selectedLayer.isEditableBySiteUser ? (
-                      <Unlock size={16} color="#34d399" />
-                    ) : (
-                      <Lock size={16} color="#f87171" />
-                    )}
-                    <span style={{ fontSize: '12px', fontWeight: 800, color: '#ffffff' }}>
-                      Site User Permission Rule
-                    </span>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={selectedLayer.isEditableBySiteUser}
-                    onChange={(e) =>
-                      handleUpdateLayer(selectedLayer.id, { isEditableBySiteUser: e.target.checked })
-                    }
-                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                  />
-                </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {selectedLayer ? (
+              <>
+                {/* 1. Governance & Site User Personalization Card */}
+                <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: selectedLayer.isEditableBySiteUser ? 'rgba(16, 185, 129, 0.08)' : '#1e293b', border: selectedLayer.isEditableBySiteUser ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid #334155' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {selectedLayer.isEditableBySiteUser ? <Unlock size={14} color="#34d399" /> : <Lock size={14} color="#94a3b8" />}
+                      <span style={{ fontSize: '12px', fontWeight: 800, color: selectedLayer.isEditableBySiteUser ? '#34d399' : '#f8fafc' }}>
+                        Site User Personalization
+                      </span>
+                    </div>
 
-                <p style={{ fontSize: '11px', color: '#cbd5e1', lineHeight: 1.4, margin: '0 0 10px 0' }}>
-                  {selectedLayer.isEditableBySiteUser
-                    ? 'Site Users CAN customize this content during the ordering flow. The design layout remains locked.'
-                    : 'LOCKED BY ADMIN: Site Users CANNOT modify this text, position, typography, or styling.'}
-                </p>
-
-                {selectedLayer.isEditableBySiteUser && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>
-                      Map to Permitted Field Key
-                    </label>
-                    <select
-                      value={selectedLayer.fieldKey || ''}
-                      onChange={(e) =>
-                        handleUpdateLayer(selectedLayer.id, { fieldKey: e.target.value as TemplateFieldKey })
-                      }
-                      style={{
-                        padding: '6px 10px',
-                        borderRadius: '6px',
-                        backgroundColor: '#0f172a',
-                        color: '#ffffff',
-                        border: '1px solid #334155',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {FIELD_KEY_OPTIONS.map((opt) => (
-                        <option key={opt.key} value={opt.key}>
-                          {opt.label} ({opt.key})
-                        </option>
-                      ))}
-                    </select>
-
-                    <label style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>
-                      Form Input Label
-                    </label>
                     <input
-                      type="text"
-                      value={selectedLayer.label}
-                      onChange={(e) => handleUpdateLayer(selectedLayer.id, { label: e.target.value })}
-                      placeholder="e.g. Branch Phone Number"
-                      style={{
-                        padding: '6px 10px',
-                        borderRadius: '6px',
-                        backgroundColor: '#0f172a',
-                        color: '#ffffff',
-                        border: '1px solid #334155',
-                        fontSize: '12px',
-                      }}
+                      type="checkbox"
+                      checked={selectedLayer.isEditableBySiteUser}
+                      onChange={(e) => handleUpdateLayer(selectedLayer.id, { isEditableBySiteUser: e.target.checked })}
+                      style={{ cursor: 'pointer', width: '16px', height: '16px' }}
                     />
                   </div>
-                )}
-              </div>
 
-              {/* Layer Content Edit */}
-              <div>
-                <label style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                  Default Template Content
-                </label>
-                {selectedLayer.type === 'text' ? (
-                  <textarea
-                    value={selectedLayer.content}
-                    onChange={(e) => handleUpdateLayer(selectedLayer.id, { content: e.target.value })}
-                    rows={3}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      backgroundColor: '#0f172a',
-                      color: '#ffffff',
-                      border: '1px solid #334155',
-                      fontSize: '12px',
-                      outline: 'none',
-                    }}
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={selectedLayer.content}
-                    onChange={(e) => handleUpdateLayer(selectedLayer.id, { content: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      backgroundColor: '#0f172a',
-                      color: '#ffffff',
-                      border: '1px solid #334155',
-                      fontSize: '12px',
-                    }}
-                  />
-                )}
-              </div>
+                  <p style={{ fontSize: '10px', color: '#94a3b8', margin: '0 0 8px 0', lineHeight: 1.4 }}>
+                    {selectedLayer.isEditableBySiteUser
+                      ? 'Branch site-users CAN edit this field in their store customizer.'
+                      : 'LOCKED BY CORPORATE: Branch users CANNOT change text, position, or styling.'}
+                  </p>
 
-              {/* Typography & Color Styling */}
-              {selectedLayer.type === 'text' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                    Typography & Color
-                  </span>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    <div>
-                      <label style={{ fontSize: '10px', color: '#94a3b8' }}>Font Size (px)</label>
-                      <input
-                        type="number"
-                        value={selectedLayer.style.fontSize || 14}
-                        onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontSize: Number(e.target.value) })}
-                        style={{
-                          width: '100%',
-                          padding: '6px',
-                          borderRadius: '6px',
-                          backgroundColor: '#0f172a',
-                          color: '#ffffff',
-                          border: '1px solid #334155',
-                          fontSize: '12px',
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '10px', color: '#94a3b8' }}>Font Weight</label>
+                  {selectedLayer.isEditableBySiteUser && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: '#34d399' }}>Auto-Fill Variable Binding</label>
                       <select
-                        value={selectedLayer.style.fontWeight || 600}
-                        onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontWeight: Number(e.target.value) })}
+                        value={selectedLayer.fieldKey || ''}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { fieldKey: e.target.value as any })}
                         style={{
                           width: '100%',
-                          padding: '6px',
+                          padding: '6px 8px',
                           borderRadius: '6px',
                           backgroundColor: '#0f172a',
-                          color: '#ffffff',
                           border: '1px solid #334155',
-                          fontSize: '12px',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          outline: 'none',
                         }}
                       >
-                        <option value={400}>Regular (400)</option>
-                        <option value={600}>Semi-Bold (600)</option>
-                        <option value={700}>Bold (700)</option>
-                        <option value={800}>Extra Bold (800)</option>
-                        <option value={900}>Black (900)</option>
+                        <option value="">None (Custom Freeform Text)</option>
+                        {FIELD_KEY_OPTIONS.map((f) => (
+                          <option key={f.key} value={f.key}>
+                            {f.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
+                  )}
+                </div>
+
+                {/* 2. Content & Text Editor */}
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '6px' }}>
+                    Content & Default Template Text
+                  </label>
+                  <textarea
+                    rows={selectedLayer.type === 'text' ? 3 : 2}
+                    value={selectedLayer.content}
+                    onChange={(e) => handleUpdateLayer(selectedLayer.id, { content: e.target.value })}
+                    placeholder="Enter layer text or URL..."
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: '6px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                {/* 3. Typography Suite (if Text / Badge) */}
+                {(selectedLayer.type === 'text' || selectedLayer.type === 'badge') && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Typography
+                    </div>
+
+                    {/* Font Family */}
+                    <div>
+                      <select
+                        value={selectedLayer.style.fontFamily || 'Inter'}
+                        onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontFamily: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          backgroundColor: '#1e293b',
+                          border: '1px solid #334155',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                        }}
+                      >
+                        {FONT_OPTIONS.map((font) => (
+                          <option key={font} value={font}>
+                            {font}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Font Size & Weight */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div>
+                        <label style={{ fontSize: '10px', color: '#94a3b8' }}>Font Size (px)</label>
+                        <input
+                          type="number"
+                          value={selectedLayer.style.fontSize || 14}
+                          onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontSize: parseInt(e.target.value) || 12 })}
+                          style={{
+                            width: '100%',
+                            padding: '6px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: '#1e293b',
+                            border: '1px solid #334155',
+                            color: '#ffffff',
+                            fontSize: '11px',
+                            marginTop: '2px',
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '10px', color: '#94a3b8' }}>Weight</label>
+                        <select
+                          value={selectedLayer.style.fontWeight || 600}
+                          onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontWeight: parseInt(e.target.value) })}
+                          style={{
+                            width: '100%',
+                            padding: '6px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: '#1e293b',
+                            border: '1px solid #334155',
+                            color: '#ffffff',
+                            fontSize: '11px',
+                            marginTop: '2px',
+                          }}
+                        >
+                          <option value="400">Regular (400)</option>
+                          <option value="500">Medium (500)</option>
+                          <option value="600">SemiBold (600)</option>
+                          <option value="700">Bold (700)</option>
+                          <option value="800">ExtraBold (800)</option>
+                          <option value="900">Black (900)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Text Alignment */}
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {(['left', 'center', 'right'] as const).map((align) => (
+                        <button
+                          key={align}
+                          onClick={() => handleUpdateLayerStyle(selectedLayer.id, { textAlign: align })}
+                          style={{
+                            flex: 1,
+                            padding: '6px',
+                            borderRadius: '6px',
+                            border: 'none',
+                            backgroundColor: selectedLayer.style.textAlign === align ? '#0284c7' : '#1e293b',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {align === 'left' && <AlignLeft size={13} />}
+                          {align === 'center' && <AlignCenter size={13} />}
+                          {align === 'right' && <AlignRight size={13} />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Color & Swatches */}
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                    Color & Styling
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                    <input
+                      type="color"
+                      value={selectedLayer.style.color || '#ffffff'}
+                      onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })}
+                      style={{ width: '32px', height: '32px', borderRadius: '6px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
+                    />
+                    <input
+                      type="text"
+                      value={selectedLayer.style.color || '#ffffff'}
+                      onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })}
+                      style={{
+                        flex: 1,
+                        padding: '6px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: '#1e293b',
+                        border: '1px solid #334155',
+                        color: '#ffffff',
+                        fontSize: '11px',
+                      }}
+                    />
                   </div>
 
-                  <div>
-                    <label style={{ fontSize: '10px', color: '#94a3b8' }}>Text Color</label>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <input
-                        type="color"
-                        value={selectedLayer.style.color || '#ffffff'}
-                        onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })}
-                        style={{ width: '32px', height: '32px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
-                      />
-                      <input
-                        type="text"
-                        value={selectedLayer.style.color || '#ffffff'}
-                        onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '4px' }}>
+                    {COLOR_SWATCHES.map((swatch) => (
+                      <button
+                        key={swatch}
+                        onClick={() => handleUpdateLayerStyle(selectedLayer.id, { color: swatch })}
                         style={{
-                          flex: 1,
-                          padding: '6px 10px',
+                          width: '100%',
+                          height: '20px',
+                          borderRadius: '3px',
+                          backgroundColor: swatch,
+                          border: selectedLayer.style.color === swatch ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                          cursor: 'pointer',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. Position & Sizing (%) */}
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                    Position & Dimensions (%)
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <div>
+                      <label style={{ fontSize: '10px', color: '#94a3b8' }}>X Position (%)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={selectedLayer.x}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { x: parseInt(e.target.value) || 0 })}
+                        style={{
+                          width: '100%',
+                          padding: '6px 8px',
                           borderRadius: '6px',
-                          backgroundColor: '#0f172a',
-                          color: '#ffffff',
+                          backgroundColor: '#1e293b',
                           border: '1px solid #334155',
-                          fontSize: '12px',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          marginTop: '2px',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '10px', color: '#94a3b8' }}>Y Position (%)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={selectedLayer.y}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { y: parseInt(e.target.value) || 0 })}
+                        style={{
+                          width: '100%',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          backgroundColor: '#1e293b',
+                          border: '1px solid #334155',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          marginTop: '2px',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '10px', color: '#94a3b8' }}>Width (%)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={selectedLayer.width}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { width: parseInt(e.target.value) || 10 })}
+                        style={{
+                          width: '100%',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          backgroundColor: '#1e293b',
+                          border: '1px solid #334155',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          marginTop: '2px',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '10px', color: '#94a3b8' }}>Height (%)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={selectedLayer.height}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { height: parseInt(e.target.value) || 10 })}
+                        style={{
+                          width: '100%',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          backgroundColor: '#1e293b',
+                          border: '1px solid #334155',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          marginTop: '2px',
                         }}
                       />
                     </div>
                   </div>
                 </div>
-              )}
 
-              {/* Geometry Controls */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                  Position & Size (%)
-                </span>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <div>
-                    <label style={{ fontSize: '10px', color: '#94a3b8' }}>X Position (%)</label>
-                    <input
-                      type="number"
-                      value={selectedLayer.x}
-                      onChange={(e) => handleUpdateLayer(selectedLayer.id, { x: Number(e.target.value) })}
-                      style={{ width: '100%', padding: '6px', borderRadius: '6px', backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #334155', fontSize: '12px' }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '10px', color: '#94a3b8' }}>Y Position (%)</label>
-                    <input
-                      type="number"
-                      value={selectedLayer.y}
-                      onChange={(e) => handleUpdateLayer(selectedLayer.id, { y: Number(e.target.value) })}
-                      style={{ width: '100%', padding: '6px', borderRadius: '6px', backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #334155', fontSize: '12px' }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '10px', color: '#94a3b8' }}>Width (%)</label>
-                    <input
-                      type="number"
-                      value={selectedLayer.width}
-                      onChange={(e) => handleUpdateLayer(selectedLayer.id, { width: Number(e.target.value) })}
-                      style={{ width: '100%', padding: '6px', borderRadius: '6px', backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #334155', fontSize: '12px' }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '10px', color: '#94a3b8' }}>Height (%)</label>
-                    <input
-                      type="number"
-                      value={selectedLayer.height}
-                      onChange={(e) => handleUpdateLayer(selectedLayer.id, { height: Number(e.target.value) })}
-                      style={{ width: '100%', padding: '6px', borderRadius: '6px', backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #334155', fontSize: '12px' }}
-                    />
-                  </div>
+                {/* 6. Layer Z-Index Reorder */}
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    onClick={() => handleMoveLayerZ(selectedLayer.id, 'up')}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      borderRadius: '6px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Bring Forward
+                  </button>
+                  <button
+                    onClick={() => handleMoveLayerZ(selectedLayer.id, 'down')}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      borderRadius: '6px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Send Backward
+                  </button>
                 </div>
+              </>
+            ) : (
+              <div style={{ padding: '24px 12px', textAlign: 'center', color: '#64748b' }}>
+                <Layers size={32} color="#334155" style={{ margin: '0 auto 12px' }} />
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>No Layer Selected</div>
+                <p style={{ fontSize: '11px', marginTop: '6px' }}>
+                  Click any element on the visual canvas or select a layer from the left panel to inspect and customize properties.
+                </p>
               </div>
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', color: '#94a3b8', padding: '32px 0' }}>
-              <Sliders size={28} style={{ margin: '0 auto 8px auto', opacity: 0.5 }} />
-              <p style={{ fontSize: '13px', margin: 0 }}>Select a layer on the canvas or from the layer stack to edit its properties & rules.</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 3. Live Proof Preview Modal */}
+      {/* 3. PROOF PREVIEW MODAL */}
       <AnimatePresence>
         {isPreviewModalOpen && (
           <div
@@ -1398,133 +1875,146 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               position: 'fixed',
               inset: 0,
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
-              backdropFilter: 'blur(10px)',
+              backdropFilter: 'blur(8px)',
+              zIndex: 100,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              zIndex: 1000,
               padding: '24px',
             }}
+            onClick={() => setIsPreviewModalOpen(false)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
               style={{
-                backgroundColor: '#1e293b',
-                borderRadius: '20px',
-                border: '1px solid #334155',
-                padding: '24px',
-                maxWidth: '750px',
                 width: '100%',
+                maxWidth: '850px',
+                backgroundColor: '#111827',
+                borderRadius: '16px',
+                border: '1px solid #374151',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '16px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>Print Proof Verification</h3>
-                  <p style={{ fontSize: '12px', color: '#94a3b8', margin: '4px 0 0 0' }}>
-                    {template.name} • {template.dimensions.width}&quot; × {template.dimensions.height}&quot; {template.category}
-                  </p>
+              {/* Modal Header */}
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f2937', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Eye size={18} color="#38bdf8" />
+                  <span style={{ fontSize: '15px', fontWeight: 800, color: '#ffffff' }}>
+                    Print Artwork Proof Preview: {template.name}
+                  </span>
                 </div>
                 <button
                   onClick={() => setIsPreviewModalOpen(false)}
-                  style={{
-                    padding: '6px 12px',
-                    borderRadius: '8px',
-                    backgroundColor: '#334155',
-                    color: '#ffffff',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                  }}
+                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
                 >
-                  Close
+                  <X size={18} />
                 </button>
               </div>
 
-              {/* Scaled Preview */}
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  aspectRatio: template.aspectRatio.replace(':', ' / '),
-                  backgroundColor: template.canvasConfig.backgroundColor,
-                  backgroundImage: template.canvasConfig.bgGradient || 'none',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)',
-                }}
-              >
-                {template.layers.map((layer) => (
+              {/* Modal Body */}
+              <div style={{ padding: '24px', display: 'flex', gap: '24px', alignItems: 'center' }}>
+                {/* Proof Visual */}
+                <div
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#090d16',
+                    padding: '24px',
+                    borderRadius: '12px',
+                  }}
+                >
                   <div
-                    key={layer.id}
                     style={{
-                      position: 'absolute',
-                      left: `${layer.x}%`,
-                      top: `${layer.y}%`,
-                      width: `${layer.width}%`,
-                      height: `${layer.height}%`,
-                      zIndex: layer.zIndex || 1,
-                      backgroundColor: layer.style.backgroundColor || 'transparent',
-                      borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : 0,
-                      opacity: layer.style.opacity ?? 1,
-                      display: 'flex',
-                      alignItems: layer.type === 'text' ? 'flex-start' : 'center',
-                      justifyContent: layer.type === 'qrcode' ? 'center' : 'flex-start',
-                      padding: layer.style.padding ? `${layer.style.padding}px` : '4px',
+                      position: 'relative',
+                      width: `${baseWidth * 0.75}px`,
+                      height: `${baseHeight * 0.75}px`,
+                      backgroundColor: template.canvasConfig.backgroundColor,
+                      backgroundImage: template.canvasConfig.bgGradient || 'none',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      boxShadow: '0 15px 35px rgba(0,0,0,0.6)',
                     }}
                   >
-                    {layer.type === 'text' && (
+                    {template.layers.map((l) => (
                       <div
+                        key={l.id}
                         style={{
-                          fontSize: `${layer.style.fontSize || 14}px`,
-                          fontWeight: layer.style.fontWeight || 600,
-                          color: layer.style.color || '#ffffff',
-                          textAlign: layer.style.textAlign || 'left',
-                          lineHeight: layer.style.lineHeight || 1.3,
-                          width: '100%',
-                          whiteSpace: 'pre-wrap',
+                          position: 'absolute',
+                          left: `${l.x}%`,
+                          top: `${l.y}%`,
+                          width: `${l.width}%`,
+                          height: `${l.height}%`,
+                          color: l.style.color || '#fff',
+                          backgroundColor: l.style.backgroundColor || 'transparent',
+                          fontSize: `${(l.style.fontSize || 14) * 0.75}px`,
+                          fontWeight: l.style.fontWeight || 600,
+                          textAlign: l.style.textAlign || 'left',
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '2px',
                         }}
                       >
-                        {layer.content}
+                        {l.type === 'text' && l.content}
+                        {l.type === 'badge' && l.content}
+                        {l.type === 'logo' && l.content && (
+                          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <Image src={l.content} alt={l.name} fill unoptimized style={{ objectFit: 'contain' }} />
+                          </div>
+                        )}
+                        {l.type === 'qrcode' && <QrCode size={20} color="#0f172a" />}
                       </div>
-                    )}
-                    {layer.type === 'logo' && (
-                      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                        <Image src={layer.content} alt="Logo" fill unoptimized style={{ objectFit: 'contain' }} />
-                      </div>
-                    )}
-                    {layer.type === 'qrcode' && (
-                      <div style={{ backgroundColor: '#ffffff', padding: '4px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <QrCode size={30} color="#0f172a" />
-                      </div>
-                    )}
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#94a3b8' }}>
-                <span>✅ Bleed 0.125&quot; and trim margins are pre-aligned for commercial direct UV press.</span>
-                <button
-                  onClick={() => {
-                    setIsPreviewModalOpen(false);
-                    handleSave(true);
-                  }}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '8px',
-                    backgroundColor: '#0284c7',
-                    color: '#ffffff',
-                    fontWeight: 700,
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Approve & Publish Template
-                </button>
+                {/* Preflight Checklist */}
+                <div style={{ width: '280px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase' }}>
+                    Preflight Certification
+                  </span>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px', color: '#94a3b8' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399' }}>
+                      <CheckCircle2 size={14} /> Resolution: 300 DPI (High Fidelity)
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399' }}>
+                      <CheckCircle2 size={14} /> Bleed Safe: {template.bleedMargin}&quot; Verified
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399' }}>
+                      <CheckCircle2 size={14} /> Total Layers: {template.layers.length} Active
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8' }}>
+                      <Info size={14} /> {editableLayersCount} Location Variables Bound
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #1f2937', paddingTop: '12px', marginTop: '4px' }}>
+                    <button
+                      onClick={() => setIsPreviewModalOpen(false)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        backgroundColor: '#0284c7',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Return to Studio
+                    </button>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>

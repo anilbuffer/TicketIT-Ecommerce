@@ -112,6 +112,10 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
     router.push(ROLE_DETAILS[newRole].defaultRedirect);
   };
 
+  const isStudioRoute =
+    pathname?.includes('/templates/') &&
+    (pathname?.includes('/edit') || pathname?.includes('/builder') || pathname?.includes('/customize'));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
 
@@ -119,7 +123,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
         {/* 1. LEFT SIDEBAR (DESKTOP) */}
         <aside
           style={{
-            width: isSidebarCollapsed ? '80px' : '260px',
+            width: isSidebarCollapsed || isStudioRoute ? '72px' : '260px',
             background: '#1e1b38',
             color: '#ffffff',
             display: 'flex',
@@ -136,10 +140,10 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           {/* Brand Header */}
           <div
             style={{
-              padding: isSidebarCollapsed ? '1.25rem 0.5rem' : '1.25rem 1.25rem',
+              padding: isSidebarCollapsed || isStudioRoute ? '1.25rem 0.5rem' : '1.25rem 1.25rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: isSidebarCollapsed ? 'center' : 'space-between',
+              justifyContent: isSidebarCollapsed || isStudioRoute ? 'center' : 'space-between',
               borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
             }}
           >
@@ -151,7 +155,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                 textDecoration: 'none',
               }}
             >
-              {isSidebarCollapsed ? (
+              {isSidebarCollapsed || isStudioRoute ? (
                 <div
                   style={{
                     width: '38px',
@@ -176,7 +180,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           </div>
 
           {/* Current Active Role Badge */}
-          {!isSidebarCollapsed && (
+          {!(isSidebarCollapsed || isStudioRoute) && (
             <div
               style={{
                 margin: '1rem 1rem 0.5rem 1rem',
@@ -232,6 +236,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           <nav style={{ flex: 1, padding: '0.75rem 0.6rem', overflowY: 'auto' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               {activeNavList.map((item) => {
+                const isItemCollapsed = isSidebarCollapsed || isStudioRoute;
                 const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href) && item.href !== '/site-user' && item.href !== '/head-office');
                 return (
                   <Link
@@ -240,9 +245,9 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: isSidebarCollapsed ? 'center' : 'space-between',
+                      justifyContent: isItemCollapsed ? 'center' : 'space-between',
                       gap: '0.75rem',
-                      padding: isSidebarCollapsed ? '0.7rem' : '0.65rem 0.85rem',
+                      padding: isItemCollapsed ? '0.7rem' : '0.65rem 0.85rem',
                       borderRadius: '10px',
                       color: isActive ? '#ffffff' : '#94a3b8',
                       background: isActive ? 'rgba(247, 53, 130, 0.2)' : 'transparent',
@@ -252,14 +257,14 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                       fontSize: '0.82rem',
                       transition: 'all 0.15s ease',
                     }}
-                    title={isSidebarCollapsed ? item.label : undefined}
+                    title={isItemCollapsed ? item.label : undefined}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <span style={{ color: isActive ? '#f73582' : '#94a3b8' }}>{item.icon}</span>
-                      {!isSidebarCollapsed && <span>{item.label}</span>}
+                      {!isItemCollapsed && <span>{item.label}</span>}
                     </div>
 
-                    {!isSidebarCollapsed && item.badge && (
+                    {!isItemCollapsed && item.badge && (
                       <span
                         style={{
                           fontSize: '0.65rem',
@@ -323,7 +328,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                     }}
                   >
                     <Shield size={16} color="#059669" />
-                    <span>Admin (Operations HQ)</span>
+                    <span>Admin HQ</span>
                   </button>
 
                   <button
@@ -336,7 +341,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                       borderRadius: '8px',
                       background: role === 'head_office' ? 'rgba(37, 99, 235, 0.2)' : 'transparent',
                       border: role === 'head_office' ? '1px solid rgba(37, 99, 235, 0.4)' : 'none',
-                      color: role === 'head_office' ? '#93c5fd' : '#94a3b8',
+                      color: role === 'head_office' ? '#60a5fa' : '#94a3b8',
                       cursor: 'pointer',
                       fontSize: '0.8rem',
                       fontWeight: 600,
@@ -345,7 +350,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                     }}
                   >
                     <Building2 size={16} color="#2563eb" />
-                    <span>Head Office (All Sites)</span>
+                    <span>Head Office</span>
                   </button>
 
                   <button
@@ -367,7 +372,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                     }}
                   >
                     <Store size={16} color="#f73582" />
-                    <span>Site User (Branch Orders)</span>
+                    <span>Site User (Branch)</span>
                   </button>
                 </div>
               </div>
@@ -377,12 +382,12 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           {/* Sidebar Footer: System Status & User Profile */}
           <div
             style={{
-              padding: isSidebarCollapsed ? '0.75rem 0.5rem' : '0.85rem 1rem',
+              padding: isSidebarCollapsed || isStudioRoute ? '0.75rem 0.5rem' : '0.85rem 1rem',
               borderTop: '1px solid rgba(255, 255, 255, 0.08)',
               background: 'rgba(0, 0, 0, 0.2)',
             }}
           >
-            {!isSidebarCollapsed && (
+            {!(isSidebarCollapsed || isStudioRoute) && (
               <div
                 style={{
                   display: 'flex',
@@ -406,10 +411,10 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: isSidebarCollapsed ? 'center' : 'space-between',
+                justifyContent: isSidebarCollapsed || isStudioRoute ? 'center' : 'space-between',
               }}
             >
-              {!isSidebarCollapsed ? (
+              {!(isSidebarCollapsed || isStudioRoute) ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 0 }}>
                   <div
                     style={{
@@ -468,6 +473,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                     fontWeight: 800,
                     fontSize: '0.82rem',
                   }}
+                  title={user?.name || 'User'}
                 >
                   {user?.name ? user.name.charAt(0) : 'U'}
                 </div>
@@ -483,7 +489,7 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
                   cursor: 'pointer',
                   padding: '6px',
                   borderRadius: '6px',
-                  display: 'flex',
+                  display: isSidebarCollapsed || isStudioRoute ? 'none' : 'flex',
                   alignItems: 'center',
                 }}
               >
@@ -498,13 +504,13 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           {/* Top SaaS Header Bar */}
           <header
             style={{
-              height: '64px',
+              height: '56px',
               background: '#ffffff',
               borderBottom: '1px solid #e2e8f0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '0 1.5rem',
+              padding: '0 1.25rem',
               position: 'sticky',
               top: 0,
               zIndex: 35,
@@ -548,55 +554,62 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
             </div>
 
             {/* Right: Quick Search + Persona Switcher + Status */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-              {/* Live Operational Status Indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {/* Delivery Network Status Pill */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.35rem',
-                  fontSize: '0.72rem',
+                  gap: '0.4rem',
+                  fontSize: '0.75rem',
                   color: '#059669',
-                  background: '#ecfdf5',
-                  border: '1px solid #a7f3d0',
-                  padding: '0.25rem 0.65rem',
-                  borderRadius: '9999px',
                   fontWeight: 700,
+                  background: '#ecfdf5',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '20px',
+                  border: '1px solid #a7f3d0',
                 }}
               >
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#059669' }} />
+                <span
+                  style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#10b981',
+                  }}
+                />
                 <span>Asset Delivery Active</span>
               </div>
 
-              {/* Quick Switch Dropdown */}
+              {/* Persona Switcher Quick Dropdown */}
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.45rem',
+                    gap: '0.4rem',
                     background: '#f8fafc',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '10px',
-                    padding: '0.45rem 0.75rem',
-                    fontSize: '0.8rem',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    padding: '0.4rem 0.75rem',
+                    fontSize: '0.78rem',
                     fontWeight: 700,
-                    color: '#1e293b',
+                    color: '#334155',
                     cursor: 'pointer',
                   }}
                 >
-                  <RefreshCw size={14} color="#f73582" />
+                  <RefreshCw size={13} color="#64748b" />
                   <span>Switch Role</span>
-                  <ChevronDown size={14} color="#64748b" />
+                  <ChevronDown size={14} color="#94a3b8" />
                 </button>
 
                 <AnimatePresence>
                   {isRoleDropdownOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
                       style={{
                         position: 'absolute',
                         right: 0,
@@ -735,7 +748,19 @@ export function SaaSLayout({ children, activeSection, onSectionChange }: SaaSLay
           </header>
 
           {/* Main Content Body */}
-          <main style={{ flex: 1, padding: '28px' }}>{children}</main>
+          <main
+            style={{
+              flex: 1,
+              padding: isStudioRoute ? 0 : '28px',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: 0,
+              overflow: isStudioRoute ? 'hidden' : 'visible',
+              height: isStudioRoute ? 'calc(100vh - 56px)' : 'auto',
+            }}
+          >
+            {children}
+          </main>
         </div>
       </div>
     </div>

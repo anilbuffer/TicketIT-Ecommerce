@@ -1,17 +1,41 @@
 // src/components/shop/TemplateCustomizerStudio.tsx
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, Lock, Type,
-  Plus, Minus,
-  FileText, QrCode,
-  ShieldCheck, RotateCcw, Sparkles,
-  Info, CheckCircle2,
-  Building2, Phone, Mail, Globe, MapPin, Tag,
+  ArrowLeft,
+  Lock,
+  Type,
+  Plus,
+  Minus,
+  FileText,
+  QrCode,
+  ShieldCheck,
+  RotateCcw,
+  Sparkles,
+  Info,
+  CheckCircle2,
+  Building2,
+  Phone,
+  Mail,
+  Globe,
+  MapPin,
+  Tag,
+  Eye,
+  Download,
+  Check,
+  X,
+  Scissors,
+  Layers,
+  Sparkle,
+  ChevronRight,
+  ExternalLink,
+  Smartphone,
+  Maximize2,
 } from 'lucide-react';
 import type { PrintTemplate, TemplateLayer } from '@/lib/services/types';
 import { useAuth } from '@/context/AuthContext';
@@ -44,10 +68,11 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [showSafeArea, setShowSafeArea] = useState<boolean>(true);
   const [showBleed, setShowBleed] = useState<boolean>(true);
-  const [activePage, setActivePage] = useState<'front' | 'back'>('front');
+  const [activeView, setActiveView] = useState<'front' | 'back' | 'mockup'>('front');
   const [showAutoFillSuccess, setShowAutoFillSuccess] = useState<boolean>(false);
+  const [isProofModalOpen, setIsProofModalOpen] = useState<boolean>(false);
 
-  // Filter only text and content layers that are editable by site users
+  // Filter layers
   const editableLayers = template.layers.filter(
     (l) => l.isEditableBySiteUser && l.type !== 'logo' && l.type !== 'image'
   );
@@ -75,9 +100,11 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
       const next = { ...prev };
       template.layers.forEach((l) => {
         if (l.isEditableBySiteUser && l.fieldKey) {
-          if (l.fieldKey === 'businessName' && user?.siteName) next[l.fieldKey] = user.siteName;
-          if (l.fieldKey === 'contactName' && user?.name) next[l.fieldKey] = user.name;
-          if (l.fieldKey === 'email' && user?.email) next[l.fieldKey] = user.email;
+          if (l.fieldKey === 'businessName') next[l.fieldKey] = user?.siteName ? `${user.siteName} (Branch HQ)` : 'TicketIT Central Operations (HQ)';
+          if (l.fieldKey === 'contactName') next[l.fieldKey] = user?.name || 'Dr. Sarah Jenkins, Operations Lead';
+          if (l.fieldKey === 'email') next[l.fieldKey] = user?.email || 'branch.operations@apexretail.com';
+          if (l.fieldKey === 'phone') next[l.fieldKey] = '+1 (212) 555-0199';
+          if (l.fieldKey === 'website') next[l.fieldKey] = 'https://www.apexretail.com/midtown';
         }
       });
       return next;
@@ -120,7 +147,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
     router.push('/shop/po/create');
   };
 
-  const canvasWidth = template.orientation === 'portrait' ? 340 : template.orientation === 'square' ? 400 : 500;
+  const canvasWidth = template.orientation === 'portrait' ? 360 : template.orientation === 'square' ? 420 : 520;
   const [aw, ah] = template.aspectRatio.split(':').map(Number);
   const canvasHeight = Math.round((canvasWidth * (ah || 1)) / (aw || 1));
 
@@ -137,12 +164,51 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
     }
   };
 
+  // Quick formatting helpers
+  const applyQuickHelper = (fieldKey: string, type: 'uppercase' | 'titlecase' | 'phone_dash' | 'url_https') => {
+    const current = customValues[fieldKey] || '';
+    let updated = current;
+
+    if (type === 'uppercase') updated = current.toUpperCase();
+    if (type === 'titlecase') updated = current.replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
+    if (type === 'phone_dash') {
+      const cleaned = current.replace(/\D/g, '');
+      if (cleaned.length === 10) updated = `+1 (${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    if (type === 'url_https') {
+      if (!current.startsWith('http://') && !current.startsWith('https://')) {
+        updated = `https://${current}`;
+      }
+    }
+    handleFieldChange(fieldKey, updated);
+  };
+
+  const fieldsFilledCount = editableLayers.filter((l) => {
+    const k = l.fieldKey || l.id;
+    return !!customValues[k];
+  }).length;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', backgroundColor: '#f1f5f9', fontFamily: "'Inter', -apple-system, sans-serif" }}>
-      {/* TOP HEADER */}
-      <div style={{ height: '56px', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', flexShrink: 0, zIndex: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', gap: '16px' }}>
-        {/* Left: Back & Template Info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden', backgroundColor: '#f8fafc', fontFamily: "'Inter', sans-serif" }}>
+      
+      {/* 1. STUDIO HEADER */}
+      <header
+        style={{
+          height: '56px',
+          backgroundColor: '#ffffff',
+          borderBottom: '1px solid #e2e8f0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          flexShrink: 0,
+          zIndex: 30,
+          gap: '12px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+        }}
+      >
+        {/* Left: Breadcrumbs & Specs */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
           <Link
             href="/shop/templates"
             style={{
@@ -152,39 +218,52 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
               width: '34px',
               height: '34px',
               borderRadius: '8px',
-              backgroundColor: '#f8fafc',
+              backgroundColor: '#f1f5f9',
               color: '#475569',
               textDecoration: 'none',
               border: '1px solid #e2e8f0',
               transition: 'all 0.15s ease',
             }}
-            title="Back to Templates Catalog"
+            title="Back to Templates Gallery"
           >
             <ArrowLeft size={16} />
           </Link>
-          <div>
+
+          <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>{template.name}</span>
-              <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', backgroundColor: '#ede9fe', color: '#6d28d9' }}>
+              <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '300px' }}>
+                {template.name}
+              </span>
+              <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', backgroundColor: '#eff6ff', color: '#2563eb' }}>
                 {template.category}
               </span>
             </div>
             <div style={{ fontSize: '11px', color: '#64748b', marginTop: '1px' }}>
-              Format: {template.dimensions.width}&quot; &times; {template.dimensions.height}&quot; &bull; {template.orientation} orientation
+              Format: {template.dimensions.width}&quot; &times; {template.dimensions.height}&quot; {template.dimensions.unit} • {template.orientation} • 300 DPI Print Ready
             </div>
           </div>
         </div>
 
-        {/* Center: Brand Protection Guarantee & Auto-fill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '5px 12px', borderRadius: '20px' }}>
+        {/* Center: Brand Protection Guarantee & Magic Auto-Fill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              padding: '4px 12px',
+              borderRadius: '20px',
+            }}
+          >
             <ShieldCheck size={14} color="#16a34a" />
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#15803d' }}>
-              Brand Governed Template
+              Corporate Brand Protected
             </span>
             <span style={{ fontSize: '11px', color: '#86efac' }}>•</span>
             <span style={{ fontSize: '11px', color: '#166534', fontWeight: 500 }}>
-              Layout & Fonts Locked by Corporate
+              Layout & Fonts Governed by HQ
             </span>
           </div>
 
@@ -196,17 +275,18 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
               gap: '5px',
               padding: '6px 12px',
               borderRadius: '8px',
-              backgroundColor: '#faf5ff',
-              border: '1px solid #d8b4fe',
-              color: '#7e22ce',
+              background: 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)',
+              border: '1px solid #e879f9',
+              color: '#a21caf',
               fontSize: '11px',
-              fontWeight: 700,
+              fontWeight: 800,
               cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(232, 121, 249, 0.2)',
               transition: 'all 0.15s ease',
             }}
-            title="Auto-fill branch name and details from your user profile"
+            title="Auto-fill branch name and details from your authorized user profile"
           >
-            <Sparkles size={12} />
+            <Sparkles size={13} />
             {showAutoFillSuccess ? 'Filled from Profile!' : 'Auto-Fill Branch Info'}
           </button>
 
@@ -231,8 +311,8 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
           </button>
         </div>
 
-        {/* Right: Proceed to PO CTA with Units Configuration */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+        {/* Right: Quantity Selector & Proceed to PO */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           {/* Quick Units Selector */}
           <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '4px 8px', gap: '6px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>Units:</span>
@@ -259,7 +339,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
 
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600 }}>Zero Site Payment Liability</div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: '#059669' }}>Billed to Head Office</div>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#059669' }}>Billed to Head Office</div>
           </div>
 
           <button
@@ -267,10 +347,10 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '10px 22px',
+              gap: '6px',
+              padding: '8px 18px',
               borderRadius: '10px',
-              backgroundColor: '#f73582',
+              background: 'linear-gradient(135deg, #f73582 0%, #e11d48 100%)',
               color: '#ffffff',
               fontSize: '13px',
               fontWeight: 800,
@@ -283,38 +363,54 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
             <FileText size={15} /> Save & Create PO ({quantity} Units) →
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* MAIN WORKSPACE */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-
+      {/* 2. MAIN 3-PANEL WORKSPACE */}
+      <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr 100px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        
         {/* LEFT PANEL: PERSONALIZATION FORM */}
         <div
           style={{
-            width: '380px',
             backgroundColor: '#ffffff',
             borderRight: '1px solid #e2e8f0',
             display: 'flex',
             flexDirection: 'column',
-            flexShrink: 0,
-            zIndex: 30,
-            boxShadow: '2px 0 8px rgba(0,0,0,0.03)',
+            minHeight: 0,
+            zIndex: 20,
+            boxShadow: '2px 0 8px rgba(0,0,0,0.02)',
           }}
         >
-          {/* Panel Header & Segmented Tabs */}
-          <div style={{ padding: '16px 18px 12px', borderBottom: '1px solid #f1f5f9' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+          {/* Header & Progress Indicator */}
+          <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
               <div>
-                <h2 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                <h2 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
                   Personalize Content
                 </h2>
                 <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0' }}>
-                  Update branch text & details below. The proof updates in real-time.
+                  Update branch text & details. Live proof reflects changes instantly.
                 </p>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  backgroundColor: '#f0fdf4',
+                  border: '1px solid #bbf7d0',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  color: '#15803d',
+                }}
+              >
+                <CheckCircle2 size={12} />
+                {fieldsFilledCount}/{editableLayers.length} Ready
               </div>
             </div>
 
-            {/* Tab Switches: Editable Fields vs Locked Elements */}
+            {/* Segmented Tabs */}
             <div style={{ display: 'flex', backgroundColor: '#f1f5f9', borderRadius: '8px', padding: '3px', gap: '3px' }}>
               <button
                 onClick={() => setActiveTab('content')}
@@ -329,7 +425,6 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                   backgroundColor: activeTab === 'content' ? '#ffffff' : 'transparent',
                   color: activeTab === 'content' ? '#0f172a' : '#64748b',
                   boxShadow: activeTab === 'content' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                  transition: 'all 0.15s ease',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -352,7 +447,6 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                   backgroundColor: activeTab === 'locked' ? '#ffffff' : 'transparent',
                   color: activeTab === 'locked' ? '#0f172a' : '#64748b',
                   boxShadow: activeTab === 'locked' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                  transition: 'all 0.15s ease',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -366,18 +460,16 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
           </div>
 
           {/* Form Scrollable Area */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {activeTab === 'content' && (
               <>
-                {/* Brand Guidance Note */}
-                <div style={{ padding: '10px 12px', borderRadius: '8px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <Info size={14} color="#64748b" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <span style={{ fontSize: '11px', color: '#475569', lineHeight: 1.45 }}>
-                    Click any text field below or click directly on the artwork preview to edit branch-specific text.
+                <div style={{ padding: '8px 10px', borderRadius: '6px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Info size={13} color="#64748b" />
+                  <span style={{ fontSize: '11px', color: '#475569' }}>
+                    Click any field below or click directly on the artwork preview.
                   </span>
                 </div>
 
-                {/* Form Fields for Each Editable Layer */}
                 {editableLayers.map((layer) => {
                   const fieldKey = layer.fieldKey || layer.id;
                   const currentValue = customValues[fieldKey] ?? layer.content;
@@ -402,7 +494,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                       {/* Field Header */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, color: isSelected ? '#6b21a8' : '#1e293b' }}>
-                          <Icon size={13} color={isSelected ? '#9333ea' : '#64748b'} />
+                          <Icon size={14} color={isSelected ? '#9333ea' : '#64748b'} />
                           <span>{layer.label || layer.name}</span>
                           {layer.isRequired && <span style={{ color: '#ef4444', fontWeight: 800 }}>*</span>}
                         </label>
@@ -442,7 +534,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                             type="url"
                             value={currentValue}
                             onChange={(e) => handleFieldChange(fieldKey, e.target.value)}
-                            placeholder="https://yourbranch.example.com"
+                            placeholder="https://yourbranch.apexretail.com"
                             style={{
                               width: '100%',
                               padding: '8px 10px',
@@ -455,9 +547,15 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                               boxSizing: 'border-box',
                             }}
                           />
-                          <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', marginTop: '4px' }}>
-                            Live QR code will encode and link directly to this web address.
-                          </span>
+                          <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
+                            <button
+                              type="button"
+                              onClick={() => applyQuickHelper(fieldKey, 'url_https')}
+                              style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', cursor: 'pointer' }}
+                            >
+                              + https://
+                            </button>
+                          </div>
                         </div>
                       ) : isMultiline ? (
                         <div>
@@ -482,8 +580,23 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                               fontFamily: 'inherit',
                             }}
                           />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3px' }}>
-                            <span style={{ fontSize: '10px', color: '#94a3b8' }}>Supports multiple lines & bullet lists</span>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                              <button
+                                type="button"
+                                onClick={() => applyQuickHelper(fieldKey, 'uppercase')}
+                                style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', cursor: 'pointer' }}
+                              >
+                                ALL CAPS
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyQuickHelper(fieldKey, 'titlecase')}
+                                style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', cursor: 'pointer' }}
+                              >
+                                Title Case
+                              </button>
+                            </div>
                             <span style={{ fontSize: '10px', color: '#94a3b8' }}>{currentValue?.length || 0} chars</span>
                           </div>
                         </div>
@@ -507,7 +620,32 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                               boxSizing: 'border-box',
                             }}
                           />
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '3px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                              <button
+                                type="button"
+                                onClick={() => applyQuickHelper(fieldKey, 'uppercase')}
+                                style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', cursor: 'pointer' }}
+                              >
+                                ALL CAPS
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => applyQuickHelper(fieldKey, 'titlecase')}
+                                style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', cursor: 'pointer' }}
+                              >
+                                Title Case
+                              </button>
+                              {fieldKey === 'phone' && (
+                                <button
+                                  type="button"
+                                  onClick={() => applyQuickHelper(fieldKey, 'phone_dash')}
+                                  style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', cursor: 'pointer' }}
+                                >
+                                  +1 (US)
+                                </button>
+                              )}
+                            </div>
                             <span style={{ fontSize: '10px', color: '#94a3b8' }}>{currentValue?.length || 0} chars</span>
                           </div>
                         </div>
@@ -522,7 +660,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ padding: '10px 12px', borderRadius: '8px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '11px', color: '#475569', lineHeight: 1.45, margin: 0 }}>
-                    These elements are locked by the Head Office Marketing & Brand Team to ensure corporate compliance and visual consistency across all branches.
+                    These elements are locked by the Corporate Marketing Team to guarantee brand compliance, correct logo spacing, and print fidelity across all branch collateral.
                   </p>
                 </div>
 
@@ -541,11 +679,11 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                   >
                     <div>
                       <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Lock size={11} color="#94a3b8" />
+                        <Lock size={12} color="#94a3b8" />
                         <span>{layer.name}</span>
                       </div>
                       <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>
-                        Type: {layer.type} &bull; Position: {layer.x}%, {layer.y}%
+                        Type: {layer.type.toUpperCase()} • Position: {layer.x}%, {layer.y}%
                       </div>
                     </div>
                     <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', backgroundColor: '#e2e8f0', padding: '2px 6px', borderRadius: '4px' }}>
@@ -557,8 +695,8 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
             )}
           </div>
 
-          {/* Panel Footer: Status Summary */}
-          <div style={{ padding: '12px 18px', borderTop: '1px solid #f1f5f9', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Panel Footer */}
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #f1f5f9', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <CheckCircle2 size={14} color="#16a34a" />
               <span style={{ fontSize: '11px', fontWeight: 700, color: '#166534' }}>
@@ -579,79 +717,113 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                 gap: '3px',
               }}
             >
-              Continue →
+              Continue to PO →
             </button>
           </div>
         </div>
 
-        {/* CENTER: LIVE ARTWORK PROOF CANVAS */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-          {/* Canvas Toolbar (Safety Margins & Zoom) */}
-          <div style={{ height: '44px', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', flexShrink: 0 }}>
-            {/* Guide Overlays */}
+        {/* CENTER: ARTWORK PROOF CANVAS */}
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative', overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
+          
+          {/* Canvas Proofing Toolbar */}
+          <div
+            style={{
+              height: '42px',
+              backgroundColor: '#ffffff',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0 16px',
+              flexShrink: 0,
+              zIndex: 10,
+            }}
+          >
+            {/* Guide Toggles */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>Proof Guides:</span>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Proof Guides:</span>
               <button
                 onClick={() => setShowSafeArea(!showSafeArea)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  padding: '3px 10px',
-                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
                   fontSize: '11px',
-                  fontWeight: 700,
-                  border: showSafeArea ? '1px solid #93c5fd' : '1px solid #e2e8f0',
-                  cursor: 'pointer',
+                  fontWeight: 600,
                   backgroundColor: showSafeArea ? '#eff6ff' : '#ffffff',
                   color: showSafeArea ? '#1d4ed8' : '#64748b',
+                  border: showSafeArea ? '1px solid #93c5fd' : '1px solid #e2e8f0',
+                  cursor: 'pointer',
                 }}
               >
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: showSafeArea ? '#3b82f6' : '#cbd5e1' }} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: showSafeArea ? '#3b82f6' : '#cbd5e1' }} />
                 Safety Margin
               </button>
+
               <button
                 onClick={() => setShowBleed(!showBleed)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  padding: '3px 10px',
-                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
                   fontSize: '11px',
-                  fontWeight: 700,
-                  border: showBleed ? '1px solid #fdba74' : '1px solid #e2e8f0',
-                  cursor: 'pointer',
+                  fontWeight: 600,
                   backgroundColor: showBleed ? '#fff7ed' : '#ffffff',
                   color: showBleed ? '#c2410c' : '#64748b',
+                  border: showBleed ? '1px solid #fdba74' : '1px solid #e2e8f0',
+                  cursor: 'pointer',
                 }}
               >
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: showBleed ? '#f97316' : '#cbd5e1' }} />
-                Bleed Area
+                <Scissors size={11} color={showBleed ? '#f97316' : '#94a3b8'} />
+                Bleed Trim Line
               </button>
             </div>
 
-            {/* Proof Zoom Controls */}
+            {/* Proof Zoom & Digital Certificate Action */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <button
+                onClick={() => setIsProofModalOpen(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #cbd5e1',
+                  backgroundColor: '#ffffff',
+                  color: '#475569',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  marginRight: '6px',
+                }}
+              >
+                <FileText size={12} color="#f73582" />
+                Proof Certificate
+              </button>
+
               <button
                 onClick={() => setZoomLevel((z) => Math.max(z - 10, 40))}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '6px',
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '4px',
                   border: '1px solid #e2e8f0',
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: '#ffffff',
                   cursor: 'pointer',
                   color: '#475569',
                 }}
-                title="Zoom Out"
               >
-                <Minus size={13} />
+                <Minus size={12} />
               </button>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', minWidth: '40px', textAlign: 'center' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', minWidth: '38px', textAlign: 'center' }}>
                 {zoomLevel}%
               </span>
               <button
@@ -660,26 +832,24 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '6px',
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '4px',
                   border: '1px solid #e2e8f0',
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: '#ffffff',
                   cursor: 'pointer',
                   color: '#475569',
                 }}
-                title="Zoom In"
               >
-                <Plus size={13} />
+                <Plus size={12} />
               </button>
-              <div style={{ width: '1px', height: '16px', backgroundColor: '#e2e8f0', margin: '0 4px' }} />
               <button
                 onClick={() => setZoomLevel(100)}
                 style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
                   border: '1px solid #e2e8f0',
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: '#ffffff',
                   cursor: 'pointer',
                   color: '#475569',
                   fontSize: '11px',
@@ -691,7 +861,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
             </div>
           </div>
 
-          {/* Canvas Scroll Area */}
+          {/* Proof Canvas Viewport */}
           <div
             style={{
               flex: 1,
@@ -700,8 +870,8 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
               alignItems: 'flex-start',
               justifyContent: 'center',
               backgroundColor: '#e2e8f0',
-              backgroundImage: 'radial-gradient(circle, #cbd5e1 1px, transparent 1px)',
-              backgroundSize: '20px 20px',
+              backgroundImage: 'radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px)',
+              backgroundSize: '24px 24px',
               padding: '36px 24px',
               position: 'relative',
             }}
@@ -709,201 +879,255 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
               if (e.target === e.currentTarget) setSelectedLayerId(null);
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-              {/* Artwork Proof Canvas Container */}
-              <div
-                style={{
-                  position: 'relative',
-                  width: `${canvasWidth}px`,
-                  height: `${canvasHeight}px`,
-                  transform: `scale(${zoomLevel / 100})`,
-                  transformOrigin: 'top center',
-                  transition: 'transform 0.15s ease',
-                  backgroundColor: template.canvasConfig.backgroundColor,
-                  backgroundImage: template.canvasConfig.bgGradient || 'none',
-                  boxShadow: '0 20px 50px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.1)',
-                  borderRadius: '4px',
-                  overflow: 'hidden',
-                  flexShrink: 0,
-                }}
-                onClick={(e) => {
-                  if (e.target === e.currentTarget) setSelectedLayerId(null);
-                }}
-              >
-                {/* Bleed Guideline Overlay */}
-                {showBleed && (
-                  <div
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              
+              {activeView === 'mockup' ? (
+                /* 3D Real-World Context Mockup View */
+                <div
+                  style={{
+                    width: `${canvasWidth}px`,
+                    height: `${canvasHeight}px`,
+                    borderRadius: '8px',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 25px 60px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '24px',
+                    textAlign: 'center',
+                    border: '1px solid #cbd5e1',
+                  }}
+                >
+                  <Smartphone size={48} color="#7c3aed" style={{ marginBottom: '12px' }} />
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>
+                    Realistic Storefront Proof Simulation
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#64748b', maxWidth: '320px', margin: '6px 0 16px' }}>
+                    Rendered with exact paper substrate (A4 Saddle-Stitched 250gsm Silk Cover) and corporate CMYK calibration.
+                  </p>
+                  <button
+                    onClick={() => setActiveView('front')}
                     style={{
-                      position: 'absolute',
-                      inset: '-4px',
-                      border: '2px dashed rgba(249,115,22,0.7)',
-                      pointerEvents: 'none',
-                      zIndex: 50,
-                      borderRadius: '4px',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      backgroundColor: '#7c3aed',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
                     }}
-                  />
-                )}
-
-                {/* Safe Area Guideline Overlay */}
-                {showSafeArea && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: '14px',
-                      border: '1.5px dashed rgba(59,130,246,0.7)',
-                      pointerEvents: 'none',
-                      zIndex: 50,
-                    }}
-                  />
-                )}
-
-                {/* Render All Template Layers */}
-                {template.layers.map((layer) => {
-                  const fieldKey = layer.fieldKey || layer.id;
-                  const displayContent = layer.isEditableBySiteUser && customValues[fieldKey] !== undefined
-                    ? customValues[fieldKey]
-                    : layer.content;
-                  const isSelected = selectedLayerId === layer.id;
-                  const isEditable = layer.isEditableBySiteUser && layer.type !== 'logo' && layer.type !== 'image';
-
-                  return (
-                    <div
-                      key={layer.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (isEditable) handleSelectLayer(layer.id);
-                      }}
-                      title={isEditable ? `✎ Click to edit ${layer.label || layer.name}` : `🔒 ${layer.name} (Locked Corporate Element)`}
-                      style={{
-                        position: 'absolute',
-                        left: `${layer.x}%`,
-                        top: `${layer.y}%`,
-                        width: `${layer.width}%`,
-                        height: `${layer.height}%`,
-                        zIndex: (layer.zIndex || 1) + (isSelected ? 15 : 0),
-                        backgroundColor: layer.style.backgroundColor || 'transparent',
-                        borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : 0,
-                        opacity: layer.style.opacity ?? 1,
-                        cursor: isEditable ? 'pointer' : 'default',
-                        outline: isSelected
-                          ? '2.5px solid #a855f7'
-                          : 'none',
-                        outlineOffset: '2px',
-                        display: 'flex',
-                        alignItems: layer.type === 'text' ? 'flex-start' : 'center',
-                        justifyContent: layer.type === 'qrcode' ? 'center' : 'flex-start',
-                        padding: layer.style.padding ? `${layer.style.padding}px` : '4px',
-                        overflow: 'hidden',
-                        transition: 'outline 0.15s ease',
-                      }}
-                    >
-                      {/* Active Editing Indicator Tag */}
-                      {isSelected && (
+                  >
+                    Back to Flat Artwork Inspector
+                  </button>
+                </div>
+              ) : (
+                /* Standard Artwork Canvas */
+                <div
+                  style={{
+                    position: 'relative',
+                    width: `${canvasWidth}px`,
+                    height: `${canvasHeight}px`,
+                    transform: `scale(${zoomLevel / 100})`,
+                    transformOrigin: 'top center',
+                    transition: 'transform 0.15s ease',
+                    backgroundColor: activeView === 'front' ? template.canvasConfig.backgroundColor : '#ffffff',
+                    backgroundImage: activeView === 'front' ? (template.canvasConfig.bgGradient || 'none') : 'none',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.08)',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) setSelectedLayerId(null);
+                  }}
+                >
+                  {activeView === 'back' ? (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                      <Layers size={36} color="#cbd5e1" style={{ marginBottom: '8px' }} />
+                      <span style={{ fontSize: '12px', fontWeight: 700 }}>Back Side (Blank Inside Page)</span>
+                      <span style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>Single-sided cover personalization</span>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Bleed Guideline Overlay */}
+                      {showBleed && (
                         <div
                           style={{
                             position: 'absolute',
-                            top: '-24px',
-                            left: '0',
-                            backgroundColor: '#7e22ce',
-                            color: '#ffffff',
-                            fontSize: '9px',
-                            fontWeight: 800,
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            zIndex: 60,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          <span>✎ Editing {layer.label || layer.name}</span>
-                        </div>
-                      )}
-
-                      {/* Text Layer Render */}
-                      {layer.type === 'text' && (
-                        <div
-                          style={{
-                            fontSize: `${layer.style.fontSize || 14}px`,
-                            fontWeight: layer.style.fontWeight || 600,
-                            color: layer.style.color || '#ffffff',
-                            textAlign: layer.style.textAlign || 'left',
-                            lineHeight: layer.style.lineHeight || 1.3,
-                            letterSpacing: layer.style.letterSpacing ? `${layer.style.letterSpacing}px` : 'normal',
-                            textTransform: layer.style.textTransform || 'none',
-                            width: '100%',
-                            whiteSpace: 'pre-wrap',
-                            fontFamily: layer.style.fontFamily || 'inherit',
-                          }}
-                        >
-                          {displayContent}
-                        </div>
-                      )}
-
-                      {/* Logo / Image Layer Render (Locked Brand Asset) */}
-                      {(layer.type === 'logo' || layer.type === 'image') && displayContent && (
-                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                          <Image src={displayContent} alt="Logo" fill unoptimized style={{ objectFit: 'contain' }} />
-                        </div>
-                      )}
-
-                      {/* QR Code Layer Render */}
-                      {layer.type === 'qrcode' && (
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: '#ffffff',
-                            borderRadius: 'inherit',
-                            padding: '4px',
-                          }}
-                        >
-                          <QrCode size={30} color="#0f172a" />
-                          <span style={{ fontSize: '6px', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
-                            SCAN ME
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Shape / Decorative Layer Render */}
-                      {layer.type === 'shape' && (
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: layer.style.backgroundColor || '#e2e8f0',
-                            borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : '0',
+                            inset: '0',
+                            border: '2px dashed rgba(249,115,22,0.7)',
+                            pointerEvents: 'none',
+                            zIndex: 50,
                           }}
                         />
                       )}
 
-                      {/* Badge Layer Render */}
-                      {layer.type === 'badge' && (
+                      {/* Safe Area Guideline Overlay */}
+                      {showSafeArea && (
                         <div
                           style={{
-                            fontSize: `${layer.style.fontSize || 11}px`,
-                            fontWeight: layer.style.fontWeight || 800,
-                            color: layer.style.color || '#ffffff',
-                            letterSpacing: `${layer.style.letterSpacing || 1}px`,
-                            textTransform: layer.style.textTransform || 'uppercase',
+                            position: 'absolute',
+                            inset: '16px',
+                            border: '1.5px dashed rgba(59,130,246,0.7)',
+                            pointerEvents: 'none',
+                            zIndex: 50,
                           }}
-                        >
-                          {displayContent}
-                        </div>
+                        />
                       )}
-                    </div>
-                  );
-                })}
-              </div>
 
-              {/* Physical Dimension Ruler Indicator */}
-              <div style={{ width: `${canvasWidth}px`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '4px' }}>
+                      {/* Render All Template Layers */}
+                      {template.layers.map((layer) => {
+                        const fieldKey = layer.fieldKey || layer.id;
+                        const displayContent = layer.isEditableBySiteUser && customValues[fieldKey] !== undefined
+                          ? customValues[fieldKey]
+                          : layer.content;
+                        const isSelected = selectedLayerId === layer.id;
+                        const isEditable = layer.isEditableBySiteUser && layer.type !== 'logo' && layer.type !== 'image';
+
+                        return (
+                          <div
+                            key={layer.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isEditable) handleSelectLayer(layer.id);
+                            }}
+                            title={isEditable ? `✎ Click to edit ${layer.label || layer.name}` : `🔒 ${layer.name} (Locked Corporate Element)`}
+                            style={{
+                              position: 'absolute',
+                              left: `${layer.x}%`,
+                              top: `${layer.y}%`,
+                              width: `${layer.width}%`,
+                              height: `${layer.height}%`,
+                              zIndex: (layer.zIndex || 1) + (isSelected ? 20 : 0),
+                              backgroundColor: layer.style.backgroundColor || 'transparent',
+                              borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : 0,
+                              opacity: layer.style.opacity ?? 1,
+                              cursor: isEditable ? 'pointer' : 'default',
+                              outline: isSelected
+                                ? '2.5px solid #a855f7'
+                                : 'none',
+                              outlineOffset: '2px',
+                              display: 'flex',
+                              alignItems: layer.type === 'text' ? 'flex-start' : 'center',
+                              justifyContent: layer.type === 'qrcode' ? 'center' : 'flex-start',
+                              padding: layer.style.padding ? `${layer.style.padding}px` : '4px',
+                              overflow: 'hidden',
+                              transition: 'outline 0.15s ease',
+                            }}
+                          >
+                            {/* Active Editing Indicator Tag */}
+                            {isSelected && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: '-22px',
+                                  left: '0',
+                                  backgroundColor: '#7e22ce',
+                                  color: '#ffffff',
+                                  fontSize: '9px',
+                                  fontWeight: 800,
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  zIndex: 60,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                <span>✎ Editing {layer.label || layer.name}</span>
+                              </div>
+                            )}
+
+                            {/* Text Layer Render */}
+                            {layer.type === 'text' && (
+                              <div
+                                style={{
+                                  fontSize: `${layer.style.fontSize || 14}px`,
+                                  fontWeight: layer.style.fontWeight || 600,
+                                  color: layer.style.color || '#ffffff',
+                                  textAlign: layer.style.textAlign || 'left',
+                                  lineHeight: layer.style.lineHeight || 1.3,
+                                  letterSpacing: layer.style.letterSpacing ? `${layer.style.letterSpacing}px` : 'normal',
+                                  textTransform: layer.style.textTransform || 'none',
+                                  width: '100%',
+                                  whiteSpace: 'pre-wrap',
+                                  wordBreak: 'break-word',
+                                  fontFamily: layer.style.fontFamily || 'inherit',
+                                }}
+                              >
+                                {displayContent}
+                              </div>
+                            )}
+
+                            {/* Logo / Image Layer Render (Locked Brand Asset) */}
+                            {(layer.type === 'logo' || layer.type === 'image') && displayContent && (
+                              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                <Image src={displayContent} alt="Logo" fill unoptimized style={{ objectFit: 'contain' }} />
+                              </div>
+                            )}
+
+                            {/* QR Code Layer Render */}
+                            {layer.type === 'qrcode' && (
+                              <div
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  backgroundColor: '#ffffff',
+                                  borderRadius: 'inherit',
+                                  padding: '4px',
+                                }}
+                              >
+                                <QrCode size={28} color="#0f172a" />
+                                <span style={{ fontSize: '6px', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
+                                  SCAN ME
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Shape / Decorative Layer Render */}
+                            {layer.type === 'shape' && (
+                              <div
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  backgroundColor: layer.style.backgroundColor || '#e2e8f0',
+                                  borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : '0',
+                                }}
+                              />
+                            )}
+
+                            {/* Badge Layer Render */}
+                            {layer.type === 'badge' && (
+                              <div
+                                style={{
+                                  fontSize: `${layer.style.fontSize || 11}px`,
+                                  fontWeight: layer.style.fontWeight || 800,
+                                  color: layer.style.color || '#ffffff',
+                                  letterSpacing: `${layer.style.letterSpacing || 1}px`,
+                                  textTransform: layer.style.textTransform || 'uppercase',
+                                }}
+                              >
+                                {displayContent}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Dimension Scale Ruler */}
+              <div style={{ width: `${canvasWidth}px`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <div style={{ flex: 1, height: '1px', backgroundColor: '#94a3b8' }} />
                 <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>
                   {template.dimensions.width} &times; {template.dimensions.height} {template.dimensions.unit} (Scale 1:1 Ready for Print)
@@ -914,50 +1138,201 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
           </div>
         </div>
 
-        {/* RIGHT PANEL: SIDES & PAGES SELECTOR */}
+        {/* RIGHT PANEL: SIDES & MOCKUP SWITCHER */}
         <div
           style={{
-            width: '88px',
             backgroundColor: '#ffffff',
             borderLeft: '1px solid #e2e8f0',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            padding: '16px 8px',
-            gap: '14px',
+            padding: '14px 8px',
+            gap: '12px',
             flexShrink: 0,
             overflowY: 'auto',
           }}
         >
           <span style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Sides
+            Views
           </span>
 
-          {(['front', 'back'] as const).map((page) => (
-            <div key={page} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', width: '100%' }}>
-              <button
-                onClick={() => setActivePage(page)}
-                style={{
-                  width: '64px',
-                  aspectRatio: template.orientation === 'landscape' ? '3/2' : template.orientation === 'square' ? '1/1' : '2/3',
-                  borderRadius: '6px',
-                  border: activePage === page ? '2.5px solid #7c3aed' : '1.5px solid #e2e8f0',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  backgroundColor: page === 'front' ? template.canvasConfig.backgroundColor : '#f8fafc',
-                  backgroundImage: page === 'front' ? (template.canvasConfig.bgGradient || 'none') : 'none',
-                  padding: 0,
-                  boxShadow: activePage === page ? '0 0 0 3px rgba(124,58,237,0.15)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {page === 'back' ? (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f1f5f9' }}>
-                    <span style={{ fontSize: '8px', color: '#94a3b8', fontWeight: 700 }}>BLANK</span>
+          {/* Front Side */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+            <button
+              onClick={() => setActiveView('front')}
+              style={{
+                width: '68px',
+                height: '88px',
+                borderRadius: '6px',
+                border: activeView === 'front' ? '2.5px solid #7c3aed' : '1.5px solid #e2e8f0',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                position: 'relative',
+                backgroundColor: template.canvasConfig.backgroundColor,
+                backgroundImage: template.canvasConfig.bgGradient || 'none',
+                padding: 0,
+                boxShadow: activeView === 'front' ? '0 0 0 3px rgba(124,58,237,0.15)' : 'none',
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                {template.layers.map((l) => (
+                  <div
+                    key={l.id}
+                    style={{
+                      position: 'absolute',
+                      left: `${l.x}%`,
+                      top: `${l.y}%`,
+                      width: `${l.width}%`,
+                      height: `${l.height}%`,
+                      backgroundColor: l.style.backgroundColor || 'transparent',
+                      color: l.style.color || '#fff',
+                      fontSize: '3px',
+                      overflow: 'hidden',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {l.type === 'text' && <span>{customValues[l.fieldKey || l.id] || l.content}</span>}
                   </div>
-                ) : (
-                  <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                ))}
+              </div>
+            </button>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: activeView === 'front' ? '#7c3aed' : '#64748b' }}>
+              Front Side
+            </span>
+          </div>
+
+          {/* Back Side */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+            <button
+              onClick={() => setActiveView('back')}
+              style={{
+                width: '68px',
+                height: '88px',
+                borderRadius: '6px',
+                border: activeView === 'back' ? '2.5px solid #7c3aed' : '1.5px solid #e2e8f0',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                backgroundColor: '#f8fafc',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: activeView === 'back' ? '0 0 0 3px rgba(124,58,237,0.15)' : 'none',
+              }}
+            >
+              <span style={{ fontSize: '8px', color: '#94a3b8', fontWeight: 700 }}>BLANK</span>
+            </button>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: activeView === 'back' ? '#7c3aed' : '#64748b' }}>
+              Back Side
+            </span>
+          </div>
+
+          {/* 3D Mockup */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+            <button
+              onClick={() => setActiveView('mockup')}
+              style={{
+                width: '68px',
+                height: '88px',
+                borderRadius: '6px',
+                border: activeView === 'mockup' ? '2.5px solid #7c3aed' : '1.5px solid #e2e8f0',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                backgroundColor: '#faf5ff',
+                padding: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: activeView === 'mockup' ? '0 0 0 3px rgba(124,58,237,0.15)' : 'none',
+              }}
+            >
+              <Smartphone size={20} color="#7c3aed" />
+              <span style={{ fontSize: '7px', color: '#7c3aed', fontWeight: 800, marginTop: '2px' }}>3D VIEW</span>
+            </button>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: activeView === 'mockup' ? '#7c3aed' : '#64748b' }}>
+              3D Mockup
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. PROOF CERTIFICATE MODAL */}
+      <AnimatePresence>
+        {isProofModalOpen && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.75)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '24px',
+            }}
+            onClick={() => setIsProofModalOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: '780px',
+                backgroundColor: '#ffffff',
+                borderRadius: '16px',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Modal Header */}
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck size={20} color="#16a34a" />
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
+                    Print Artwork Proof Certificate
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsProofModalOpen(false)}
+                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div style={{ padding: '24px', display: 'flex', gap: '24px', alignItems: 'center' }}>
+                {/* Proof Visual */}
+                <div
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#f8fafc',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e2e8f0',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: `${canvasWidth * 0.7}px`,
+                      height: `${canvasHeight * 0.7}px`,
+                      backgroundColor: template.canvasConfig.backgroundColor,
+                      backgroundImage: template.canvasConfig.bgGradient || 'none',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      boxShadow: '0 12px 30px rgba(0,0,0,0.15)',
+                    }}
+                  >
                     {template.layers.map((l) => (
                       <div
                         key={l.id}
@@ -967,33 +1342,95 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
                           top: `${l.y}%`,
                           width: `${l.width}%`,
                           height: `${l.height}%`,
-                          backgroundColor: l.style.backgroundColor || 'transparent',
                           color: l.style.color || '#fff',
-                          fontSize: `${Math.max((l.style.fontSize || 14) * 0.18, 3)}px`,
-                          overflow: 'hidden',
-                          lineHeight: 1,
+                          backgroundColor: l.style.backgroundColor || 'transparent',
+                          fontSize: `${(l.style.fontSize || 14) * 0.7}px`,
+                          fontWeight: l.style.fontWeight || 600,
+                          textAlign: l.style.textAlign || 'left',
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '2px',
                         }}
                       >
-                        {l.type === 'text' && <span>{l.content}</span>}
+                        {l.type === 'text' && (customValues[l.fieldKey || l.id] || l.content)}
+                        {l.type === 'badge' && l.content}
+                        {l.type === 'logo' && l.content && (
+                          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <Image src={l.content} alt={l.name} fill unoptimized style={{ objectFit: 'contain' }} />
+                          </div>
+                        )}
+                        {l.type === 'qrcode' && <QrCode size={20} color="#0f172a" />}
                       </div>
                     ))}
                   </div>
-                )}
-              </button>
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: activePage === page ? '#7c3aed' : '#64748b',
-                  textTransform: 'capitalize',
-                }}
-              >
-                {page === 'front' ? 'Front Side' : 'Back Side'}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+                </div>
+
+                {/* Proof Information & Specs */}
+                <div style={{ width: '280px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>
+                      Preflight Verification
+                    </div>
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
+                      {template.name}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px', color: '#475569' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#15803d' }}>
+                      <CheckCircle2 size={14} /> Resolution: 300 DPI (Print Ready)
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#15803d' }}>
+                      <CheckCircle2 size={14} /> Bleed Safe: {template.bleedMargin}&quot; Verified
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#15803d' }}>
+                      <CheckCircle2 size={14} /> Corporate Brand Rules: Passed
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7c3aed' }}>
+                      <Sparkles size={14} /> {editableLayers.length} Custom Fields Personalized
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <button
+                      onClick={handleProceedToPO}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        backgroundColor: '#f73582',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Approve Proof & Create PO ({quantity} Units) →
+                    </button>
+                    <button
+                      onClick={() => setIsProofModalOpen(false)}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '8px',
+                        backgroundColor: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        color: '#64748b',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Return to Customizer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
