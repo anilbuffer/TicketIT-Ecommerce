@@ -1,7 +1,7 @@
 // src/components/admin/TemplateBuilderStudio.tsx
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -18,19 +18,10 @@ import {
   Square,
   Lock,
   Unlock,
-  Sliders,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
   Copy,
   Trash2,
-  Upload,
-  ChevronDown,
   Sparkles,
-  ShieldAlert,
   Info,
-  Maximize2,
-  FileCheck,
   Settings2,
   ExternalLink,
   Move,
@@ -38,16 +29,13 @@ import {
   AlignLeft,
   AlignRight,
   EyeOff,
-  Palette,
   Grid,
   Scissors,
   CheckCircle2,
-  Download,
   X,
   Plus,
   Minus,
   Pencil,
-  Sparkle,
   ShieldCheck,
 } from 'lucide-react';
 import type {
@@ -130,7 +118,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       bleedMargin: 0.125,
       safeMargin: 0.375,
       status: 'DRAFT',
-      theme: 'retail',
+      theme: 'retail' as TemplateTheme,
       canvasConfig: {
         backgroundColor: '#ffffff',
         bgGradient: 'linear-gradient(160deg, #f8fafc 0%, #ffffff 100%)',
@@ -217,12 +205,23 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
     }
   );
 
-  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(template.layers[1]?.id || template.layers[0]?.id || null);
+  useEffect(() => {
+    if (initialTemplate) {
+      setTemplate(initialTemplate);
+      if (initialTemplate.layers && initialTemplate.layers.length > 0) {
+        setSelectedLayerId(initialTemplate.layers[0].id);
+      }
+    }
+  }, [initialTemplate]);
+
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(
+    initialTemplate?.layers?.[0]?.id || template.layers?.[1]?.id || template.layers?.[0]?.id || null
+  );
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [showBleedGuides, setShowBleedGuides] = useState<boolean>(true);
   const [showSafeGuides, setShowSafeGuides] = useState<boolean>(true);
   const [showGrid, setShowGrid] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'layers' | 'add' | 'setup' | 'governance'>('layers');
+  const [activeTab, setActiveTab] = useState<'layers' | 'add' | 'setup'>('layers');
   const [layerFilter, setLayerFilter] = useState<'all' | 'editable' | 'locked'>('all');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
@@ -234,28 +233,28 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
   const [isDraggingLayer, setIsDraggingLayer] = useState(false);
   const dragStartRef = useRef<{ startX: number; startY: number; initialLayerX: number; initialLayerY: number } | null>(null);
 
-  const selectedLayer = template.layers.find((l) => l.id === selectedLayerId) || null;
+  const selectedLayer = template.layers?.find((l) => l.id === selectedLayerId) || null;
 
   // Layer manipulation helpers
   const handleUpdateLayer = (id: string, updates: Partial<TemplateLayer>) => {
     setTemplate((prev) => ({
       ...prev,
-      layers: prev.layers.map((l) => (l.id === id ? { ...l, ...updates } : l)),
+      layers: (prev.layers || []).map((l) => (l.id === id ? { ...l, ...updates } : l)),
     }));
   };
 
   const handleUpdateLayerStyle = (id: string, styleUpdates: Partial<TemplateLayer['style']>) => {
     setTemplate((prev) => ({
       ...prev,
-      layers: prev.layers.map((l) =>
-        l.id === id ? { ...l, style: { ...l.style, ...styleUpdates } } : l
+      layers: (prev.layers || []).map((l) =>
+        l.id === id ? { ...l, style: { ...(l.style || {}), ...styleUpdates } } : l
       ),
     }));
   };
 
   const handleAddLayer = (type: TemplateLayerType) => {
     const newId = `layer-${Date.now()}`;
-    let newLayer: TemplateLayer = {
+    const newLayer: TemplateLayer = {
       id: newId,
       type,
       name: `New ${type.charAt(0).toUpperCase() + type.slice(1)} Element`,
@@ -264,8 +263,8 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       label: `Custom ${type.toUpperCase()}`,
       x: 15,
       y: 25,
-      width: type === 'qrcode' ? 18 : type === 'logo' ? 20 : type === 'shape' ? 70 : 65,
-      height: type === 'qrcode' ? 18 : type === 'logo' ? 20 : type === 'shape' ? 20 : 10,
+      width: type === 'qrcode' ? 18 : type === 'logo' ? 20 : type === 'shape' ? 70 : type === 'divider' ? 80 : 65,
+      height: type === 'qrcode' ? 18 : type === 'logo' ? 20 : type === 'shape' ? 20 : type === 'divider' ? 2 : 10,
       content:
         type === 'text'
           ? 'Enter your customizable message here'
@@ -280,17 +279,26 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
         fontSize: type === 'text' ? 16 : type === 'badge' ? 11 : 14,
         fontWeight: type === 'badge' ? 800 : 600,
         color: '#ffffff',
-        backgroundColor: type === 'shape' ? '#0284c7' : type === 'badge' ? '#f73582' : type === 'qrcode' ? '#ffffff' : undefined,
-        borderRadius: type === 'shape' || type === 'qrcode' ? 8 : type === 'badge' ? 20 : 0,
+        backgroundColor:
+          type === 'shape'
+            ? '#0284c7'
+            : type === 'badge'
+            ? '#f73582'
+            : type === 'qrcode'
+            ? '#ffffff'
+            : type === 'divider'
+            ? '#f59e0b'
+            : undefined,
+        borderRadius: type === 'shape' || type === 'qrcode' ? 8 : type === 'badge' ? 20 : type === 'divider' ? 2 : 0,
         letterSpacing: type === 'badge' ? 1.5 : 0,
         textAlign: 'left',
       },
-      zIndex: template.layers.length + 1,
+      zIndex: (template.layers || []).length + 1,
     };
 
     setTemplate((prev) => ({
       ...prev,
-      layers: [...prev.layers, newLayer],
+      layers: [...(prev.layers || []), newLayer],
     }));
     setSelectedLayerId(newId);
     setActiveTab('layers');
@@ -299,7 +307,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
   const handleDeleteLayer = (id: string) => {
     setTemplate((prev) => ({
       ...prev,
-      layers: prev.layers.filter((l) => l.id !== id),
+      layers: (prev.layers || []).filter((l) => l.id !== id),
     }));
     if (selectedLayerId === id) {
       setSelectedLayerId(null);
@@ -307,7 +315,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
   };
 
   const handleDuplicateLayer = (id: string) => {
-    const orig = template.layers.find((l) => l.id === id);
+    const orig = template.layers?.find((l) => l.id === id);
     if (!orig) return;
     const newId = `layer-${Date.now()}`;
     const clone: TemplateLayer = {
@@ -316,30 +324,30 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       name: `${orig.name} (Copy)`,
       x: Math.min(orig.x + 4, 80),
       y: Math.min(orig.y + 4, 80),
-      zIndex: template.layers.length + 1,
+      zIndex: (template.layers || []).length + 1,
     };
     setTemplate((prev) => ({
       ...prev,
-      layers: [...prev.layers, clone],
+      layers: [...(prev.layers || []), clone],
     }));
     setSelectedLayerId(newId);
   };
 
   const handleMoveLayerZ = (id: string, direction: 'up' | 'down') => {
     setTemplate((prev) => {
-      const idx = prev.layers.findIndex((l) => l.id === id);
+      const layers = [...(prev.layers || [])];
+      const idx = layers.findIndex((l) => l.id === id);
       if (idx < 0) return prev;
       const targetIdx = direction === 'up' ? idx + 1 : idx - 1;
-      if (targetIdx < 0 || targetIdx >= prev.layers.length) return prev;
+      if (targetIdx < 0 || targetIdx >= layers.length) return prev;
 
-      const newLayers = [...prev.layers];
-      const temp = newLayers[idx];
-      newLayers[idx] = newLayers[targetIdx];
-      newLayers[targetIdx] = temp;
+      const temp = layers[idx];
+      layers[idx] = layers[targetIdx];
+      layers[targetIdx] = temp;
 
       return {
         ...prev,
-        layers: newLayers.map((l, i) => ({ ...l, zIndex: i + 1 })),
+        layers: layers.map((l, i) => ({ ...l, zIndex: i + 1 })),
       };
     });
   };
@@ -365,11 +373,17 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDraggingLayer || !dragStartRef.current || !selectedLayerId || !canvasRef.current) return;
       const rect = canvasRef.current.getBoundingClientRect();
-      const deltaX = ((e.clientX - dragStartRef.current.startX) / rect.width) * 100 * (100 / zoomLevel);
-      const deltaY = ((e.clientY - dragStartRef.current.startY) / rect.height) * 100 * (100 / zoomLevel);
+      if (rect.width === 0 || rect.height === 0) return;
 
-      const newX = Math.max(0, Math.min(100 - (selectedLayer?.width || 10), Math.round(dragStartRef.current.initialLayerX + deltaX)));
-      const newY = Math.max(0, Math.min(100 - (selectedLayer?.height || 10), Math.round(dragStartRef.current.initialLayerY + deltaY)));
+      const deltaX = ((e.clientX - dragStartRef.current.startX) / rect.width) * 100;
+      const deltaY = ((e.clientY - dragStartRef.current.startY) / rect.height) * 100;
+
+      const targetLayer = template.layers?.find((l) => l.id === selectedLayerId);
+      const layerW = targetLayer?.width || 10;
+      const layerH = targetLayer?.height || 10;
+
+      const newX = Math.max(0, Math.min(100 - layerW, Math.round(dragStartRef.current.initialLayerX + deltaX)));
+      const newY = Math.max(0, Math.min(100 - layerH, Math.round(dragStartRef.current.initialLayerY + deltaY)));
 
       handleUpdateLayer(selectedLayerId, { x: newX, y: newY });
     };
@@ -389,7 +403,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDraggingLayer, selectedLayerId, zoomLevel, selectedLayer]);
+  }, [isDraggingLayer, selectedLayerId, template.layers]);
 
   const handleSave = async (publish: boolean = false) => {
     const status = publish ? 'PUBLISHED' : template.status;
@@ -401,13 +415,13 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
 
     if (isNew) {
       const created = await createTemplate(payload);
-      setSaveSuccess(`Template "${created.name}" created successfully!`);
+      setSaveSuccess(`Template "${created?.name || template.name}" created successfully!`);
       setTimeout(() => {
         router.push('/admin/templates');
       }, 1200);
     } else {
       await updateTemplate(template.id, payload);
-      setSaveSuccess(publish ? `Template published to Storefront!` : `Template "${template.name}" draft saved!`);
+      setSaveSuccess(publish ? 'Template published to Storefront!' : `Template "${template.name}" draft saved!`);
       setTimeout(() => setSaveSuccess(null), 3000);
     }
   };
@@ -427,23 +441,34 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
     }
   };
 
-  const filteredLayers = template.layers.filter((l) => {
+  const filteredLayers = (template.layers || []).filter((l) => {
     if (layerFilter === 'editable') return l.isEditableBySiteUser;
     if (layerFilter === 'locked') return !l.isEditableBySiteUser;
     return true;
   });
 
-  const editableLayersCount = template.layers.filter((l) => l.isEditableBySiteUser).length;
-  const lockedLayersCount = template.layers.length - editableLayersCount;
+  const editableLayersCount = (template.layers || []).filter((l) => l.isEditableBySiteUser).length;
+  const lockedLayersCount = (template.layers || []).length - editableLayersCount;
 
   // Calculate canvas dimensions
   const baseWidth = template.orientation === 'portrait' ? 380 : template.orientation === 'square' ? 440 : 540;
-  const [aw, ah] = template.aspectRatio.split(':').map(Number);
-  const baseHeight = Math.round((baseWidth * (ah || 1)) / (aw || 1));
+  const [aw, ah] = (template.aspectRatio || '3:4').split(':').map(Number);
+  const baseHeight = Math.round((baseWidth * (ah || 4)) / (aw || 3));
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', backgroundColor: '#090d16', color: '#f8fafc', overflow: 'hidden', fontFamily: "'Inter', sans-serif" }}>
-      
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        minHeight: 'calc(100vh - 40px)',
+        width: '100%',
+        backgroundColor: '#090d16',
+        color: '#f8fafc',
+        overflow: 'hidden',
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
       {/* 1. TOP STUDIO HEADER BAR */}
       <header
         style={{
@@ -516,7 +541,17 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   }}
                   title="Click to rename template"
                 >
-                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#f8fafc', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '280px' }}>
+                  <span
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      color: '#f8fafc',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      maxWidth: '280px',
+                    }}
+                  >
                     {template.name}
                   </span>
                   <Pencil size={12} color="#64748b" />
@@ -548,7 +583,9 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#94a3b8', margin: '2px 0 0 6px' }}>
               <span>{template.productName}</span>
               <span>•</span>
-              <span style={{ color: '#38bdf8' }}>{template.dimensions.width}&quot; × {template.dimensions.height}&quot; {template.dimensions.unit}</span>
+              <span style={{ color: '#38bdf8' }}>
+                {template.dimensions?.width}&quot; × {template.dimensions?.height}&quot; {template.dimensions?.unit || 'in'}
+              </span>
               <span>•</span>
               <span style={{ color: '#64748b' }}>300 DPI CMYK</span>
             </div>
@@ -603,6 +640,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
           </Link>
 
           <button
+            type="button"
             onClick={() => setIsPreviewModalOpen(true)}
             style={{
               display: 'flex',
@@ -623,6 +661,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
           </button>
 
           <button
+            type="button"
             onClick={() => handleSave(false)}
             disabled={isPending}
             style={{
@@ -636,7 +675,8 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               border: '1px solid #4b5563',
               fontSize: '12px',
               fontWeight: 700,
-              cursor: 'pointer',
+              cursor: isPending ? 'not-allowed' : 'pointer',
+              opacity: isPending ? 0.7 : 1,
             }}
           >
             <Save size={13} />
@@ -644,6 +684,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
           </button>
 
           <button
+            type="button"
             onClick={() => handleSave(true)}
             disabled={isPending}
             style={{
@@ -657,8 +698,9 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               border: 'none',
               fontSize: '12px',
               fontWeight: 800,
-              cursor: 'pointer',
+              cursor: isPending ? 'not-allowed' : 'pointer',
               boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
+              opacity: isPending ? 0.7 : 1,
             }}
           >
             <Sparkles size={13} />
@@ -676,6 +718,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
           {/* Segmented Top Tabs */}
           <div style={{ display: 'flex', padding: '8px', backgroundColor: '#0f172a', borderBottom: '1px solid #1e293b', gap: '4px' }}>
             <button
+              type="button"
               onClick={() => setActiveTab('layers')}
               style={{
                 flex: 1,
@@ -693,9 +736,10 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 gap: '4px',
               }}
             >
-              <Layers size={13} /> Layers ({template.layers.length})
+              <Layers size={13} /> Layers ({(template.layers || []).length})
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('add')}
               style={{
                 flex: 1,
@@ -716,6 +760,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               <Plus size={13} /> Add Elements
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('setup')}
               style={{
                 flex: 1,
@@ -749,6 +794,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                     {(['all', 'editable', 'locked'] as const).map((f) => (
                       <button
                         key={f}
+                        type="button"
                         onClick={() => setLayerFilter(f)}
                         style={{
                           padding: '3px 8px',
@@ -773,7 +819,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
 
                 {/* Layer List */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {filteredLayers.map((layer, idx) => {
+                  {filteredLayers.map((layer) => {
                     const isSelected = selectedLayerId === layer.id;
                     const isHidden = hiddenLayers[layer.id];
 
@@ -810,10 +856,11 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                             }}
                           >
                             {layer.type === 'text' && <Type size={14} />}
-                            {layer.type === 'logo' && <ImageIcon size={14} />}
+                            {(layer.type === 'logo' || layer.type === 'image') && <ImageIcon size={14} />}
                             {layer.type === 'qrcode' && <QrCode size={14} />}
                             {layer.type === 'shape' && <Square size={14} />}
                             {layer.type === 'badge' && <Sparkles size={14} />}
+                            {layer.type === 'divider' && <Minus size={14} />}
                           </div>
 
                           <div style={{ minWidth: 0 }}>
@@ -907,6 +954,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 {/* Element Cards Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   <button
+                    type="button"
                     onClick={() => handleAddLayer('text')}
                     style={{
                       padding: '14px 10px',
@@ -928,6 +976,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleAddLayer('qrcode')}
                     style={{
                       padding: '14px 10px',
@@ -949,6 +998,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleAddLayer('logo')}
                     style={{
                       padding: '14px 10px',
@@ -970,6 +1020,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleAddLayer('badge')}
                     style={{
                       padding: '14px 10px',
@@ -991,6 +1042,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleAddLayer('shape')}
                     style={{
                       padding: '14px 10px',
@@ -1004,12 +1056,33 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       gap: '8px',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
-                      gridColumn: 'span 2',
                     }}
                   >
                     <Square size={20} color="#a78bfa" />
-                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Shape / Decorative Band</span>
-                    <span style={{ fontSize: '9px', color: '#94a3b8' }}>Footer ribbon, color band, or card container</span>
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Shape Block</span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8', textAlign: 'center' }}>Color card or background container</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleAddLayer('divider')}
+                    style={{
+                      padding: '14px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: '#1e293b',
+                      border: '1px solid #334155',
+                      color: '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <Minus size={20} color="#f59e0b" />
+                    <span style={{ fontSize: '12px', fontWeight: 700 }}>Accent Divider</span>
+                    <span style={{ fontSize: '9px', color: '#94a3b8', textAlign: 'center' }}>Thin divider line or accent bar</span>
                   </button>
                 </div>
               </div>
@@ -1048,15 +1121,19 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 {/* Dimensions */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   <div>
-                    <label style={{ fontSize: '11px', color: '#94a3b8' }}>Width ({template.dimensions.unit})</label>
+                    <label style={{ fontSize: '11px', color: '#94a3b8' }}>Width ({template.dimensions?.unit || 'in'})</label>
                     <input
                       type="number"
-                      step="0.1"
-                      value={template.dimensions.width}
+                      step="0.01"
+                      value={template.dimensions?.width ?? 8.5}
                       onChange={(e) =>
                         setTemplate({
                           ...template,
-                          dimensions: { ...template.dimensions, width: parseFloat(e.target.value) || 0 },
+                          dimensions: {
+                            unit: template.dimensions?.unit || 'in',
+                            height: template.dimensions?.height ?? 11,
+                            width: parseFloat(e.target.value) || 0,
+                          },
                         })
                       }
                       style={{
@@ -1072,15 +1149,19 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: '11px', color: '#94a3b8' }}>Height ({template.dimensions.unit})</label>
+                    <label style={{ fontSize: '11px', color: '#94a3b8' }}>Height ({template.dimensions?.unit || 'in'})</label>
                     <input
                       type="number"
-                      step="0.1"
-                      value={template.dimensions.height}
+                      step="0.01"
+                      value={template.dimensions?.height ?? 11}
                       onChange={(e) =>
                         setTemplate({
                           ...template,
-                          dimensions: { ...template.dimensions, height: parseFloat(e.target.value) || 0 },
+                          dimensions: {
+                            unit: template.dimensions?.unit || 'in',
+                            width: template.dimensions?.width ?? 8.5,
+                            height: parseFloat(e.target.value) || 0,
+                          },
                         })
                       }
                       style={{
@@ -1106,16 +1187,17 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                     {GRADIENT_PRESETS.map((g) => (
                       <button
                         key={g.label}
+                        type="button"
                         onClick={() =>
                           setTemplate({
                             ...template,
-                            canvasConfig: { ...template.canvasConfig, bgGradient: g.value },
+                            canvasConfig: { ...(template.canvasConfig || {}), backgroundColor: '#ffffff', bgGradient: g.value },
                           })
                         }
                         style={{
                           padding: '8px',
                           borderRadius: '6px',
-                          border: template.canvasConfig.bgGradient === g.value ? '2px solid #38bdf8' : '1px solid #334155',
+                          border: template.canvasConfig?.bgGradient === g.value ? '2px solid #38bdf8' : '1px solid #334155',
                           background: g.value,
                           color: '#ffffff',
                           fontSize: '10px',
@@ -1156,6 +1238,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Guides:</span>
               <button
+                type="button"
                 onClick={() => setShowBleedGuides(!showBleedGuides)}
                 style={{
                   display: 'flex',
@@ -1176,6 +1259,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               </button>
 
               <button
+                type="button"
                 onClick={() => setShowSafeGuides(!showSafeGuides)}
                 style={{
                   display: 'flex',
@@ -1196,6 +1280,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               </button>
 
               <button
+                type="button"
                 onClick={() => setShowGrid(!showGrid)}
                 style={{
                   display: 'flex',
@@ -1219,6 +1304,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
             {/* Zoom Controls */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <button
+                type="button"
                 onClick={() => setZoomLevel((z) => Math.max(z - 10, 40))}
                 style={{
                   display: 'flex',
@@ -1239,6 +1325,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 {zoomLevel}%
               </span>
               <button
+                type="button"
                 onClick={() => setZoomLevel((z) => Math.min(z + 10, 200))}
                 style={{
                   display: 'flex',
@@ -1256,6 +1343,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 <Plus size={12} />
               </button>
               <button
+                type="button"
                 onClick={() => setZoomLevel(100)}
                 style={{
                   padding: '3px 8px',
@@ -1305,8 +1393,8 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   transform: `scale(${zoomLevel / 100})`,
                   transformOrigin: 'top center',
                   transition: isDraggingLayer ? 'none' : 'transform 0.15s ease',
-                  backgroundColor: template.canvasConfig.backgroundColor,
-                  backgroundImage: template.canvasConfig.bgGradient || 'none',
+                  backgroundColor: template.canvasConfig?.backgroundColor || '#ffffff',
+                  backgroundImage: template.canvasConfig?.bgGradient || 'none',
                   boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
                   borderRadius: '2px',
                   overflow: 'hidden',
@@ -1352,7 +1440,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 )}
 
                 {/* Render Template Layers */}
-                {template.layers.map((layer) => {
+                {(template.layers || []).map((layer) => {
                   if (hiddenLayers[layer.id]) return null;
                   const isSelected = selectedLayerId === layer.id;
 
@@ -1367,16 +1455,16 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                         width: `${layer.width}%`,
                         height: `${layer.height}%`,
                         zIndex: (layer.zIndex || 1) + (isSelected ? 20 : 0),
-                        backgroundColor: layer.style.backgroundColor || 'transparent',
-                        borderRadius: layer.style.borderRadius ? `${layer.style.borderRadius}px` : 0,
-                        opacity: layer.style.opacity ?? 1,
+                        backgroundColor: layer.style?.backgroundColor || 'transparent',
+                        borderRadius: layer.style?.borderRadius ? `${layer.style.borderRadius}px` : 0,
+                        opacity: layer.style?.opacity ?? 1,
                         cursor: 'grab',
                         outline: isSelected ? '2px solid #38bdf8' : 'none',
                         outlineOffset: '2px',
                         display: 'flex',
                         alignItems: layer.type === 'text' ? 'flex-start' : 'center',
-                        justifyContent: layer.type === 'qrcode' ? 'center' : 'flex-start',
-                        padding: layer.style.padding ? `${layer.style.padding}px` : '4px',
+                        justifyContent: layer.type === 'qrcode' || layer.type === 'badge' ? 'center' : 'flex-start',
+                        padding: layer.style?.padding ? `${layer.style.padding}px` : '4px',
                         overflow: 'hidden',
                       }}
                     >
@@ -1409,14 +1497,14 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       {layer.type === 'text' && (
                         <div
                           style={{
-                            fontSize: `${layer.style.fontSize || 14}px`,
-                            fontWeight: layer.style.fontWeight || 600,
-                            color: layer.style.color || '#ffffff',
-                            textAlign: layer.style.textAlign || 'left',
-                            lineHeight: layer.style.lineHeight || 1.3,
-                            letterSpacing: layer.style.letterSpacing ? `${layer.style.letterSpacing}px` : 'normal',
-                            textTransform: layer.style.textTransform || 'none',
-                            fontFamily: layer.style.fontFamily || 'inherit',
+                            fontSize: `${layer.style?.fontSize || 14}px`,
+                            fontWeight: layer.style?.fontWeight || 600,
+                            color: layer.style?.color || '#ffffff',
+                            textAlign: layer.style?.textAlign || 'left',
+                            lineHeight: layer.style?.lineHeight || 1.3,
+                            letterSpacing: layer.style?.letterSpacing ? `${layer.style.letterSpacing}px` : 'normal',
+                            textTransform: layer.style?.textTransform || 'none',
+                            fontFamily: layer.style?.fontFamily || 'inherit',
                             width: '100%',
                             whiteSpace: 'pre-wrap',
                             wordBreak: 'break-word',
@@ -1427,10 +1515,16 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       )}
 
                       {/* Logo / Image Render */}
-                      {(layer.type === 'logo' || layer.type === 'image') && layer.content && (
-                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                          <Image src={layer.content} alt={layer.name} fill unoptimized style={{ objectFit: 'contain' }} />
-                        </div>
+                      {(layer.type === 'logo' || layer.type === 'image') && (
+                        layer.content && layer.content.trim().length > 0 ? (
+                          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <Image src={layer.content} alt={layer.name || 'Image'} fill unoptimized style={{ objectFit: 'contain' }} />
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '6px', border: '1px dashed #475569' }}>
+                            <ImageIcon size={18} color="#64748b" />
+                          </div>
+                        )
                       )}
 
                       {/* QR Code Render */}
@@ -1457,11 +1551,13 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       {layer.type === 'badge' && (
                         <div
                           style={{
-                            fontSize: `${layer.style.fontSize || 11}px`,
-                            fontWeight: layer.style.fontWeight || 800,
-                            color: layer.style.color || '#ffffff',
-                            letterSpacing: `${layer.style.letterSpacing || 1}px`,
+                            fontSize: `${layer.style?.fontSize || 11}px`,
+                            fontWeight: layer.style?.fontWeight || 800,
+                            color: layer.style?.color || '#ffffff',
+                            letterSpacing: `${layer.style?.letterSpacing || 1}px`,
                             textTransform: 'uppercase',
+                            textAlign: 'center',
+                            width: '100%',
                           }}
                         >
                           {layer.content}
@@ -1476,7 +1572,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
               <div style={{ width: `${baseWidth}px`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <div style={{ flex: 1, height: '1px', backgroundColor: '#334155' }} />
                 <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>
-                  {template.dimensions.width} &times; {template.dimensions.height} {template.dimensions.unit} (Scale 1:1 Ready for Print)
+                  {template.dimensions?.width} &times; {template.dimensions?.height} {template.dimensions?.unit || 'in'} (Scale 1:1 Ready for Print)
                 </span>
                 <div style={{ flex: 1, height: '1px', backgroundColor: '#334155' }} />
               </div>
@@ -1530,7 +1626,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       <label style={{ fontSize: '10px', fontWeight: 700, color: '#34d399' }}>Auto-Fill Variable Binding</label>
                       <select
                         value={selectedLayer.fieldKey || ''}
-                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { fieldKey: e.target.value as any })}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { fieldKey: (e.target.value || undefined) as any })}
                         style={{
                           width: '100%',
                           padding: '6px 8px',
@@ -1588,7 +1684,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                     {/* Font Family */}
                     <div>
                       <select
-                        value={selectedLayer.style.fontFamily || 'Inter'}
+                        value={selectedLayer.style?.fontFamily || 'Inter'}
                         onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontFamily: e.target.value })}
                         style={{
                           width: '100%',
@@ -1614,7 +1710,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                         <label style={{ fontSize: '10px', color: '#94a3b8' }}>Font Size (px)</label>
                         <input
                           type="number"
-                          value={selectedLayer.style.fontSize || 14}
+                          value={selectedLayer.style?.fontSize || 14}
                           onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontSize: parseInt(e.target.value) || 12 })}
                           style={{
                             width: '100%',
@@ -1632,7 +1728,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       <div>
                         <label style={{ fontSize: '10px', color: '#94a3b8' }}>Weight</label>
                         <select
-                          value={selectedLayer.style.fontWeight || 600}
+                          value={selectedLayer.style?.fontWeight || 600}
                           onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { fontWeight: parseInt(e.target.value) })}
                           style={{
                             width: '100%',
@@ -1660,13 +1756,14 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       {(['left', 'center', 'right'] as const).map((align) => (
                         <button
                           key={align}
+                          type="button"
                           onClick={() => handleUpdateLayerStyle(selectedLayer.id, { textAlign: align })}
                           style={{
                             flex: 1,
                             padding: '6px',
                             borderRadius: '6px',
                             border: 'none',
-                            backgroundColor: selectedLayer.style.textAlign === align ? '#0284c7' : '#1e293b',
+                            backgroundColor: selectedLayer.style?.textAlign === align ? '#0284c7' : '#1e293b',
                             color: '#ffffff',
                             cursor: 'pointer',
                             display: 'flex',
@@ -1686,19 +1783,35 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 {/* 4. Color & Swatches */}
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
-                    Color & Styling
+                    {selectedLayer.type === 'shape' || selectedLayer.type === 'divider' ? 'Background & Fill Color' : 'Color & Styling'}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                     <input
                       type="color"
-                      value={selectedLayer.style.color || '#ffffff'}
-                      onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })}
+                      value={
+                        selectedLayer.type === 'shape' || selectedLayer.type === 'divider'
+                          ? selectedLayer.style?.backgroundColor || '#0284c7'
+                          : selectedLayer.style?.color || '#ffffff'
+                      }
+                      onChange={(e) =>
+                        selectedLayer.type === 'shape' || selectedLayer.type === 'divider'
+                          ? handleUpdateLayerStyle(selectedLayer.id, { backgroundColor: e.target.value })
+                          : handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })
+                      }
                       style={{ width: '32px', height: '32px', borderRadius: '6px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
                     />
                     <input
                       type="text"
-                      value={selectedLayer.style.color || '#ffffff'}
-                      onChange={(e) => handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })}
+                      value={
+                        selectedLayer.type === 'shape' || selectedLayer.type === 'divider'
+                          ? selectedLayer.style?.backgroundColor || '#0284c7'
+                          : selectedLayer.style?.color || '#ffffff'
+                      }
+                      onChange={(e) =>
+                        selectedLayer.type === 'shape' || selectedLayer.type === 'divider'
+                          ? handleUpdateLayerStyle(selectedLayer.id, { backgroundColor: e.target.value })
+                          : handleUpdateLayerStyle(selectedLayer.id, { color: e.target.value })
+                      }
                       style={{
                         flex: 1,
                         padding: '6px 8px',
@@ -1712,20 +1825,31 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '4px' }}>
-                    {COLOR_SWATCHES.map((swatch) => (
-                      <button
-                        key={swatch}
-                        onClick={() => handleUpdateLayerStyle(selectedLayer.id, { color: swatch })}
-                        style={{
-                          width: '100%',
-                          height: '20px',
-                          borderRadius: '3px',
-                          backgroundColor: swatch,
-                          border: selectedLayer.style.color === swatch ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
-                          cursor: 'pointer',
-                        }}
-                      />
-                    ))}
+                    {COLOR_SWATCHES.map((swatch) => {
+                      const isActive =
+                        selectedLayer.type === 'shape' || selectedLayer.type === 'divider'
+                          ? selectedLayer.style?.backgroundColor === swatch
+                          : selectedLayer.style?.color === swatch;
+                      return (
+                        <button
+                          key={swatch}
+                          type="button"
+                          onClick={() =>
+                            selectedLayer.type === 'shape' || selectedLayer.type === 'divider'
+                              ? handleUpdateLayerStyle(selectedLayer.id, { backgroundColor: swatch })
+                              : handleUpdateLayerStyle(selectedLayer.id, { color: swatch })
+                          }
+                          style={{
+                            width: '100%',
+                            height: '20px',
+                            borderRadius: '3px',
+                            backgroundColor: swatch,
+                            border: isActive ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                            cursor: 'pointer',
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1742,7 +1866,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                         min={0}
                         max={100}
                         value={selectedLayer.x}
-                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { x: parseInt(e.target.value) || 0 })}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { x: parseFloat(e.target.value) || 0 })}
                         style={{
                           width: '100%',
                           padding: '6px 8px',
@@ -1762,7 +1886,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                         min={0}
                         max={100}
                         value={selectedLayer.y}
-                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { y: parseInt(e.target.value) || 0 })}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { y: parseFloat(e.target.value) || 0 })}
                         style={{
                           width: '100%',
                           padding: '6px 8px',
@@ -1782,7 +1906,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                         min={1}
                         max={100}
                         value={selectedLayer.width}
-                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { width: parseInt(e.target.value) || 10 })}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { width: parseFloat(e.target.value) || 1 })}
                         style={{
                           width: '100%',
                           padding: '6px 8px',
@@ -1802,7 +1926,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                         min={1}
                         max={100}
                         value={selectedLayer.height}
-                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { height: parseInt(e.target.value) || 10 })}
+                        onChange={(e) => handleUpdateLayer(selectedLayer.id, { height: parseFloat(e.target.value) || 1 })}
                         style={{
                           width: '100%',
                           padding: '6px 8px',
@@ -1821,6 +1945,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                 {/* 6. Layer Z-Index Reorder */}
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button
+                    type="button"
                     onClick={() => handleMoveLayerZ(selectedLayer.id, 'up')}
                     style={{
                       flex: 1,
@@ -1837,6 +1962,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                     Bring Forward
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleMoveLayerZ(selectedLayer.id, 'down')}
                     style={{
                       flex: 1,
@@ -1910,6 +2036,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                   </span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setIsPreviewModalOpen(false)}
                   style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
                 >
@@ -1936,14 +2063,14 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       position: 'relative',
                       width: `${baseWidth * 0.75}px`,
                       height: `${baseHeight * 0.75}px`,
-                      backgroundColor: template.canvasConfig.backgroundColor,
-                      backgroundImage: template.canvasConfig.bgGradient || 'none',
+                      backgroundColor: template.canvasConfig?.backgroundColor || '#ffffff',
+                      backgroundImage: template.canvasConfig?.bgGradient || 'none',
                       borderRadius: '4px',
                       overflow: 'hidden',
                       boxShadow: '0 15px 35px rgba(0,0,0,0.6)',
                     }}
                   >
-                    {template.layers.map((l) => (
+                    {(template.layers || []).map((l) => (
                       <div
                         key={l.id}
                         style={{
@@ -1952,11 +2079,11 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                           top: `${l.y}%`,
                           width: `${l.width}%`,
                           height: `${l.height}%`,
-                          color: l.style.color || '#fff',
-                          backgroundColor: l.style.backgroundColor || 'transparent',
-                          fontSize: `${(l.style.fontSize || 14) * 0.75}px`,
-                          fontWeight: l.style.fontWeight || 600,
-                          textAlign: l.style.textAlign || 'left',
+                          color: l.style?.color || '#fff',
+                          backgroundColor: l.style?.backgroundColor || 'transparent',
+                          fontSize: `${(l.style?.fontSize || 14) * 0.75}px`,
+                          fontWeight: l.style?.fontWeight || 600,
+                          textAlign: l.style?.textAlign || 'left',
                           display: 'flex',
                           alignItems: 'center',
                           padding: '2px',
@@ -1964,9 +2091,9 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       >
                         {l.type === 'text' && l.content}
                         {l.type === 'badge' && l.content}
-                        {l.type === 'logo' && l.content && (
+                        {(l.type === 'logo' || l.type === 'image') && l.content && l.content.trim().length > 0 && (
                           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                            <Image src={l.content} alt={l.name} fill unoptimized style={{ objectFit: 'contain' }} />
+                            <Image src={l.content} alt={l.name || 'Image'} fill unoptimized style={{ objectFit: 'contain' }} />
                           </div>
                         )}
                         {l.type === 'qrcode' && <QrCode size={20} color="#0f172a" />}
@@ -1989,7 +2116,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
                       <CheckCircle2 size={14} /> Bleed Safe: {template.bleedMargin}&quot; Verified
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399' }}>
-                      <CheckCircle2 size={14} /> Total Layers: {template.layers.length} Active
+                      <CheckCircle2 size={14} /> Total Layers: {(template.layers || []).length} Active
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8' }}>
                       <Info size={14} /> {editableLayersCount} Location Variables Bound
@@ -1998,6 +2125,7 @@ export function TemplateBuilderStudio({ initialTemplate, isNew = false }: Templa
 
                   <div style={{ borderTop: '1px solid #1f2937', paddingTop: '12px', marginTop: '4px' }}>
                     <button
+                      type="button"
                       onClick={() => setIsPreviewModalOpen(false)}
                       style={{
                         width: '100%',

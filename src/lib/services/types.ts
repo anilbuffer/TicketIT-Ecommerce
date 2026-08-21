@@ -126,7 +126,16 @@ export type TemplateLayer = {
   isRequired?: boolean;
 };
 
-export type TemplateTheme = 'modern' | 'corporate' | 'healthcare' | 'promotional' | 'minimalist' | 'luxury' | 'vibrant';
+export type TemplateTheme =
+  | 'modern'
+  | 'corporate'
+  | 'healthcare'
+  | 'promotional'
+  | 'minimalist'
+  | 'luxury'
+  | 'vibrant'
+  | 'retail'
+  | 'grand-opening';
 
 export type PrintTemplate = {
   id: string;
