@@ -219,7 +219,7 @@ export default function HODashboardPage() {
       {/* KPI Cards */}
       <motion.div
         variants={containerVariants} initial="hidden" animate="visible"
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '18px' }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '18px' }}
       >
         {isLoading ? (
           [0, 1, 2, 3].map((i) => (

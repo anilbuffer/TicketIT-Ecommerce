@@ -38,6 +38,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
     return initial;
   });
 
+  const [quantity, setQuantity] = useState<number>(10);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'content' | 'locked'>('content');
   const [zoomLevel, setZoomLevel] = useState<number>(100);
@@ -109,6 +110,8 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
       aspectRatio: template.aspectRatio,
       canvasConfig: template.canvasConfig,
       layers: template.layers,
+      selectedQuantity: quantity,
+      unitBasePrice: 65.0,
       timestamp: new Date().toISOString(),
     };
     if (typeof window !== 'undefined') {
@@ -228,12 +231,37 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
           </button>
         </div>
 
-        {/* Right: Proceed to PO CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+        {/* Right: Proceed to PO CTA with Units Configuration */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+          {/* Quick Units Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '4px 8px', gap: '6px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>Units:</span>
+            <select
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                color: '#0f172a',
+                border: 'none',
+                backgroundColor: 'transparent',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              <option value={5}>5 Units (10% off)</option>
+              <option value={10}>10 Units (15% off)</option>
+              <option value={25}>25 Units (20% off)</option>
+              <option value={50}>50 Units (25% off)</option>
+              <option value={100}>100 Units (25% off)</option>
+            </select>
+          </div>
+
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600 }}>Zero Site Payment Liability</div>
             <div style={{ fontSize: '11px', fontWeight: 700, color: '#059669' }}>Billed to Head Office</div>
           </div>
+
           <button
             onClick={handleProceedToPO}
             style={{
@@ -252,7 +280,7 @@ export function TemplateCustomizerStudio({ template }: TemplateCustomizerStudioP
               transition: 'transform 0.1s ease, box-shadow 0.1s ease',
             }}
           >
-            <FileText size={15} /> Save & Create PO →
+            <FileText size={15} /> Save & Create PO ({quantity} Units) →
           </button>
         </div>
       </div>

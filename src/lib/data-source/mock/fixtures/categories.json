@@ -4,20 +4,13 @@
     "name": "Signs & Posters",
     "code": "SIGNS",
     "description": "Yard signs, acrylic office signs, aluminum composite boards, and high-gloss posters",
-    "itemCount": 2
+    "itemCount": 1
   },
   {
     "id": "cat-banners",
     "name": "Banners & Displays",
     "code": "BAN",
     "description": "Vinyl retractable rollup banners, mesh outdoor banners, step & repeat backdrops",
-    "itemCount": 1
-  },
-  {
-    "id": "cat-cards",
-    "name": "Business Cards & Stationery",
-    "code": "CARD",
-    "description": "Executive soft-touch cards, linen textured cards, foil stamped cards, and envelopes",
     "itemCount": 1
   },
   {
@@ -28,24 +21,10 @@
     "itemCount": 1
   },
   {
-    "id": "cat-pos",
-    "name": "Point of Sale",
-    "code": "POS",
-    "description": "Table tents, counter displays, retail window graphics, and shelf talkers",
+    "id": "cat-cards",
+    "name": "Business Cards & Stationery",
+    "code": "CARD",
+    "description": "Executive soft-touch cards, linen textured cards, foil stamped cards, and envelopes",
     "itemCount": 1
-  },
-  {
-    "id": "cat-catalogue",
-    "name": "Catalogue",
-    "code": "CAT",
-    "description": "Printed product catalogues, look-books, and multi-page marketing materials for business promotions",
-    "itemCount": 6
-  },
-  {
-    "id": "cat-template-design",
-    "name": "Template Design",
-    "code": "TPL",
-    "description": "Ready-to-use design templates for business signs, promotional materials, and branded marketing collateral",
-    "itemCount": 6
   }
 ]

@@ -352,10 +352,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                     fontSize: '12px',
                     fontWeight: 700,
                     cursor: isValidQty ? 'pointer' : 'not-allowed',
-                    backgroundColor: isAdded ? '#059669' : isValidQty ? '#2B253E' : '#cbd5e1',
+                    backgroundColor: isAdded ? '#059669' : isValidQty ? '#f73582' : '#cbd5e1',
                     color: '#ffffff',
                     border: 'none',
-                    boxShadow: isValidQty && !isAdded ? '0 2px 6px rgba(43, 37, 62, 0.25)' : 'none',
+                    boxShadow: isValidQty && !isAdded ? '0 2px 6px rgba(247, 53, 130, 0.35)' : 'none',
                     transition: 'all 0.15s ease',
                   }}
                 >

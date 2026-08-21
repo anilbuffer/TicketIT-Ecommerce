@@ -71,7 +71,7 @@ export default function ShopTemplateGalleryPage() {
               <span>{user?.siteName || 'Apex Midtown Central Pharmacy'} ({user?.siteCode || 'APX-MID-101'})</span>
             </div>
 
-            <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.25, margin: 0 }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.25, margin: 0 }}>
               Design Template Library — Signs, Posters & Banners
             </h1>
 
@@ -356,14 +356,22 @@ export default function ShopTemplateGalleryPage() {
                       gap: '8px',
                       padding: '12px 18px',
                       borderRadius: '12px',
-                      backgroundColor: '#2B253E',
+                      backgroundColor: '#f73582',
                       color: '#ffffff',
                       fontSize: '13px',
                       fontWeight: 700,
                       textDecoration: 'none',
                       marginTop: 'auto',
-                      boxShadow: '0 4px 10px rgba(43, 37, 62, 0.2)',
+                      boxShadow: '0 4px 12px rgba(247, 53, 130, 0.25)',
                       transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#e02573';
+                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(247, 53, 130, 0.35)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f73582';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(247, 53, 130, 0.25)';
                     }}
                   >
                     <span>Customize This Design</span>

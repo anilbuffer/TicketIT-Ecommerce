@@ -57,9 +57,8 @@ const FIELD_KEY_OPTIONS: { key: TemplateFieldKey; label: string; defaultPlacehol
 const PRESET_PRODUCTS = [
   { id: 'prod-001', name: 'Corrugated Yard & Lawn Signs (18" x 24")', category: 'Signs', width: 24, height: 18, unit: 'in' as const, ratio: '4:3', orient: 'landscape' as const },
   { id: 'prod-002', name: 'Retractable Pull-Up Banner Stand (33" x 80")', category: 'Banners', width: 33, height: 80, unit: 'in' as const, ratio: '1:2', orient: 'portrait' as const },
-  { id: 'prod-007', name: 'High-Definition Promotional Poster (24" x 36")', category: 'Posters', width: 24, height: 36, unit: 'in' as const, ratio: '2:3', orient: 'portrait' as const },
-  { id: 'prod-008', name: 'Executive Soft-Touch Business Cards (Pack of 500)', category: 'Business Cards', width: 3.5, height: 2.0, unit: 'in' as const, ratio: '16:9', orient: 'landscape' as const },
   { id: 'prod-009', name: 'Gloss Tri-Fold Patient Care Brochure & Flyer', category: 'Flyers', width: 11, height: 8.5, unit: 'in' as const, ratio: '16:9', orient: 'landscape' as const },
+  { id: 'prod-008', name: 'Executive Soft-Touch Business Cards (Pack of 500)', category: 'Business Cards', width: 3.5, height: 2.0, unit: 'in' as const, ratio: '16:9', orient: 'landscape' as const },
 ];
 
 interface TemplateBuilderStudioProps {

@@ -220,7 +220,7 @@ export default function HOSpendInsightsPage() {
         <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#2b253e', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Building2 size={18} color="#8b8599" /> Site Performance — This Month
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '18px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '18px' }}>
           {isLoading ? (
             [0, 1, 2].map((i) => (
               <div key={i} style={{ background: '#fff', borderRadius: '16px', padding: '1.25rem', border: '1px solid rgba(43,37,62,0.09)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

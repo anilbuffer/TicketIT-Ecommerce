@@ -76,42 +76,40 @@
     "updatedAt": "2026-08-20T11:00:00.000Z"
   },
   {
-    "id": "prod-007",
-    "sku": "POS-POSTER-2436",
-    "name": "High-Definition Promotional Poster (24\" x 36\")",
-    "description": "Museum-grade 200gsm photo paper with vibrant archival UV inks. Available in high-gloss or glare-free matte finish.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-signs",
-    "categoryName": "Signs & Posters",
-    "packSize": "Pack of 10",
+    "id": "prod-009",
+    "sku": "FLY-TRI-FOLD-1000",
+    "name": "Gloss Tri-Fold Promotional Brochure & Flyer",
+    "description": "100lb premium gloss book paper with double-sided aqueous coating. Machine scored and folded into clean 6-panel informational guides.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80",
+    "categoryId": "cat-flyers",
+    "categoryName": "Flyers & Brochures",
+    "packSize": "Pack of 250",
     "uom": "PK",
-    "basePrice": 89.00,
+    "basePrice": 95.00,
     "moq": 1,
     "orderMultiple": 1,
     "status": "ACTIVE",
-    "printCategory": "Posters",
-    "templatesCount": 5,
+    "printCategory": "Flyers",
+    "templatesCount": 4,
     "turnaroundDays": 2,
     "availableSizes": [
-      { "id": "sz-1824", "label": "18\" x 24\" (Medium Display)", "dimensions": "18\" x 24\"", "widthInches": 18, "heightInches": 24, "priceMultiplier": 0.8 },
-      { "id": "sz-2436", "label": "24\" x 36\" (Standard Promotional Poster)", "dimensions": "24\" x 36\"", "widthInches": 24, "heightInches": 36, "priceMultiplier": 1.0, "isPopular": true },
-      { "id": "sz-3648", "label": "36\" x 48\" (Mega Event Poster)", "dimensions": "36\" x 48\"", "widthInches": 36, "heightInches": 48, "priceMultiplier": 1.8 }
+      { "id": "sz-8511", "label": "8.5\" x 11\" (Letter Tri-Fold)", "dimensions": "8.5\" x 11\"", "widthInches": 11, "heightInches": 8.5, "priceMultiplier": 1.0, "isPopular": true },
+      { "id": "sz-8514", "label": "8.5\" x 14\" (Legal 4-Panel Fold)", "dimensions": "8.5\" x 14\"", "widthInches": 14, "heightInches": 8.5, "priceMultiplier": 1.35 }
     ],
     "materials": [
-      { "id": "mat-gloss-200", "name": "200gsm High Gloss Photo Stock", "description": "Ultra vibrant colors with reflective glossy sheen", "priceAddon": 0 },
-      { "id": "mat-matte-200", "name": "200gsm Premium Non-Glare Matte Stock", "description": "Velvety smooth texture ideal for bright showroom lighting", "priceAddon": 5.00 },
-      { "id": "mat-foam-core", "name": "5mm Rigid Foam Board Mount", "description": "Rigid self-standing board ready to place on easels", "priceAddon": 25.00 }
+      { "id": "mat-100lb-gloss", "name": "100lb Gloss Book with Aqueous Seal", "description": "Standard high-definition magazine-feel brochure paper", "priceAddon": 0 },
+      { "id": "mat-100lb-cover", "name": "100lb Heavy Cover Cardstock", "description": "Firm cardstock that stands independently in racks", "priceAddon": 28.00 }
     ],
     "finishingOptions": [
-      { "id": "fin-none", "name": "Trimmed to Edge (Unmounted)", "description": "Rolled in protective craft mailing tube", "priceAddon": 0 },
-      { "id": "fin-lam-matte", "name": "Double-Sided Matte Lamination", "description": "Water-resistant scratch protection", "priceAddon": 15.00 }
+      { "id": "fin-trifold", "name": "Tri-Fold (Letter Fold)", "description": "Standard 3-panel roll fold", "priceAddon": 0 },
+      { "id": "fin-zfold", "name": "Z-Fold (Accordion Fold)", "description": "Zig-zag opening for stepped presentations", "priceAddon": 5.00 }
     ],
     "volumeDiscounts": [
-      { "minQty": 3, "discountPercent": 10 },
-      { "minQty": 10, "discountPercent": 25 }
+      { "minQty": 4, "discountPercent": 18 },
+      { "minQty": 10, "discountPercent": 35 }
     ],
-    "createdAt": "2026-02-10T10:00:00.000Z",
-    "updatedAt": "2026-08-20T12:00:00.000Z"
+    "createdAt": "2026-03-01T09:00:00.000Z",
+    "updatedAt": "2026-08-20T15:00:00.000Z"
   },
   {
     "id": "prod-008",
@@ -149,151 +147,5 @@
     ],
     "createdAt": "2026-02-15T11:00:00.000Z",
     "updatedAt": "2026-08-20T14:00:00.000Z"
-  },
-  {
-    "id": "prod-009",
-    "sku": "FLY-TRI-FOLD-1000",
-    "name": "Gloss Tri-Fold Promotional Brochure & Flyer",
-    "description": "100lb premium gloss book paper with double-sided aqueous coating. Machine scored and folded into clean 6-panel informational guides.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-flyers",
-    "categoryName": "Flyers & Brochures",
-    "packSize": "Pack of 250",
-    "uom": "PK",
-    "basePrice": 95.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "ACTIVE",
-    "printCategory": "Flyers",
-    "templatesCount": 4,
-    "turnaroundDays": 2,
-    "availableSizes": [
-      { "id": "sz-8511", "label": "8.5\" x 11\" (Letter Tri-Fold)", "dimensions": "8.5\" x 11\"", "widthInches": 11, "heightInches": 8.5, "priceMultiplier": 1.0, "isPopular": true },
-      { "id": "sz-8514", "label": "8.5\" x 14\" (Legal 4-Panel Fold)", "dimensions": "8.5\" x 14\"", "widthInches": 14, "heightInches": 8.5, "priceMultiplier": 1.35 }
-    ],
-    "materials": [
-      { "id": "mat-100lb-gloss", "name": "100lb Gloss Book with Aqueous Seal", "description": "Standard high-definition magazine-feel brochure paper", "priceAddon": 0 },
-      { "id": "mat-100lb-cover", "name": "100lb Heavy Cover Cardstock", "description": "Firm cardstock that stands independently in racks", "priceAddon": 28.00 }
-    ],
-    "finishingOptions": [
-      { "id": "fin-trifold", "name": "Tri-Fold (Letter Fold)", "description": "Standard 3-panel roll fold", "priceAddon": 0 },
-      { "id": "fin-zfold", "name": "Z-Fold (Accordion Fold)", "description": "Zig-zag opening for stepped presentations", "priceAddon": 5.00 }
-    ],
-    "volumeDiscounts": [
-      { "minQty": 4, "discountPercent": 18 },
-      { "minQty": 10, "discountPercent": 35 }
-    ],
-    "createdAt": "2026-03-01T09:00:00.000Z",
-    "updatedAt": "2026-08-20T15:00:00.000Z"
-  },
-  {
-    "id": "prod-010",
-    "sku": "SGN-TABLE-TENT-46",
-    "name": "Premium Table Tent & Counter Sign (4\" x 6\")",
-    "description": "Double-sided 16pt gloss cardstock table tents, pre-scored and folded. Perfect for countertops, waiting rooms, and point-of-sale promotions.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-pos",
-    "categoryName": "Point of Sale",
-    "packSize": "Pack of 50",
-    "uom": "PK",
-    "basePrice": 38.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "ACTIVE",
-    "printCategory": "Signs",
-    "templatesCount": 3,
-    "turnaroundDays": 2,
-    "availableSizes": [
-      { "id": "sz-46", "label": "4\" x 6\" (Standard Counter Tent)", "dimensions": "4\" x 6\"", "widthInches": 4, "heightInches": 6, "priceMultiplier": 1.0, "isPopular": true },
-      { "id": "sz-58", "label": "5\" x 8\" (Large Display Tent)", "dimensions": "5\" x 8\"", "widthInches": 5, "heightInches": 8, "priceMultiplier": 1.3 },
-      { "id": "sz-46-a", "label": "A-Frame 4\" x 6\" (Self-Standing)", "dimensions": "4\" x 6\" A-Frame", "widthInches": 4, "heightInches": 6, "priceMultiplier": 1.5 }
-    ],
-    "materials": [
-      { "id": "mat-16pt-gloss", "name": "16pt Gloss Cardstock (Standard)", "description": "Crisp gloss finish ideal for vivid promotional photography", "priceAddon": 0 },
-      { "id": "mat-16pt-matte-tent", "name": "16pt Satin Matte Cardstock", "description": "Non-reflective matte tone for premium retail look", "priceAddon": 4.00 }
-    ],
-    "finishingOptions": [
-      { "id": "fin-gloss-lam", "name": "Single-Sided Gloss Lamination", "description": "Wipe-clean surface protective coating", "priceAddon": 0 },
-      { "id": "fin-matte-lam", "name": "Single-Sided Matte Lamination", "description": "Soft-touch anti-fingerprint laminate", "priceAddon": 6.00 }
-    ],
-    "volumeDiscounts": [
-      { "minQty": 5, "discountPercent": 12 },
-      { "minQty": 20, "discountPercent": 25 }
-    ],
-    "createdAt": "2026-03-15T10:00:00.000Z",
-    "updatedAt": "2026-08-20T16:30:00.000Z"
-  },
-  {
-    "id": "prod-011",
-    "sku": "CAT-PRINT-GLOSS-A4",
-    "name": "Full-Colour Printed Product Catalogue (A4, Saddle-Stitched)",
-    "description": "Premium 170gsm gloss inner pages with 300gsm cover, full-bleed CMYK print. Ideal for product look-books, retail catalogues, and event programs.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-catalogue",
-    "categoryName": "Catalogue",
-    "packSize": "Pack of 50",
-    "uom": "PK",
-    "basePrice": 185.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "ACTIVE",
-    "printCategory": "Catalogue",
-    "templatesCount": 6,
-    "turnaroundDays": 4,
-    "availableSizes": [
-      { "id": "sz-a4-8pg", "label": "A4 – 8 Pages (Starter)", "dimensions": "8.27\" x 11.69\"", "widthInches": 8.27, "heightInches": 11.69, "priceMultiplier": 1.0, "isPopular": true },
-      { "id": "sz-a4-16pg", "label": "A4 – 16 Pages (Standard)", "dimensions": "8.27\" x 11.69\"", "widthInches": 8.27, "heightInches": 11.69, "priceMultiplier": 1.6 },
-      { "id": "sz-a4-32pg", "label": "A4 – 32 Pages (Full Catalogue)", "dimensions": "8.27\" x 11.69\"", "widthInches": 8.27, "heightInches": 11.69, "priceMultiplier": 2.8 }
-    ],
-    "materials": [
-      { "id": "mat-170gsm-gloss", "name": "170gsm Gloss Inner Pages", "description": "High-definition full-bleed magazine quality", "priceAddon": 0 },
-      { "id": "mat-200gsm-matte", "name": "200gsm Silk Matte Inner Pages", "description": "Soft matte finish for premium editorial feel", "priceAddon": 20.00 }
-    ],
-    "finishingOptions": [
-      { "id": "fin-saddle-stitch", "name": "Saddle-Stitched Binding", "description": "Stapled spine ideal up to 64 pages", "priceAddon": 0 },
-      { "id": "fin-perfect-bind", "name": "Perfect Bound (Glued Spine)", "description": "Flat professional spine with title printing", "priceAddon": 35.00 }
-    ],
-    "volumeDiscounts": [
-      { "minQty": 5, "discountPercent": 12 },
-      { "minQty": 20, "discountPercent": 25 }
-    ],
-    "createdAt": "2026-04-01T09:00:00.000Z",
-    "updatedAt": "2026-08-20T17:00:00.000Z"
-  },
-  {
-    "id": "prod-012",
-    "sku": "TPL-DESIGN-PACK-BIZ",
-    "name": "Business Sign & Promotional Template Design Pack",
-    "description": "Professionally designed, fully editable print-ready templates for business signs, promotional campaigns, and branded marketing collateral. Instant download as press-quality PDF.",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&auto=format&fit=crop&q=80",
-    "categoryId": "cat-template-design",
-    "categoryName": "Template Design",
-    "packSize": "Single Template",
-    "uom": "EA",
-    "basePrice": 24.00,
-    "moq": 1,
-    "orderMultiple": 1,
-    "status": "ACTIVE",
-    "printCategory": "Template Design",
-    "templatesCount": 6,
-    "turnaroundDays": 0,
-    "availableSizes": [
-      { "id": "sz-tpl-a4", "label": "A4 Portrait (Letter Equivalent)", "dimensions": "8.27\" x 11.69\"", "widthInches": 8.27, "heightInches": 11.69, "priceMultiplier": 1.0, "isPopular": true },
-      { "id": "sz-tpl-a3", "label": "A3 Landscape (Tabloid)", "dimensions": "16.54\" x 11.69\"", "widthInches": 16.54, "heightInches": 11.69, "priceMultiplier": 1.3 }
-    ],
-    "materials": [
-      { "id": "mat-pdf-digital", "name": "Press-Ready PDF (Digital Download)", "description": "Layered PDF with bleed marks, ready for professional print", "priceAddon": 0 },
-      { "id": "mat-ai-editable", "name": "Fully Editable Adobe Illustrator File", "description": "Unlocked AI/EPS source file for full customization", "priceAddon": 15.00 }
-    ],
-    "finishingOptions": [
-      { "id": "fin-pdf-only", "name": "PDF Download Only", "description": "Standard press-ready PDF with bleed & crop marks", "priceAddon": 0 },
-      { "id": "fin-pdf-ai", "name": "PDF + AI/EPS Editable Source", "description": "Complete source bundle for agency-level customization", "priceAddon": 15.00 }
-    ],
-    "volumeDiscounts": [
-      { "minQty": 3, "discountPercent": 20 },
-      { "minQty": 6, "discountPercent": 35 }
-    ],
-    "createdAt": "2026-04-10T10:00:00.000Z",
-    "updatedAt": "2026-08-20T17:30:00.000Z"
   }
 ]
